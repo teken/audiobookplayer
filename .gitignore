@@ -11,6 +11,7 @@
 /dist
 locallibrary
 booktimes
+/.idea
 
 # misc
 .DS_Store
