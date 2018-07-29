@@ -9,6 +9,8 @@
 # production
 /build
 /dist
+locallibrary
+booktimes
 
 # misc
 .DS_Store
