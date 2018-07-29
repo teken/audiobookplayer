@@ -1,0 +1,63 @@
+{
+  "name": "audiobookplayer",
+  "version": "0.1.0",
+  "description": "A new audiobook player",
+  "author": "Duncan Haig",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.0-14",
+    "@fortawesome/free-brands-svg-icons": "^5.1.0-11",
+    "@fortawesome/free-regular-svg-icons": "^5.1.0-11",
+    "@fortawesome/free-solid-svg-icons": "^5.1.0-11",
+    "@fortawesome/react-fontawesome": "0.1.0-11",
+    "fuse.js": "^3.2.1",
+    "lokijs": "^1.5.3",
+    "music-metadata": "^2.4.2",
+    "nconf": "^0.10.0",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0",
+    "react-id-generator": "^0.1.6",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.1.1",
+    "react-table": "^6.8.2"
+  },
+  "main": "public/electron.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "set NODE_ENV=development && electron .",
+    "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+	"publish": "electron-builder --publish always"
+  },
+  "postinstall": "electron-builder install-app-deps",
+  "devDependencies": {
+    "electron": "^1.8.4",
+    "electron-builder": "^20.8.1"
+  },
+  "build": {
+    "appId": "com.Teken",
+    "productName": "Audio Book Player",
+    "copyright": "Copyright © 2018 Duncan Haig",
+    "files": [
+      "build/**/*",
+      "src/services/*"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "win": {
+      "icon": "public/icon.ico",
+      "publish": {
+        "provider": "s3",
+        "bucket": "audiobookplayer",
+        "encryption": "AES256",
+        "acl":"public-read"
+      }
+    }
+  }
+}
