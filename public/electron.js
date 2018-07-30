@@ -3,6 +3,8 @@ const {app, BrowserWindow} = require('electron');
 const url = require('url');
 const path = require('path');
 
+const { autoUpdater } = require("electron-updater")
+
 let mainWindow;
 let splash;
 
@@ -14,6 +16,8 @@ let ipcService;
 let globalShortcutService;
 const settings = new SettingsService();
 const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'development' : false;
+
+autoUpdater.checkForUpdatesAndNotify();
 
 if (!development) {
 	const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
