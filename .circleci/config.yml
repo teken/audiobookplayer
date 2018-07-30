@@ -7,8 +7,8 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8.11.3
-      - image: cibuilds/snapcraft:stable
+      #- image: circleci/node:8.11.3
+      - image: electronuserland/builder:wine-mono
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -19,6 +19,10 @@ jobs:
 
     steps:
       - checkout
+
+#      - run:
+#          name: Install GCC MultiLib
+#          command: sudo apt install --no-install-recommends -y gcc-multilib g++-multilib
 
       # Download and cache dependencies
       - restore_cache:
