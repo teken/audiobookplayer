@@ -34,10 +34,10 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       - run:
-        command: |
-          sudo apt update && sudo apt install -y snapd
-          sudo snap install snapcraft --classic
-          /snap/bin/snapcraft
+          command: |
+            sudo apt update && sudo apt install -y snapd
+            sudo snap install snapcraft --classic
+            /snap/bin/snapcraft
       - run: yarn build
       - run: yarn dist
       #- run: yarn publish
