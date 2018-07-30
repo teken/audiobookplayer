@@ -7,7 +7,8 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8.11.3-sid
+      - image: circleci/node:8.11.3
+      - image: cibuilds/snapcraft:stable
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
