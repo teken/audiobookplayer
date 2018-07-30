@@ -112,4 +112,4 @@ function storeWindowState() {
 	settings.set('windowState.y', bounds.y);
 	settings.set('windowState.maximised', mainWindow.isMaximized());
 	//settings.save()
-};
+}

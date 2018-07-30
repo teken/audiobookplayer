@@ -34,4 +34,11 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: yarn test
+      - run: yarn build
+      - run: yarn dist
+      - run: yarn publish
+  #deployment:`
+  #  prod:
+  #    branch: master
+  #    commands:
+  #      - aws s3 sync dist/ http://audiobookplayer.s3-aws-region.amazonaws.com --delete
