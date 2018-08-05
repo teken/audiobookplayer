@@ -1,6 +1,6 @@
 {
   "name": "audiobookplayer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A new audiobook player",
   "author": "Duncan Haig",
   "private": true,
@@ -10,6 +10,8 @@
     "@fortawesome/free-regular-svg-icons": "^5.1.0-11",
     "@fortawesome/free-solid-svg-icons": "^5.1.0-11",
     "@fortawesome/react-fontawesome": "0.1.0-11",
+    "deep-equal": "^1.0.1",
+    "electron-updater": "^3.0.3",
     "fuse.js": "^3.2.1",
     "lokijs": "^1.5.3",
     "music-metadata": "^2.4.2",
@@ -32,7 +34,9 @@
     "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-	"publish": "electron-builder --publish always"
+    "publish": "electron-builder --publish always",
+    "eb-start": "electron-builder start",
+    "eb-create-certs": "electron-builder create-self-signed-cert"
   },
   "postinstall": "electron-builder install-app-deps",
   "devDependencies": {
@@ -56,7 +60,29 @@
         "provider": "s3",
         "bucket": "audiobookplayer",
         "encryption": "AES256",
-        "acl":"public-read"
+        "acl": "public-read",
+        "path": "/builds/win/"
+      }
+    },
+    "linux": {
+      "category": "Audio",
+      "publish": {
+        "provider": "s3",
+        "bucket": "audiobookplayer",
+        "encryption": "AES256",
+        "acl": "public-read",
+        "path": "/builds/linux/"
+      }
+    },
+    "mac": {
+      "category": "public.app-category.music",
+      "icon": "public/icon.icns",
+      "publish": {
+        "provider": "s3",
+        "bucket": "audiobookplayer",
+        "encryption": "AES256",
+        "acl": "public-read",
+        "path": "/builds/mac/"
       }
     }
   }

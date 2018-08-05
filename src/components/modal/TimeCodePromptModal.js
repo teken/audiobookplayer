@@ -19,6 +19,7 @@ export default class TimeCodePromptModal extends Component {
 		this.changeSeconds = this.changeSeconds.bind(this);
 		this.hours = React.createRef();
 	}
+
 	componentDidUpdate(prevProps, prevState) {
 		if (this.props.show !== prevProps.show) {
 			if (this.props.show) this.show();
@@ -44,6 +45,7 @@ export default class TimeCodePromptModal extends Component {
 		this.setState({
 			hidden: false
 		});
+		this.hours.current && this.hours.current.focus(); //TODO : not working
 		window.addEventListener('keydown', this.listenKeyboard.bind(this), true);
 	}
 
@@ -121,9 +123,9 @@ export default class TimeCodePromptModal extends Component {
 					<div style={{padding:'0 1em', ...centreStyle}}><h1>Please Enter Desired Time</h1></div>
 					<div style={{padding:'0 1em', color: this.props.styling.secondaryText, ...centreStyle}}>
 						<div style={{backgroundColor: this.props.styling.inputBackground}}>
-							<input ref={this.hours} className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.hours} onChange={this.changeHours}/>:
-							<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.minutes} onChange={this.changeMinutes}/>:
-							<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.seconds} onChange={this.changeSeconds}/>
+							<input ref={this.hours} className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.hours} onChange={this.changeHours} onKeyPress={this.changeHours}/>:
+							<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.minutes} onChange={this.changeMinutes} onKeyPress={this.changeMinutes}/>:
+							<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.seconds} onChange={this.changeSeconds} onKeyPress={this.changeSeconds}/>
 						</div>
 					</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>

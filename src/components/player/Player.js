@@ -15,7 +15,7 @@ export default withRouter(class Player extends Component {
 		this._player = props.player;
 		this.state = {
 			playButtonIcon: 'pause',
-			volume: 100,
+			volume: ipcRenderer.sendSync('settings.get', 'volume'),
 			volumeIcon: "volume-up",
 			muted: false,
 			intervalId : null,
@@ -42,10 +42,13 @@ export default withRouter(class Player extends Component {
 			}
 		};
 		ipcRenderer.send('window.progressbar.set', progress);
+		ipcRenderer.send('settings.set', {
+			name:'volume',
+			value: this.state.volume
+		});
 		this.setState({
 			progress: this._player.currentTime,
 			duration: this._player.duration,
-			volume: this._player.volume,
 			playButtonIcon: this._player.isPlaying ? `pause` : `play`,
 			volumeIcon: this.volumeIcon()
 		});
@@ -102,10 +105,15 @@ export default withRouter(class Player extends Component {
 					<IconButton title="Next Track" icon="forward" onClick={() => this._player.playNextTrack()} style={{...commonButtonStyling, color: this._player.hasNextTrack ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
 					<IconButton title="Stop" icon="stop" onClick={() => this._player.stop()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
 					<IconButton title="Skip to Point" icon="map-marker-alt" onClick={() => this._player.isLoaded && this.setState({showTimePicker: true})} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
-					<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.styling.warning :this.props.styling.activeText}} svgStyle={{minWidth:'18px'}}/>
-					<Volume styling={this.props.styling} player={this._player} progress={this.state.volume} duration={100}/>
-					<span style={{color:this.props.styling.activeText, cursor:'pointer', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
-						let path = `${this._player.work.$loki}${this._player.work.type === 'SERIES' ? `/${this._player._bookNameIfSeries}`: ''}`;
+					<span onMouseOver={() => this.displayVolume = true} onMouseOut={() => this.displayVolume = false}>
+						<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.styling.warning :this.props.styling.activeText}} svgStyle={{minWidth:'18px'}}/>
+						<span style={{display: !this.state.muted && this.displayVolume ? 'inline-flex' : 'none'}}>
+							<Volume styling={this.props.styling} player={this._player} progress={this.state.volume} duration={100}/>
+						</span>
+					</span>
+					<span style={{color:this.props.styling.activeText, cursor: this._player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
+						if (this._player.isLoaded) return;
+						const path = `${this._player.work.$loki}${this._player.work.type === 'SERIES' ? `/${this._player._bookNameIfSeries}`: ''}`;
 						this.props.history.push(`/works/${path}`);
 					}}>
 						{this._player.isLoaded && this._player.book.name}

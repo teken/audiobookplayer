@@ -26,7 +26,7 @@ export default class AuthoredGridView extends Component {
 				{
 					this.props.displaySavedTimesSection && (
 						<div>
-							<h1>Saved Times</h1>
+							<h1>{this.props.savedTimesTitle}</h1>
 							<div style={{
 								display: 'grid',
 								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,
@@ -43,13 +43,13 @@ export default class AuthoredGridView extends Component {
 					)
 				}
 				{
-					!this.props.displayLibrary ? (
-						<h1>no books to be found, maybe import some</h1>
-					) : (
+					!this.props.displayLibrary ?
+						this.props.noBooksFound
+					: (
 						<div>
 							<h1 style={{
 								display: !this.props.displaySavedTimesSection ? 'none' : 'block'
-							}}>Library</h1>
+							}}>{this.props.libraryTitle}</h1>
 							<div style={{
 								display: 'grid',
 								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,

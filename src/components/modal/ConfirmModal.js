@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import ButtonRow from '../settings/ButtonRow';
+import Loading from '../loading/Loading';
 
 export default class ConfirmModal extends Component {
 
@@ -20,18 +21,23 @@ export default class ConfirmModal extends Component {
 	}
 
 	okClick() {
+		this.setState({ loading: true });
+		this.forceUpdate();
 		this.props.okOnClick && this.props.okOnClick();
 		this.hide();
 	}
 
 	cancelClick() {
+		this.setState({ loading: true });
+		this.forceUpdate();
 		this.props.cancelOnClick && this.props.cancelOnClick();
 		this.hide();
 	}
 
 	show() {
 		this.setState({
-			hidden: false
+			hidden: false,
+			loading: false
 		});
 		window.addEventListener('keydown', this.listenKeyboard.bind(this), true);
 	}
@@ -46,6 +52,17 @@ export default class ConfirmModal extends Component {
 	listenKeyboard(event) {
 		if (event.key === 'Escape' || event.keyCode === 27) this.cancelClick();
 		if (event.key === 'Enter' || event.keyCode === 12) this.okClick();
+	}
+
+	buttons() {
+		if (this.state.loading) {
+			return <Loading />
+		} else {
+			return <ButtonRow styling={this.props.styling} buttonWidth={100} buttons={[
+				{value:"OK", onClick:this.okClick},
+				{value:"Cancel", onClick:this.cancelClick},
+			]}/>
+		}
 	}
 
 	render() {
@@ -75,10 +92,7 @@ export default class ConfirmModal extends Component {
 					<div style={{padding:'0 1em', ...centreStyle}}><h1>{this.props.heading}</h1></div>
 					<div style={{padding:'0 1em', color: this.props.styling.secondaryText, ...centreStyle}}>{this.props.body}</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>
-						<ButtonRow styling={this.props.styling} buttonWidth={100} buttons={[
-							{value:"OK", onClick:this.okClick},
-							{value:"Cancel", onClick:this.cancelClick},
-						]}/>
+						{this.buttons()}
 					</div>
 				</div>
 			</div>

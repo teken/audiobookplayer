@@ -10,8 +10,8 @@ module.exports = class LibraryService {
 	static clearLibrary() {
 		return new Promise((res, rej) => {
 			let localLibrary = DatabaseService.localLibrary;
-			localLibrary.getCollection('authors').clear();
-			localLibrary.getCollection('works').clear();
+			localLibrary.removeCollection('authors');
+			localLibrary.removeCollection('works');
 
 			localLibrary.addCollection('authors', {autoupdate: true});
 			localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});

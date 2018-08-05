@@ -17,6 +17,7 @@ module.exports = class SettingsService {
 				libraryPath: '',
 				libraryStyle: 'grid',
 				libraryDisplayAuthors: false,
+				volume: 100,
 				windowState: {
 					width: 800,
 					height: 600,

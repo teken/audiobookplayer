@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { withRouter } from 'react-router-dom'
+import equal from 'deep-equal';
 
 import Setting from './Setting';
 import FolderSelector from './FolderSelector';
@@ -14,13 +15,33 @@ const {ipcRenderer} = window.require('electron');
 export default withRouter(class Settings extends Component {
 	constructor(props) {
 		super(props);
-		this.oldSettings = {
-			libraryDataFolder: ipcRenderer.sendSync('settings.get', 'libraryPath'),
-			dataDataFolder: ipcRenderer.sendSync('settings.get', 'dataPath'),
-			libraryStyle: ipcRenderer.sendSync('settings.get', 'libraryStyle'),
-			libraryDisplayAuthors: ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors'),
+
+		this.settingsObjects = [
+			{name:'libraryDataFolder', dataName:'libraryPath'},
+			{name:'dataDataFolder', dataName:'dataPath'},
+			{name:'libraryStyle', dataName:'libraryStyle'},
+			{name:'libraryDisplayAuthors', dataName:'libraryDisplayAuthors', type:'boolean'},
+		];
+
+		this.oldSettings = {};
+		this.settingsObjects.forEach(item => {
+			switch (item.type) {
+				default:
+				case 'string':
+					this.oldSettings[item.name] = ipcRenderer.sendSync('settings.get', item.dataName);
+					break;
+				case 'boolean':
+					this.oldSettings[item.name] = ipcRenderer.sendSync('settings.get', item.dataName) === 'true';
+					break;
+				case 'number':
+					this.oldSettings[item.name] = Number(ipcRenderer.sendSync('settings.get', item.dataName));
+					break;
+			}
+		});
+
+		this.state = {
+			settings: Object.assign({}, this.oldSettings)
 		};
-		this.state = this.oldSettings;
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.clearLibrary = this.clearLibrary.bind(this);
 		this.reimportLibrary = this.reimportLibrary.bind(this);
@@ -28,21 +49,22 @@ export default withRouter(class Settings extends Component {
 	}
 
 	handleChange(event, name) {
-		this.setState({[name]: event.target.value});
+		let settings = this.state.settings;
+		settings[name] = event.target.value;
+		this.setState({settings:settings});
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
-		if (this.oldSettings.libraryDataFolder !== this.state.libraryDataFolder) ipcRenderer.send('settings.set', {name:'libraryPath', value: this.state.libraryDataFolder});
-		if (this.oldSettings.dataDataFolder !== this.state.dataDataFolder) ipcRenderer.send('settings.set', {name:'dataPath', value: this.state.dataDataFolder});
-		if (this.oldSettings.libraryStyle !== this.state.libraryStyle) ipcRenderer.send('settings.set', {name:'libraryStyle', value: this.state.libraryStyle});
-		if (this.oldSettings.libraryDisplayAuthors !== this.state.libraryDisplayAuthors) ipcRenderer.send('settings.set', {name:'libraryDisplayAuthors', value: this.state.libraryDisplayAuthors});
+		this.settingsObjects.forEach(item => {
+			if (this.oldSettings[item.name] !== this.state.settings[item.name])
+				ipcRenderer.send('settings.set', {name: this.item.dataName, value: this.state.settings[item.name]});
+		});
 		this.props.history.push('/');
 	}
 
 	get isDirty() {
-		if (this.oldSettings.libraryDataFolder !== this.state.libraryDataFolder ||
-			this.oldSettings.dataDataFolder !== this.state.dataDataFolder) return true;
+		return !equal(this.oldSettings, this.state.settings);
 	}
 
 	clearLibrary() {
@@ -82,27 +104,33 @@ export default withRouter(class Settings extends Component {
 	render() {
 		return (
 			<div style={{margin:'1em'}}>
-				<ConfirmModal show={this.state.showClear} styling={this.props.styling} heading="Are you sure?" body="This will clear the library completely. Are you sure you want to do this?" okOnClick={this.clearLibrary} cancelOnClick={() => this.setState({showClear: false})} />
-				<ConfirmModal show={this.state.showReimport} styling={this.props.styling} heading="Are you sure?" body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?" okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
+				<ConfirmModal show={this.state.showClear} styling={this.props.styling}
+							  heading="Are you sure?"
+							  body="This will clear the library completely. Are you sure you want to do this?"
+							  okOnClick={this.clearLibrary} cancelOnClick={() => this.setState({showClear: false})} />
+				<ConfirmModal show={this.state.showReimport} styling={this.props.styling}
+							  heading="Are you sure?"
+							  body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?"
+							  okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
 				<h1>Settings</h1>
 				<form onSubmit={this.handleSubmit} style={{color:this.props.styling.secondaryText}}>
 					<Setting label="Library Actions">
 						<ButtonRow styling={this.props.styling} buttons={this.buttons}/>
 					</Setting>
 					<Setting label="Library Folder Path">
-						<FolderSelector styling={this.props.styling} value={this.state.libraryDataFolder} onChange={(event) => this.handleChange(event, "libraryDataFolder")} />
+						<FolderSelector styling={this.props.styling} value={this.state.settings.libraryDataFolder} onChange={(event) => this.handleChange(event, "libraryDataFolder")} />
 					</Setting>
 					<Setting label="Data Folder Path">
-						<FolderSelector styling={this.props.styling} value={this.state.dataDataFolder} onChange={(event) => this.handleChange(event, "dataDataFolder")} />
+						<FolderSelector styling={this.props.styling} value={this.state.settings.dataDataFolder} onChange={(event) => this.handleChange(event, "dataDataFolder")} />
 					</Setting>
 					<Setting label="Library Style">
-						<Dropdown styling={this.props.styling} value={this.state.libraryStyle} options={[
+						<Dropdown styling={this.props.styling} value={this.state.settings.libraryStyle} options={[
 							{name:'Grid', value:'grid'},
 							{name:'Rows', value:'row'}
 						]} onChange={(event) => this.handleChange(event, "libraryStyle")} />
 					</Setting>
 					<Setting label="Display Authors in Library">
-						<Checkbox styling={this.props.styling} value={this.state.libraryDisplayAuthors} onChange={(event) => this.handleChange(event, "libraryDisplayAuthors")} />
+						<Checkbox styling={this.props.styling} value={this.state.settings.libraryDisplayAuthors} onChange={(event) => this.handleChange(event, "libraryDisplayAuthors")} />
 					</Setting>
 					<Setting>
 						<input type="submit" value="Save" disabled={!this.isDirty} style={{

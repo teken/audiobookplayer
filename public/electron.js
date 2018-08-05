@@ -3,7 +3,7 @@ const {app, BrowserWindow} = require('electron');
 const url = require('url');
 const path = require('path');
 
-const { autoUpdater } = require("electron-updater")
+const { autoUpdater } = require("electron-updater");
 
 let mainWindow;
 let splash;
@@ -34,11 +34,19 @@ if (!development) {
 
 function createWindow() {
 	const splashStartUrl = url.format({
-		pathname: path.join(__dirname, `/../${development ? 'public' : 'build'}/splash.html`),
+		pathname: `${getMainPath()}/splash.html`,
 		protocol: 'file:',
 		slashes: true
 	});
-	splash = new BrowserWindow({width: 300, height: 380, transparent: true, frame: false, alwaysOnTop: true, backgroundColor:'#1d1e26', icon:__dirname+`/../${development ? 'public' : 'build'}/icon.ico`});
+	splash = new BrowserWindow({
+		width: 300,
+		height: 380,
+		transparent: true,
+		frame: false,
+		alwaysOnTop: true,
+		backgroundColor:'#1d1e26',
+		icon: getIconPath()
+	});
 	splash.loadURL(splashStartUrl);
 	const preferences = {
 		width: settings.get('windowState.width'),
@@ -46,7 +54,7 @@ function createWindow() {
 		x: settings.get('windowState.x'),
 		y: settings.get('windowState.y'),
 		frame: false,
-		icon:__dirname+`/../${development ? 'public' : 'build'}/icon.ico`,
+		icon: getIconPath(),
 		show: false,
 		darkTheme: true,
 		backgroundColor:'#1d1e26',
@@ -64,7 +72,7 @@ function createWindow() {
 	if (!ipcService) ipcService = new IPCService(mainWindow);
 
 	const startUrl = process.env.ELECTRON_START_URL || url.format({
-		pathname: path.join(__dirname, `/../${development ? 'public' : 'build'}/index.html`),
+		pathname: `${getMainPath()}/index.html`,
 		protocol: 'file:',
 		slashes: true
 	});
@@ -116,4 +124,19 @@ function storeWindowState() {
 	settings.set('windowState.y', bounds.y);
 	settings.set('windowState.maximised', mainWindow.isMaximized());
 	//settings.save()
+}
+
+function getIconPath() {
+	switch(process.platform){
+		case 'darwin':
+			return `${getMainPath()}/icon.icns`;
+		case 'win32':
+			return `${getMainPath()}/icon.ico`;
+		default:
+			return `${getMainPath()}/icon.png`;
+	}
+}
+
+function getMainPath() {
+	return `${__dirname}/../${development ? 'public' : 'build'}`;
 }

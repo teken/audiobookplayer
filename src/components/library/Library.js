@@ -11,6 +11,8 @@ import AuthoredRowView from './AuthoredRowView';
 
 import Fuse from 'fuse.js';
 
+import Loading from '../loading/Loading';
+
 const {ipcRenderer, shell} = window.require('electron');
 const path = window.require('path');
 
@@ -19,8 +21,8 @@ export default withRouter(class Library extends Component {
 	constructor(props) {
 		super(props);
 		this._player = props.player;
-		let libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
-		let displayAuthors = ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors');
+		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
+		const displayAuthors = ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors') === 'true';
 		this.state = {
 			authors: [],
 			works: [],
@@ -28,7 +30,8 @@ export default withRouter(class Library extends Component {
 			flattenedWorks:[],
 			searchTerm: "",
 			//intervalId: null,
-			libraryDisplayFormat: (displayAuthors ? 'authored' : '') + libraryStyle//'grid'
+			libraryDisplayFormat: (displayAuthors ? 'authored' : '') + libraryStyle,
+			loading: true
 		};
 		this.fuse = null;
 		this.fuseOptions = {
@@ -56,7 +59,13 @@ export default withRouter(class Library extends Component {
 	}
 
 	componentDidMount() {
-		this.loadData();
+		setTimeout(() => {
+			this.loadData();
+			this.forceUpdate();
+			this.setState({
+				loading:false
+			});
+		},0);
 		// const id = setInterval(() => {
 		// 		this.loadData();
 		// 		this.forceUpdate();
@@ -79,14 +88,15 @@ export default withRouter(class Library extends Component {
 	loadData() {
 		const {works, authors} = ipcRenderer.sendSync('library.getAll');
 		const {times} = ipcRenderer.sendSync('timings.getAll');
+		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
+		const displayAuthors = ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors') === 'true';
 		const flattenedWorks = works.map(work => {
 			work.author = authors.find(x => x.$loki === work.author_id);
-			if(work.type === 'SERIES') work.books = work.books.map(book => {
+			if (work.type === 'SERIES') work.books = work.books.map(book => {
 				book.series = work;
 				book.author = work.author;
 				return book;
 			});
-			//if(work.author_id === 1) console.log (work)
 			return work;
 		}).reduce((a,v) => a.concat(v.type === 'SERIES' ? v.books : v) ,[]).filter(item => item.type === 'BOOK');
 		this.fuse = new Fuse(flattenedWorks, this.fuseOptions);
@@ -94,8 +104,13 @@ export default withRouter(class Library extends Component {
 			works: works,
 			authors: authors,
 			flattenedWorks: flattenedWorks,
-			states: times
+			states: times,
+			libraryDisplayFormat: (displayAuthors ? 'authored' : '') + libraryStyle
 		});
+	}
+
+	get isSearching() {
+		return this.state.searchTerm.length > 0;
 	}
 
 	render() {
@@ -116,29 +131,38 @@ export default withRouter(class Library extends Component {
 			<div>
 				<div style={{ margin: '1em', padding: '1em', color:this.props.styling.activeText, backgroundColor:this.props.styling.inputBackground }}>
 					<input type="text" value={this.state.searchTerm} onChange={this.onSearchBoxChange} placeholder="Search"
-						   style={{
-							   width: '97%',
-							   border:'none',
-							   backgroundColor: 'transparent',
-							   color: this.props.styling.activeText,
-							   fontSize: '1em',
-							   paddingLeft:'0.3em'
-						   }}/>
+					   style={{
+						   width: '97%',
+						   border:'none',
+						   backgroundColor: 'transparent',
+						   color: this.props.styling.activeText,
+						   fontSize: '1em',
+						   paddingLeft:'0.3em'
+						}}
+					/>
 					<Icon icon="search" style={{
-						borderBottom:'1px solid '+this.props.styling.activeColour,
+						borderBottom:`'1px solid ${this.props.styling.activeColour}`,
 						fontSize: '1em',
 						transform: 'translateY(4px)',
 						paddingBottom: '2px',
 						color: this.props.styling.inactiveText
 					}}/>
 				</div>
-				{this.library(displaySavedTimesSection, displayLibrary, savedTimeWorks, savedTimes, libraryWorks)}
+				{
+					this.state.loading ?
+						<div style={{display:'flex', justifyContent:'center', alignItems: 'center', height: window.innerHeight - 200}}><Loading/></div>
+						:
+						this.library(displaySavedTimesSection, displayLibrary, savedTimeWorks, savedTimes, libraryWorks)
+				}
 			</div>
 		);
 	}
 
 	library(displaySavedTimesSection, displayLibrary, savedTimeWorks, savedTimes, libraryWorks) {
 		const properties = {
+			libraryTitle: 'Library',
+			savedTimesTitle: 'SavedTimes',
+			noBooksFound: this.noBooksFound(),
 			styling: this.props.styling,
 			displaySavedTimesSection: displaySavedTimesSection,
 			displayLibrary: displayLibrary,
@@ -152,9 +176,9 @@ export default withRouter(class Library extends Component {
 			getStateKey: this.getStateKey.bind(this),
 			itemClick: this.handleClick.bind(this),
 		};
-		switch(this.state.libraryDisplayFormat) {
-			case 'grid':
+		switch (this.state.libraryDisplayFormat) {
 			default:
+			case 'grid':
 				return <GridView {...properties} />;
 			case 'authoredgrid':
 				return <AuthoredGridView {...properties} />;
@@ -163,6 +187,17 @@ export default withRouter(class Library extends Component {
 			case 'authoredrow':
 				return <AuthoredRowView {...properties} />;
 		}
+	}
+
+	noBooksFound() {
+		return <div style={{display:'flex', justifyContent:'center', alignItems: 'center'}}>
+			<div>
+				<h1>no books to be found,<br />maybe try importing some...</h1>
+				<div style={{color:this.props.styling.secondaryText}}>
+					Head to the settings page using the cog icon on the menu bar
+				</div>
+			</div>
+		</div>;
 	}
 
 	getStateKey(author, series, work) {

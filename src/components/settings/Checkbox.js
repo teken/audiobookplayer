@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome';
 
+
 export default class Checkbox extends Component {
 	constructor(props) {
 		super(props);
@@ -8,8 +9,8 @@ export default class Checkbox extends Component {
 		this.handleClick = this.handleClick.bind(this);
 		this.textInput = React.createRef();
 		this.state = {
-			value: this.props.value
-		}
+			value: this.props.value === 'true'
+		};
 	}
 
 	handleChange(event) {
@@ -20,8 +21,8 @@ export default class Checkbox extends Component {
 		event.preventDefault();
 		this.setState({
 			value: !this.state.value
-		})
-		this.props.onChange({target:{value:this.state.value}})
+		});
+		this.props.onChange({target:{value:!this.state.value}})
 	}
 
 	render() {
@@ -47,4 +48,3 @@ export default class Checkbox extends Component {
 		);
 	}
 }
-
