@@ -32,13 +32,16 @@
     "eject": "react-scripts eject",
     "electron": "set NODE_ENV=development && electron .",
     "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
-    "publish": "electron-builder --publish always",
+	"pack": "yarn build && electron-builder --dir",
+	"dist": "yarn build && electron-builder",
+	"dist:linux": "yarn build && electron-builder --linux",
+	"dist:mac": "yarn build && electron-builder --macos",
+	"dist:win": "yarn build && electron-builder --win",
+    "release": "electron-builder --publish always",
     "eb-start": "electron-builder start",
-    "eb-create-certs": "electron-builder create-self-signed-cert"
+    "eb-create-certs": "electron-builder create-self-signed-cert",
+	"postinstall": "electron-builder install-app-deps"
   },
-  "postinstall": "electron-builder install-app-deps",
   "devDependencies": {
     "electron": "^1.8.4",
     "electron-builder": "^20.8.1"
