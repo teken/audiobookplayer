@@ -19,7 +19,7 @@ import { faPlay, faPause, faStop, faBackward, faForward, faVolumeOff, faVolumeDo
 //import { faSquare } from '@fontawesome/free-regular-svg-icons';
 //import { } from '@fontawesome/free-brands-svg-icons';
 
-const {ipcRenderer} = window.require('electron');
+const {ipcRenderer, shell} = window.require('electron');
 const {app, process} = window.require('electron').remote;
 
 library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolumeDown, faVolumeOff, faMapMarkerAlt,
@@ -123,6 +123,14 @@ export default class App extends Component {
 									Electron: v{process.versions.electron}<br/>
 									Node: v{process.versions.node}<br/>
 									Chrome: v{process.versions.chrome}<br/>
+									<br/>
+									Support this software on:
+									<span onClick={() => shell.openExternal('https://audiobookplayer.app')}>
+										AudioBookPlayer.app
+									</span>
+									<span onClick={() => shell.openExternal('https://www.patreon.com/AudioBookPlayer')}>
+										Patreon
+									</span>
 								</div>
 							</div>
 						)}/>
