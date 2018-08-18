@@ -4,8 +4,9 @@ const {ipcRenderer} = window.require('electron');
 const mm = window.require('music-metadata');
 
 export default class BookPlayer {
-	constructor() {
+	constructor(volume) {
 		this._audioPlayer = new AudioPlayer();
+		this._audioPlayer.volume = Number(volume);
 		this._work = null;
 		this._bookNameIfSeries = null;
 		this._author = null;

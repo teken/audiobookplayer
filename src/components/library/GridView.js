@@ -15,7 +15,8 @@ export default class GridView extends Component {
 
 	renderTile(author, series, work) {
 		return <Tile author={author} series={series} work={work}
-			onClick={() => this.props.itemClick(author, series, work)} styling={this.props.styling}
+			onClick={() => this.props.itemClick(author, series, work)}
+		 	styling={this.props.styling}
 			/>
 	}
 
@@ -25,7 +26,7 @@ export default class GridView extends Component {
 				{
 					this.props.displaySavedTimesSection && (
 						<div>
-							<h1>{this.props.savedTimesTitle}</h1>
+							<h1 style={{letterSpacing: '0.03em'}}>{this.props.savedTimesTitle}</h1>
 							<div style={{
 								display: 'grid',
 								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,
@@ -45,7 +46,8 @@ export default class GridView extends Component {
 					 : (
 						<div>
 							<h1 style={{
-								display: !this.props.displaySavedTimesSection ? 'none' : 'block'
+								display: !this.props.displaySavedTimesSection ? 'none' : 'block',
+								letterSpacing: '0.03em'
 							}}>{this.props.libraryTitle}</h1>
 							<div style={{
 								display: 'grid',

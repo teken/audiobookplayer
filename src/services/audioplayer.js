@@ -3,6 +3,15 @@ const AppAudioContext = (window.AudioContext || window.webkitAudioContext);
 export default class AudioPlayer {
 	constructor () {
 		/**
+		 * Indicates that the audio is playing.
+		 * @type {Boolean}
+		 */
+		this.init();
+		this._isPlaying = false;
+	}
+
+	init() {
+		/**
 		 * Audio context.
 		 * @type {AudioContext|webkitAudioContext}
 		 */
@@ -54,12 +63,6 @@ export default class AudioPlayer {
 		this._sourceEffectNode = this._audioContext.createGain();
 		this._sourceEffectNode.gain.value = 1.0;
 		this._sourceEffectNode.connect(this._effectNode);
-
-		/**
-		 * Indicates that the audio is playing.
-		 * @type {Boolean}
-		 */
-		this._isPlaying = false;
 	}
 
 	get isPlaying () {
@@ -133,7 +136,7 @@ export default class AudioPlayer {
 	 * @param {Number} value New volume (range: 0 - 100).
 	 */
 	set volume (value) {
-		if (0 <= value && value <= 100) this._gainNode.gain.value = (value / 100);
+		if (0 <= value && value <= 200) this._gainNode.gain.value = (value / 100);
 	}
 
 	/**

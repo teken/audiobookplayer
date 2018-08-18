@@ -26,7 +26,7 @@ export default class AuthoredGridView extends Component {
 				{
 					this.props.displaySavedTimesSection && (
 						<div>
-							<h1>{this.props.savedTimesTitle}</h1>
+							<h1 style={{letterSpacing:'0.03em'}}>{this.props.savedTimesTitle}</h1>
 							<div style={{
 								display: 'grid',
 								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,
@@ -48,7 +48,8 @@ export default class AuthoredGridView extends Component {
 					: (
 						<div>
 							<h1 style={{
-								display: !this.props.displaySavedTimesSection ? 'none' : 'block'
+								display: !this.props.displaySavedTimesSection ? 'none' : 'block',
+								letterSpacing: '0.03em'
 							}}>{this.props.libraryTitle}</h1>
 							<div style={{
 								display: 'grid',
@@ -57,16 +58,17 @@ export default class AuthoredGridView extends Component {
 								margin: '1em'
 							}}>
 								{orderAuthors.map(author => {
-									const items = this.props.libraryWorks.filter(x => x.author_id === author.$loki).map(book => this.props.libraryBook(this.renderTile, author, book.series, book, this.props.getStateKey(author, book.series, book)))//this.props.libraryWorks.filter(x => x.author_id === author.$loki).map(book => this.props.libraryBook(this.renderTile, author, book.series, book, this.props.getStateKey(author, book.series, book)))
-										.reduce((acc, val) => acc.concat(val), [])
+									const items = this.props.libraryWorks
+										.filter(x => x.author_id === author.$loki)
+										.map(book => this.props.libraryBook(this.renderTile, author, book.series, book, this.props.getStateKey(author, book.series, book)))
 										.filter(x => x)
 										.reduce((acc, val, i) => i%(this.gridWidthCellCount-1) === 0 ?acc.concat(<span key={`spacer-start-${author.name}-${i}`}/>,val) : acc.concat(val), [])
 										.slice(1);
 
 									return [
-										items.length > 0 && <h2 key={`title-${author.name}`} style={{textAlign:'left'}}>{author.name}</h2>,
+										items.length > 0 && <h2 key={`title-${author.name}`} style={{textAlign:'left', lineHeight:'1em'}}>{author.name}</h2>,
 										...items,
-										items.length > 0 && [...Array(this.gridWidthCellCount-((items.length+1)%this.gridWidthCellCount)).keys()].map(x => <span key={`spacer-end-${author.name}-${x}`}/>)
+										items.length > 0 && [...new Array(this.gridWidthCellCount-((items.length+1)%this.gridWidthCellCount)).keys()].map(x => <span key={`spacer-end-${author.name}-${x}`}/>)
 									]})
 								}
 							</div>

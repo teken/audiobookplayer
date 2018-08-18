@@ -58,7 +58,7 @@ export default withRouter(class Settings extends Component {
 		event.preventDefault();
 		this.settingsObjects.forEach(item => {
 			if (this.oldSettings[item.name] !== this.state.settings[item.name])
-				ipcRenderer.send('settings.set', {name: this.item.dataName, value: this.state.settings[item.name]});
+				ipcRenderer.send('settings.set', {name: item.dataName, value: this.state.settings[item.name]});
 		});
 		this.props.history.push('/');
 	}

@@ -20,7 +20,6 @@ const path = window.require('path');
 export default withRouter(class Library extends Component {
 	constructor(props) {
 		super(props);
-		this._player = props.player;
 		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
 		const displayAuthors = ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors') === 'true';
 		this.state = {
@@ -52,6 +51,7 @@ export default withRouter(class Library extends Component {
 		this.loadData = this.loadData.bind(this);
 		this.clearTimingData = this.clearTimingData.bind(this);
 		this.playFromStateTime = this.playFromStateTime.bind(this);
+		this.play = this.play.bind(this);
 	}
 
 	onSearchBoxChange(event) {
@@ -61,7 +61,6 @@ export default withRouter(class Library extends Component {
 	componentDidMount() {
 		setTimeout(() => {
 			this.loadData();
-			this.forceUpdate();
 			this.setState({
 				loading:false
 			});
@@ -114,8 +113,7 @@ export default withRouter(class Library extends Component {
 	}
 
 	render() {
-		const isSearching = this.state.searchTerm.length > 0;
-		const libraryWorks = isSearching ? this.state.results : this.state.flattenedWorks;
+		const libraryWorks = this.isSearching ? this.state.results : this.state.flattenedWorks;
 		const savedTimes = this.state.states.map(x => {
 			const parts = x.key.split('-');
 			x.author = parts[0];
@@ -125,7 +123,7 @@ export default withRouter(class Library extends Component {
 		});
 		const savedTimeWorks = (libraryWorks ? libraryWorks : []).filter(book => savedTimes.some(value => (value.bookName ? value.bookName : value.work) === book.name && value.time));
 
-		const displaySavedTimesSection = !isSearching && savedTimeWorks && savedTimeWorks.length > 0;
+		const displaySavedTimesSection = !this.isSearching && savedTimeWorks && savedTimeWorks.length > 0;
 		const displayLibrary = libraryWorks && libraryWorks.length > 0;
 		return (
 			<div>
@@ -141,16 +139,16 @@ export default withRouter(class Library extends Component {
 						}}
 					/>
 					<Icon icon="search" style={{
-						borderBottom:`'1px solid ${this.props.styling.activeColour}`,
+						borderBottom:`'1em solid ${this.props.styling.activeColour}`,
 						fontSize: '1em',
-						transform: 'translateY(4px)',
-						paddingBottom: '2px',
+						transform: 'translateY(.25em)',
+						paddingBottom: '0.1em',
 						color: this.props.styling.inactiveText
 					}}/>
 				</div>
 				{
 					this.state.loading ?
-						<div style={{display:'flex', justifyContent:'center', alignItems: 'center', height: window.innerHeight - 200}}><Loading/></div>
+						<div style={{display:'flex', justifyContent:'center', alignItems: 'center', height: `calc(${window.innerHeight}px - 12.5em)`}}><Loading/></div>
 						:
 						this.library(displaySavedTimesSection, displayLibrary, savedTimeWorks, savedTimes, libraryWorks)
 				}
@@ -161,7 +159,7 @@ export default withRouter(class Library extends Component {
 	library(displaySavedTimesSection, displayLibrary, savedTimeWorks, savedTimes, libraryWorks) {
 		const properties = {
 			libraryTitle: 'Library',
-			savedTimesTitle: 'SavedTimes',
+			savedTimesTitle: 'Saved Times',
 			noBooksFound: this.noBooksFound(),
 			styling: this.props.styling,
 			displaySavedTimesSection: displaySavedTimesSection,
@@ -209,7 +207,8 @@ export default withRouter(class Library extends Component {
 			backgroundColor: this.props.styling.inputBackground,
 			color: this.props.styling.activeText,
 			cursor:'pointer',
-			border: this.isPlaying(author, series, work) ? `1px solid ${this.props.styling.activeText}` : ''
+			//border: this.isPlaying(author, series, work) ? `1px solid ${this.props.styling.activeText}` : ''
+			boxShadow: this.isPlaying(author, series, work) ? `${this.props.styling.activeText} 0 0 .1em 0` : ''
 		}} styling={this.props.styling}
 		   key={author.name + work.name} options={rightClickOptions}
 		>
@@ -242,9 +241,9 @@ export default withRouter(class Library extends Component {
 	}
 
 	isPlaying(author, series, work) {
-		if (!this._player.isLoaded) return false;
-		if (series) return this._player.work.$loki === series.$loki && this._player._bookNameIfSeries === work.name;
-		else return this._player.work.$loki === work.$loki;
+		if (!this.props.player.isLoaded) return false;
+		if (series) return this.props.player.work.$loki === series.$loki && this.props.player._bookNameIfSeries === work.name;
+		else return this.props.player.work.$loki === work.$loki;
 	}
 
 	handleClick(author, series, work) {
@@ -256,10 +255,10 @@ export default withRouter(class Library extends Component {
 		const state = ipcRenderer.sendSync('timings.get', { key: stateKey });
 		const book = series ? series : work;
 		const name = series ? work.name : null;
-		this._player.open(book.$loki, name,() => {
-			this._player.play();
+		this.props.player.open(book.$loki, name,() => {
+			this.props.player.play();
 			setTimeout(() => {
-				this._player.currentTime = state.time;
+				this.props.player.currentTime = state.time;
 			}, 500);
 		})
 	}
@@ -267,7 +266,11 @@ export default withRouter(class Library extends Component {
 	play(author, series, work) {
 		const book = series ? series : work;
 		const name = series ? work.name : null;
-		this._player.open(book.$loki, name, () => this._player.play());
+		this.props.player.open(book.$loki, name, () => {
+			this.props.player.play();
+		});
+		// this.loadData();
+		// this.forceUpdate();
 	}
 
 	search(text) {

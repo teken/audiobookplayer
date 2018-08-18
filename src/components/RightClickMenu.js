@@ -12,7 +12,7 @@ export default class RightClickMenu extends Component {
 			show: false,
 			x:0,
 			y:0,
-			width:150
+			width:10
 		};
 	}
 
@@ -23,7 +23,7 @@ export default class RightClickMenu extends Component {
 			});
 		} else {
 			const bounds = event.currentTarget.getBoundingClientRect();
-			const maxWidth = window.innerWidth - this.state.width - 20;
+			const maxWidth = window.innerWidth - (this.state.width * 16) - 20;
 			this.setState({
 				show: true,
 				x: event.clientX > maxWidth ? maxWidth - bounds.left : event.clientX - bounds.left,
@@ -72,16 +72,15 @@ export default class RightClickMenu extends Component {
 					zIndex:'2001',
 					background: 'rgba(0,0,0,0.8)',
 					padding: '0.3em',
-					width: `${this.state.width}px`,
+					width: `${this.state.width}em`,
 					textAlign: 'left',
 				}}>
 					<div>
 					{options.map((item, index) => {
-						const first = index === 0;
 						const notLast = options.length > index + 1;
 						return <div key={idGenerator('right_click')} style={{
-							padding: first ? '0 0 0.15em' : notLast ? '0.15em 0' : '0.15em 0 0',
-							borderBottom: notLast ? `1px solid ${this.props.styling.secondaryText}` : '',
+							padding: index === 0 ? '0 0 0.15em' : notLast ? '0.15em 0' : '0.15em 0 0',
+							borderBottom: notLast ? `.1em solid ${this.props.styling.secondaryText}` : '',
 							cursor: 'pointer'
 						}} onClick={() => this._click(item.onClick)}>
 							{item.name}

@@ -30,15 +30,15 @@ library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolume
 export default class App extends Component {
 	constructor(props) {
 		super(props);
-		this._player = new BookPlayer();
+		this._player = new BookPlayer(ipcRenderer.sendSync('settings.get', 'volume'));
 		this.registerIPCListeners();
 		this.state = {
 			height: window.innerHeight,
 		};
-		this._styling = { //light
-		 	activeColour: "#42A5F5",
-		 	inactiveColour: "#E0E0E0"
-		};
+		// this._styling = { //light
+		//  	activeColour: "#42A5F5",
+		//  	inactiveColour: "#E0E0E0"
+		// };
 		this._styling = { //dark
 			background: 'radial-gradient(circle at 0% 0%, #373b52, #252736 51%, #1d1e26)',
 			windowBarBackground: 'transparent',
@@ -53,7 +53,7 @@ export default class App extends Component {
 			rainbowBackground: 'linear-gradient(to right, #B294FF, #57E6E6, #FEFFB8, #57E6E6, #B294FF, #57E6E6)',
 			rainbowBackgroundSize: '500% auto',
 			rainbowAnimation: 'gradient 3s linear infinite',
-			warning: '#b10808'
+			warning: '#e81123'
 		};
 	}
 
@@ -93,7 +93,9 @@ export default class App extends Component {
 				backgroundImage: this._styling.background,
 				color: this._styling.primaryText,
 				WebkitFontSmoothing: 'antialiased',
-				fontFamily: 'Helvetica Neue",Helvetica,Arial,sans-serif'
+				fontFamily: 'Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif',
+				lineHeight: '1em',
+				letterSpacing: '0.03em'
 			}}>
 				<WindowControls styling={this._styling}/>
 				<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
@@ -133,6 +135,118 @@ export default class App extends Component {
 				</div>
 				<Player styling={this._styling} player={this._player}/>
 				<style dangerouslySetInnerHTML={{__html: `
+				
+					@font-face {
+					  font-family: 'Archivo';
+					  font-style: normal;
+					  font-weight: normal;
+					  src: url('fonts/Archivo/OpenSans-Regular.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Archivo';
+					  font-style: italic;
+					  font-weight: normal;
+					  src: url('fonts/Archivo/OpenSans-Italic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Archivo';
+					  font-style: normal;
+					  font-weight: 600;
+					  src: url('fonts/Archivo/OpenSans-SemiBold.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Archivo';
+					  font-style: italic;
+					  font-weight: 600;
+					  src: url('fonts/Archivo/OpenSans-SemiBoldItalic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Archivo';
+					  font-style: normal;
+					  font-weight: 700;
+					  src: url('fonts/Archivo/OpenSans-Bold.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Archivo';
+					  font-style: italic;
+					  font-weight: 700;
+					  src: url('fonts/Archivo/OpenSans-BoldItalic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: normal;
+					  font-weight: 300;
+					  src: url('fonts/Open Sans/OpenSans-Light.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: italic;
+					  font-weight: 300;
+					  src: url('fonts/Open Sans/OpenSans-LightItalic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: normal;
+					  font-weight: normal;
+					  src: url('fonts/Open Sans/OpenSans-Regular.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: italic;
+					  font-weight: normal;
+					  src: url('fonts/Open Sans/OpenSans-Italic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: normal;
+					  font-weight: 600;
+					  src: url('fonts/Open Sans/OpenSans-SemiBold.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: italic;
+					  font-weight: 600;
+					  src: url('fonts/Open Sans/OpenSans-SemiBoldItalic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: normal;
+					  font-weight: 700;
+					  src: url('fonts/Open Sans/OpenSans-Bold.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: italic;
+					  font-weight: 700;
+					  src: url('fonts/Open Sans/OpenSans-BoldItalic.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: normal;
+					  font-weight: 800;
+					  src: url('fonts/Open Sans/OpenSans-ExtraBold.ttf') format('truetype');
+					}
+
+					@font-face {
+					  font-family: 'Open Sans';
+					  font-style: italic;
+					  font-weight: 800;
+					  src: url('fonts/Open Sans/OpenSans-ExtraBoldItalic.ttf') format('truetype');
+					}
 
 					body {
 						-webkit-user-select:none;

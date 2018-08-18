@@ -145,7 +145,7 @@ export default class Timeline extends Component {
 		const barHeight = 4;
 
 		return (
-			<div className="timeline" style={{ width: "100%", transform: 'translateY(-6px)' }}>
+			<div className="timeline" style={{ width: "100%", transform: 'translateY(-0.5em)' }}>
 				<ProgressBar
 					width={this.state.barWidth}
 					height={handlerHeight}

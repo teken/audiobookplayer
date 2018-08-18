@@ -10,9 +10,9 @@ export default class Tile extends Component {
 		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
 			return <img src={p} alt={this.props.work.name} style={{
-				minHeight: '78px',
+				minHeight: '5em',
 				maxWidth: '100%',
-				maxHeight: '100px'
+				maxHeight: '6.75em'
 			}}/>;
 		}
 	}
@@ -23,11 +23,11 @@ export default class Tile extends Component {
 
 	render() {
 		let s = {};
-		if (!this.hasArtWork) s = {...s, height: '100%', minHeight: '100px'}; //, margin:'4em 0'
+		if (!this.hasArtWork) s = {...s, height: '100%', minHeight: '6.75em'}; //, margin:'4em 0'
 		return (
 			<div onClick={this.props.onClick} style={{
 				cursor: 'pointer',
-				border: this.props.isPlaying ? `1px solid ${this.props.styling.activeText}` : '',
+				border: this.props.isPlaying ? `.1em solid ${this.props.styling.activeText}` : '',
 				display: 'flex'
 			}}>
 
@@ -35,11 +35,10 @@ export default class Tile extends Component {
 					{this.tilePicture}
 				</div>
 				<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width:'100%', ...s}}>
-					<div style={{margin:'0 0.1em'}}>
-						{this.props.work.name}<br />
-						{this.props.series && this.props.series.name}
-						{this.props.series && (<br/>)}
-						{this.props.author.name}
+					<div style={{margin:'0.2em 0.1em 0.4em'}}>
+						<div style={{fontWeight:600}}>{this.props.work.name}</div>
+						{this.props.series && <div style={{color:this.props.styling.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.props.series.name})</div>}
+						<div style={{padding:'0.1em 0 0'}}>{this.props.author.name}</div>
 					</div>
 				</div>
 			</div>

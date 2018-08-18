@@ -15,7 +15,7 @@ export default withRouter(class Player extends Component {
 		this._player = props.player;
 		this.state = {
 			playButtonIcon: 'pause',
-			volume: ipcRenderer.sendSync('settings.get', 'volume'),
+			volume: this._player.volume,
 			volumeIcon: "volume-up",
 			muted: false,
 			intervalId : null,
@@ -44,11 +44,12 @@ export default withRouter(class Player extends Component {
 		ipcRenderer.send('window.progressbar.set', progress);
 		ipcRenderer.send('settings.set', {
 			name:'volume',
-			value: this.state.volume
+			value: this._player.volume
 		});
 		this.setState({
 			progress: this._player.currentTime,
 			duration: this._player.duration,
+			volume: this._player.volume,
 			playButtonIcon: this._player.isPlaying ? `pause` : `play`,
 			volumeIcon: this.volumeIcon()
 		});
@@ -108,7 +109,7 @@ export default withRouter(class Player extends Component {
 					<span onMouseOver={() => this.displayVolume = true} onMouseOut={() => this.displayVolume = false}>
 						<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.styling.warning :this.props.styling.activeText}} svgStyle={{minWidth:'18px'}}/>
 						<span style={{display: !this.state.muted && this.displayVolume ? 'inline-flex' : 'none'}}>
-							<Volume styling={this.props.styling} player={this._player} progress={this.state.volume} duration={100}/>
+							<Volume styling={this.props.styling} player={this._player} progress={this.state.volume} duration={200}/>
 						</span>
 					</span>
 					<span style={{color:this.props.styling.activeText, cursor: this._player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
