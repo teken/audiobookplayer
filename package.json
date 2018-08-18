@@ -47,7 +47,7 @@
     "electron-builder": "^20.8.1"
   },
   "build": {
-    "appId": "com.Teken",
+    "appId": "app.AudioBookPlayer",
     "productName": "Audio Book Player",
     "copyright": "Copyright © 2018 Duncan Haig",
     "files": [

@@ -115,22 +115,26 @@ export default class App extends Component {
 						<Route path="/about" render={() => (
 							<div>
 								<h1>About</h1>
-								<div style={{color: this._styling.secondaryText}}>
-									Audio Book Player: v{app.getVersion()}<br/>
-									Created By Duncan Haig<br/>
-									Copywrite 2018 Duncan Haig<br/>
-									<br/>
-									Electron: v{process.versions.electron}<br/>
-									Node: v{process.versions.node}<br/>
-									Chrome: v{process.versions.chrome}<br/>
-									<br/>
-									Support this software on:
-									<span onClick={() => shell.openExternal('https://audiobookplayer.app')}>
-										AudioBookPlayer.app
-									</span>
-									<span onClick={() => shell.openExternal('https://www.patreon.com/AudioBookPlayer')}>
-										Patreon
-									</span>
+								<div style={{color: this._styling.secondaryText, lineHeight: '1.2em'}}>
+									<div style={{marginBottom:'1em'}}>
+										Audio Book Player: v{app.getVersion()}<br/>
+										Created By Duncan Haig<br/>
+										Copywrite 2018 Duncan Haig<br/>
+									</div>
+									<div style={{marginBottom:'1em'}}>
+										Electron: v{process.versions.electron}<br/>
+										Node: v{process.versions.node}<br/>
+										Chrome: v{process.versions.chrome}<br/>
+									</div>
+									<div style={{marginBottom:'1em'}}>
+										<h2 style={{color:this._styling.primaryText}}>Support this software on:</h2>
+										<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>
+											AudioBookPlayer.app
+										</span><br/>
+										<span style={{cursor:'pointer', textDecoration:'underline'}} onClick={() => shell.openExternal('https://www.patreon.com/AudioBookPlayer')}>
+											Patreon
+										</span>
+									</div>
 								</div>
 							</div>
 						)}/>
