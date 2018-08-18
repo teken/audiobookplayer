@@ -3,7 +3,9 @@ import React, {Component} from 'react';
 import ButtonRow from '../settings/ButtonRow';
 import Loading from '../loading/Loading';
 
-export default class ConfirmModal extends Component {
+import withTheme from '../theme/withTheme';
+
+export default withTheme(class ConfirmModal extends Component {
 
 	constructor(props) {
 		super(props);
@@ -58,7 +60,7 @@ export default class ConfirmModal extends Component {
 		if (this.state.loading) {
 			return <Loading />
 		} else {
-			return <ButtonRow styling={this.props.styling} buttonWidth={100} buttons={[
+			return <ButtonRow buttonWidth={100} buttons={[
 				{value:"OK", onClick:this.okClick},
 				{value:"Cancel", onClick:this.cancelClick},
 			]}/>
@@ -84,13 +86,13 @@ export default class ConfirmModal extends Component {
 			}}>
 				<div style={{
 					display: this.state.hidden ? 'none' : 'grid',
-					background: this.props.styling.background,
+					background: this.props.theme.background,
 					gridTemplateRows: '1fr 1fr 1fr',
 					width: '90%',
 					height: '40%'
 				}}>
 					<div style={{padding:'0 1em', ...centreStyle}}><h1>{this.props.heading}</h1></div>
-					<div style={{padding:'0 1em', color: this.props.styling.secondaryText, ...centreStyle}}>{this.props.body}</div>
+					<div style={{padding:'0 1em', color: this.props.theme.secondaryText, ...centreStyle}}>{this.props.body}</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>
 						{this.buttons()}
 					</div>
@@ -98,4 +100,4 @@ export default class ConfirmModal extends Component {
 			</div>
 		);
 	}
-}
+})

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 
-export default class Tile extends Component {
+import withTheme from '../../theme/withTheme';
+
+export default withTheme(class Tile extends Component {
 
 	get hasArtWork() {
 		return this.props.work.art.length > 0;
@@ -27,7 +29,7 @@ export default class Tile extends Component {
 		return (
 			<div onClick={this.props.onClick} style={{
 				cursor: 'pointer',
-				border: this.props.isPlaying ? `.1em solid ${this.props.styling.activeText}` : '',
+				border: this.props.isPlaying ? `.1em solid ${this.props.theme.activeText}` : '',
 				display: 'flex'
 			}}>
 
@@ -37,12 +39,12 @@ export default class Tile extends Component {
 				<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width:'100%', ...s}}>
 					<div style={{margin:'0.2em 0.1em 0.4em'}}>
 						<div style={{fontWeight:600}}>{this.props.work.name}</div>
-						{this.props.series && <div style={{color:this.props.styling.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.props.series.name})</div>}
+						{this.props.series && <div style={{color:this.props.theme.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.props.series.name})</div>}
 						<div style={{padding:'0.1em 0 0'}}>{this.props.author.name}</div>
 					</div>
 				</div>
 			</div>
 		);
 	}
-}
+})
 

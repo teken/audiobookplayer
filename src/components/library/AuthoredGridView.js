@@ -15,7 +15,7 @@ export default class AuthoredGridView extends Component {
 
 	renderTile(author, series, work) {
 		return <Tile author={author} series={series} work={work}
-					 onClick={() => this.props.itemClick(author, series, work)} styling={this.props.styling}
+					 onClick={() => this.props.itemClick(author, series, work)}
 		/>
 	}
 

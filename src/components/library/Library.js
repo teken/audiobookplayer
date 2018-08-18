@@ -13,11 +13,13 @@ import Fuse from 'fuse.js';
 
 import Loading from '../loading/Loading';
 
+import withTheme from '../theme/withTheme';
+
 const {ipcRenderer, shell} = window.require('electron');
 const path = window.require('path');
 
 
-export default withRouter(class Library extends Component {
+export default withRouter(withTheme(class Library extends Component {
 	constructor(props) {
 		super(props);
 		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
@@ -127,23 +129,23 @@ export default withRouter(class Library extends Component {
 		const displayLibrary = libraryWorks && libraryWorks.length > 0;
 		return (
 			<div>
-				<div style={{ margin: '1em', padding: '1em', color:this.props.styling.activeText, backgroundColor:this.props.styling.inputBackground }}>
+				<div style={{ margin: '1em', padding: '1em', color:this.props.theme.activeText, backgroundColor:this.props.theme.inputBackground }}>
 					<input type="text" value={this.state.searchTerm} onChange={this.onSearchBoxChange} placeholder="Search"
 					   style={{
 						   width: '97%',
 						   border:'none',
 						   backgroundColor: 'transparent',
-						   color: this.props.styling.activeText,
+						   color: this.props.theme.activeText,
 						   fontSize: '1em',
 						   paddingLeft:'0.3em'
 						}}
 					/>
 					<Icon icon="search" style={{
-						borderBottom:`'1em solid ${this.props.styling.activeColour}`,
+						borderBottom:`'1em solid ${this.props.theme.activeColour}`,
 						fontSize: '1em',
 						transform: 'translateY(.25em)',
 						paddingBottom: '0.1em',
-						color: this.props.styling.inactiveText
+						color: this.props.theme.inactiveText
 					}}/>
 				</div>
 				{
@@ -161,7 +163,6 @@ export default withRouter(class Library extends Component {
 			libraryTitle: 'Library',
 			savedTimesTitle: 'Saved Times',
 			noBooksFound: this.noBooksFound(),
-			styling: this.props.styling,
 			displaySavedTimesSection: displaySavedTimesSection,
 			displayLibrary: displayLibrary,
 			authors: this.state.authors,
@@ -191,7 +192,7 @@ export default withRouter(class Library extends Component {
 		return <div style={{display:'flex', justifyContent:'center', alignItems: 'center'}}>
 			<div>
 				<h1>no books to be found,<br />maybe try importing some...</h1>
-				<div style={{color:this.props.styling.secondaryText}}>
+				<div style={{color:this.props.theme.secondaryText}}>
 					Head to the settings page using the cog icon on the menu bar
 				</div>
 			</div>
@@ -204,12 +205,12 @@ export default withRouter(class Library extends Component {
 
 	book(renderFunction, author, series, work, stateKey, rightClickOptions) {
 		return <RightClickMenu style={{
-			backgroundColor: this.props.styling.inputBackground,
-			color: this.props.styling.activeText,
+			backgroundColor: this.props.theme.inputBackground,
+			color: this.props.theme.activeText,
 			cursor:'pointer',
-			//border: this.isPlaying(author, series, work) ? `1px solid ${this.props.styling.activeText}` : ''
-			boxShadow: this.isPlaying(author, series, work) ? `${this.props.styling.activeText} 0 0 .1em 0` : ''
-		}} styling={this.props.styling}
+			//border: this.isPlaying(author, series, work) ? `1px solid ${this.props.theme.activeText}` : ''
+			boxShadow: this.isPlaying(author, series, work) ? `${this.props.theme.activeText} 0 0 .1em 0` : ''
+		}}
 		   key={author.name + work.name} options={rightClickOptions}
 		>
 			{renderFunction(author, series, work)}
@@ -290,5 +291,5 @@ export default withRouter(class Library extends Component {
 		if (!time) time = 0;
 		return new Date(1000 * time).toISOString().substr(11, 8);
 	}
-})
+}))
 

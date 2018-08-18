@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 
 import ButtonRow from '../settings/ButtonRow';
 
-export default class TimeCodePromptModal extends Component {
+import withTheme from '../theme/withTheme';
+
+export default withTheme(class TimeCodePromptModal extends Component {
 
 	constructor(props) {
 		super(props);
@@ -98,7 +100,7 @@ export default class TimeCodePromptModal extends Component {
 			width: '2em',
 			border:'none',
 			backgroundColor: 'transparent',
-			color: this.props.styling.activeText,
+			color: this.props.theme.activeText,
 			fontSize: '1em',
 			textAlign: 'center'
 		};
@@ -115,21 +117,21 @@ export default class TimeCodePromptModal extends Component {
 			}}>
 				<div style={{
 					display: this.state.hidden ? 'none' : 'grid',
-					background: this.props.styling.background,
+					background: this.props.theme.background,
 					gridTemplateRows: '1fr 1fr 1fr',
 					width: '90%',
 					height: '40%'
 				}}>
 					<div style={{padding:'0 1em', ...centreStyle}}><h1>Please Enter Desired Time</h1></div>
-					<div style={{padding:'0 1em', color: this.props.styling.secondaryText, ...centreStyle}}>
-						<div style={{backgroundColor: this.props.styling.inputBackground}}>
+					<div style={{padding:'0 1em', color: this.props.theme.secondaryText, ...centreStyle}}>
+						<div style={{backgroundColor: this.props.theme.inputBackground}}>
 							<input ref={this.hours} className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.hours} onChange={this.changeHours} onKeyPress={this.changeHours}/>:
 							<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.minutes} onChange={this.changeMinutes} onKeyPress={this.changeMinutes}/>:
 							<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.seconds} onChange={this.changeSeconds} onKeyPress={this.changeSeconds}/>
 						</div>
 					</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>
-						<ButtonRow styling={this.props.styling} buttonWidth={100} buttons={[
+						<ButtonRow buttonWidth={100} buttons={[
 							{value:"OK", onClick:this.okClick},
 							{value:"Cancel", onClick:this.cancelClick},
 						]}/>
@@ -138,4 +140,4 @@ export default class TimeCodePromptModal extends Component {
 			</div>
 		);
 	}
-}
+})

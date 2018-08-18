@@ -16,7 +16,6 @@ export default class GridView extends Component {
 	renderTile(author, series, work) {
 		return <Tile author={author} series={series} work={work}
 			onClick={() => this.props.itemClick(author, series, work)}
-		 	styling={this.props.styling}
 			/>
 	}
 

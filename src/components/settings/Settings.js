@@ -10,9 +10,11 @@ import Checkbox from './Checkbox';
 
 import ConfirmModal from '../modal/ConfirmModal';
 
+import withTheme from '../theme/withTheme';
+
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(class Settings extends Component {
+export default withRouter(withTheme(class Settings extends Component {
 	constructor(props) {
 		super(props);
 
@@ -104,33 +106,33 @@ export default withRouter(class Settings extends Component {
 	render() {
 		return (
 			<div style={{margin:'1em'}}>
-				<ConfirmModal show={this.state.showClear} styling={this.props.styling}
+				<ConfirmModal show={this.state.showClear}
 							  heading="Are you sure?"
 							  body="This will clear the library completely. Are you sure you want to do this?"
 							  okOnClick={this.clearLibrary} cancelOnClick={() => this.setState({showClear: false})} />
-				<ConfirmModal show={this.state.showReimport} styling={this.props.styling}
+				<ConfirmModal show={this.state.showReimport}
 							  heading="Are you sure?"
 							  body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?"
 							  okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
 				<h1>Settings</h1>
-				<form onSubmit={this.handleSubmit} style={{color:this.props.styling.secondaryText}}>
+				<form onSubmit={this.handleSubmit} style={{color:this.props.theme.secondaryText}}>
 					<Setting label="Library Actions">
-						<ButtonRow styling={this.props.styling} buttons={this.buttons}/>
+						<ButtonRow buttons={this.buttons}/>
 					</Setting>
 					<Setting label="Library Folder Path">
-						<FolderSelector styling={this.props.styling} value={this.state.settings.libraryDataFolder} onChange={(event) => this.handleChange(event, "libraryDataFolder")} />
+						<FolderSelector value={this.state.settings.libraryDataFolder} onChange={(event) => this.handleChange(event, "libraryDataFolder")} />
 					</Setting>
 					<Setting label="Data Folder Path">
-						<FolderSelector styling={this.props.styling} value={this.state.settings.dataDataFolder} onChange={(event) => this.handleChange(event, "dataDataFolder")} />
+						<FolderSelector value={this.state.settings.dataDataFolder} onChange={(event) => this.handleChange(event, "dataDataFolder")} />
 					</Setting>
 					<Setting label="Library Style">
-						<Dropdown styling={this.props.styling} value={this.state.settings.libraryStyle} options={[
+						<Dropdown value={this.state.settings.libraryStyle} options={[
 							{name:'Grid', value:'grid'},
 							{name:'Rows', value:'row'}
 						]} onChange={(event) => this.handleChange(event, "libraryStyle")} />
 					</Setting>
 					<Setting label="Display Authors in Library">
-						<Checkbox styling={this.props.styling} value={this.state.settings.libraryDisplayAuthors} onChange={(event) => this.handleChange(event, "libraryDisplayAuthors")} />
+						<Checkbox value={this.state.settings.libraryDisplayAuthors} onChange={(event) => this.handleChange(event, "libraryDisplayAuthors")} />
 					</Setting>
 					<Setting>
 						<input type="submit" value="Save" disabled={!this.isDirty} style={{
@@ -138,13 +140,13 @@ export default withRouter(class Settings extends Component {
 							fontSize:' 1.5em',
 							border: 'none',
 							cursor: this.isDirty ? 'pointer' : 'default',
-							backgroundColor: this.props.styling.inputBackground,
-							color: this.isDirty ? this.props.styling.activeText : this.props.styling.inactiveText,
+							backgroundColor: this.props.theme.inputBackground,
+							color: this.isDirty ? this.props.theme.activeText : this.props.theme.inactiveText,
 						}}/>
 					</Setting>
 				</form>
 			</div>
 		);
 	}
-})
+}))
 

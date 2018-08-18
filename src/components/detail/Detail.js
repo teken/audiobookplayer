@@ -6,11 +6,13 @@ import {FontAwesomeIcon as Icon} from '@fortawesome/react-fontawesome'
 
 import 'react-table/react-table.css'
 
+import withTheme from '../theme/withTheme';
+
 const fs = window.require('fs');
 const mm = window.require('music-metadata');
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(class Detail extends Component {
+export default withRouter(withTheme(class Detail extends Component {
 	constructor(props) {
 		super(props);
 		this._player = props.player;
@@ -151,11 +153,11 @@ export default withRouter(class Detail extends Component {
 					<div>
 						<h1>{this.title}</h1>
 						<h2>By {this.state.author.name}</h2>
-						<div  style={{color: this.props.styling.secondaryText}}>
-							<div style={{display:'flex', justifyContent: 'space-between', color: this.props.styling.secondaryText, alignItems: 'flex-end'}}>
+						<div  style={{color: this.props.theme.secondaryText}}>
+							<div style={{display:'flex', justifyContent: 'space-between', color: this.props.theme.secondaryText, alignItems: 'flex-end'}}>
 								<div style={{width:'30%'}}>
 									{this.isSeries && this.hasPreviousBook && (
-										<span style={{cursor:'pointer', color: this.props.styling.activeText, display: 'flex', justifyContent: 'flex-start'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.previousBook.name}`)}>
+										<span style={{cursor:'pointer', color: this.props.theme.activeText, display: 'flex', justifyContent: 'flex-start'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.previousBook.name}`)}>
 											<Icon style={{padding:'0 .5em'}} icon="chevron-left"/>
 											{this.previousBook.name}
 										</span>
@@ -171,7 +173,7 @@ export default withRouter(class Detail extends Component {
 									<br/>
 									{
 										this.state.saveTime !== null && (
-											<div style={{cursor:'pointer', color:this.props.styling.activeText}} onClick={() =>
+											<div style={{cursor:'pointer', color:this.props.theme.activeText}} onClick={() =>
 												this._player.open(this.state.work.$loki, this.props.bookName,() => {
 													this._player.play();
 													this._player.currentTime = this.state.saveTime;
@@ -185,7 +187,7 @@ export default withRouter(class Detail extends Component {
 								</div>
 								<div style={{width:'30%'}}>
 									{this.isSeries && this.hasNextBook && (
-										<span style={{cursor:'pointer', color: this.props.styling.activeText, display: 'flex', justifyContent: 'flex-end'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.nextBook.name}`)}>
+										<span style={{cursor:'pointer', color: this.props.theme.activeText, display: 'flex', justifyContent: 'flex-end'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.nextBook.name}`)}>
 											{this.nextBook.name}
 											<Icon style={{padding:'0 .5em'}} icon="chevron-right"/>
 										</span>
@@ -210,7 +212,7 @@ export default withRouter(class Detail extends Component {
 									sortable={false}
 									getTdProps={(state, rowInfo) => {
 										return {
-											style:{ cursor: 'pointer', color: this.props.styling.activeText},
+											style:{ cursor: 'pointer', color: this.props.theme.activeText},
 											onDoubleClick: (e, handleOriginal) => {
 												if (this.state.work.type === "SERIES")
 													this._player.openFromSpecificTrack(this.state.work.$loki, this.props.bookName, rowInfo.row.name, () => { this._player.play()});
@@ -250,7 +252,7 @@ export default withRouter(class Detail extends Component {
 														sortable={false}
 														getTdProps={(state, rowInfo) => {
 															return {
-																style:{ cursor: 'pointer', color: this.props.styling.activeText},
+																style:{ cursor: 'pointer', color: this.props.theme.activeText},
 																onDoubleClick: (e, handleOriginal) => {
 																	if (this.state.work.type === "SERIES")
 																		this._player.open(this.state.work.$loki, this.props.bookName, () => {
@@ -314,5 +316,5 @@ export default withRouter(class Detail extends Component {
 		date.setMilliseconds(Number(parts[2])*10);
 		return date.getTime()/1000;
 	}
-})
+}))
 

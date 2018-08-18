@@ -3,7 +3,9 @@ import React, {Component} from 'react';
 import ProgressBar from './ProgressBar';
 import ProgressBarHandler from './ProgressBarHandler';
 
-export default class Timeline extends Component {
+import withTheme from '../../theme/withTheme';
+
+export default withTheme(class Timeline extends Component {
 	constructor(props) {
 		super(props);
 		this._player = props.player;
@@ -156,8 +158,8 @@ export default class Timeline extends Component {
 					onMouseDown={this._onMouseDownProgressBar}
 					onMouseOver={this._onMouseOverProgressBar}
 					onMouseOut={this._onMouseOutProgressBar}
-					colour={this.props.styling.activeText}
-					inactiveColour={this.props.styling.inactiveText}
+					colour={this.props.theme.activeText}
+					inactiveColour={this.props.theme.inactiveText}
 				>
 					<ProgressBarHandler
 						width={handlerWidth}
@@ -165,11 +167,11 @@ export default class Timeline extends Component {
 						visibility={this._player.isLoaded && (this.state.showHandler || this.holding)}
 						translate={`translate(${this.state.translate - (handlerWidth / 2)})`}
 						onMouseDown={this._onMouseDownProgressBarHandler}
-						colour={this.props.styling.activeText}
-						inactiveColour={this.props.styling.inactiveText}
+						colour={this.props.theme.activeText}
+						inactiveColour={this.props.theme.inactiveText}
 					/>
 				</ProgressBar>
 			</div>
 		);
 	}
-}
+})

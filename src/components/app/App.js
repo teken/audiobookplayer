@@ -16,6 +16,9 @@ import { faPlay, faPause, faStop, faBackward, faForward, faVolumeOff, faVolumeDo
 		faQuestion, faCaretDown, faCheckSquare
 } from '@fortawesome/free-solid-svg-icons';
 
+
+import withTheme from '../theme/withTheme';
+
 //import { faSquare } from '@fontawesome/free-regular-svg-icons';
 //import { } from '@fontawesome/free-brands-svg-icons';
 
@@ -27,33 +30,13 @@ library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolume
 			faQuestion, faCaretDown, faCheckSquare
 );
 
-export default class App extends Component {
+export default withTheme(class App extends Component {
 	constructor(props) {
 		super(props);
 		this._player = new BookPlayer(ipcRenderer.sendSync('settings.get', 'volume'));
 		this.registerIPCListeners();
 		this.state = {
 			height: window.innerHeight,
-		};
-		// this._styling = { //light
-		//  	activeColour: "#42A5F5",
-		//  	inactiveColour: "#E0E0E0"
-		// };
-		this._styling = { //dark
-			background: 'radial-gradient(circle at 0% 0%, #373b52, #252736 51%, #1d1e26)',
-			windowBarBackground: 'transparent',
-			playerBackground: 'transparent',
-			scrollBarTrack: 'rgba(256, 256, 256, 0.1)',
-			primaryText:'#f5f6ff',
-			secondaryText: 'rgba(202, 205, 239, 0.8)',
-			activeText: '#BFD2FF',
-			inactiveText: '#7881A1',
-			inputBackground: 'rgba(57, 63, 84, 0.8)',
-			iconButtonHoverBackground: 'rgba(256,256,256,0.1)',
-			rainbowBackground: 'linear-gradient(to right, #B294FF, #57E6E6, #FEFFB8, #57E6E6, #B294FF, #57E6E6)',
-			rainbowBackgroundSize: '500% auto',
-			rainbowAnimation: 'gradient 3s linear infinite',
-			warning: '#e81123'
 		};
 	}
 
@@ -89,33 +72,36 @@ export default class App extends Component {
 		const top = 2, bottom = 3;
 		return (
 		<Router>
-			<div style={{textAlign: 'center', paddingTop: `${top}em`, paddingBottom: `${bottom}em`,
-				backgroundImage: this._styling.background,
-				color: this._styling.primaryText,
+			<div style={{
+				textAlign: 'center',
+				paddingTop: `${top}em`,
+				paddingBottom: `${bottom}em`,
+				backgroundImage: this.props.theme.background,
+				color: this.props.theme.primaryText,
 				WebkitFontSmoothing: 'antialiased',
 				fontFamily: 'Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif',
 				lineHeight: '1em',
 				letterSpacing: '0.03em'
 			}}>
-				<WindowControls styling={this._styling}/>
+				<WindowControls/>
 				<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
 					<Switch>
 						<Route exact path="/" render={() => (
-							<Library styling={this._styling} player={this._player}/>
+							<Library player={this._player}/>
 						)}/>
 						<Route path="/works/:workId/:bookName" render={({match}) => (
-							<Detail styling={this._styling} player={this._player} workId={match.params.workId} bookName={match.params.bookName}/>
+							<Detail player={this._player} workId={match.params.workId} bookName={match.params.bookName}/>
 						)}/>
 						<Route path="/works/:workId" render={({match}) => (
-							<Detail styling={this._styling} player={this._player} workId={match.params.workId}/>
+							<Detail player={this._player} workId={match.params.workId}/>
 						)}/>
 						<Route path="/settings" render={() => (
-							<Settings styling={this._styling} />
+							<Settings />
 						)}/>
 						<Route path="/about" render={() => (
 							<div>
 								<h1>About</h1>
-								<div style={{color: this._styling.secondaryText, lineHeight: '1.2em'}}>
+								<div style={{color: this.props.theme.secondaryText, lineHeight: '1.2em'}}>
 									<div style={{marginBottom:'1em'}}>
 										Audio Book Player: v{app.getVersion()}<br/>
 										Created By Duncan Haig<br/>
@@ -127,7 +113,7 @@ export default class App extends Component {
 										Chrome: v{process.versions.chrome}<br/>
 									</div>
 									<div style={{marginBottom:'1em'}}>
-										<h2 style={{color:this._styling.primaryText}}>Support this software on:</h2>
+										<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 										<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>
 											AudioBookPlayer.app
 										</span><br/>
@@ -140,12 +126,12 @@ export default class App extends Component {
 						)}/>
 						<Route render={({location}) => (
 							<div>
-								<h1>Failed to find page</h1>
+								<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
 							</div>
 						)}/>
 					</Switch>
 				</div>
-				<Player styling={this._styling} player={this._player}/>
+				<Player player={this._player}/>
 				<style dangerouslySetInnerHTML={{__html: `
 				
 					@font-face {
@@ -266,11 +252,11 @@ export default class App extends Component {
 					}
 
 					.rt-expander::after {
-						border-top-color: ${this._styling.activeText} !important;
+						border-top-color: ${this.props.theme.activeText} !important;
 					}
 
 					::-webkit-input-placeholder {
-						color: ${this._styling.inactiveText};
+						color: ${this.props.theme.inactiveText};
 					}
 
 					input:focus,
@@ -284,17 +270,17 @@ export default class App extends Component {
 					}
 
 					::-webkit-scrollbar-thumb:vertical {
-						background: ${this._styling.inactiveText};
+						background: ${this.props.theme.inactiveText};
 						-webkit-border-radius: 100px;
 					}
 
 					::-webkit-scrollbar-thumb:vertical:active {
-						background: ${this._styling.activeText};
+						background: ${this.props.theme.activeText};
 						-webkit-border-radius: 100px;
 					}
 
 					::-webkit-scrollbar-track {
-						background-color: ${this._styling.scrollBarTrack};
+						background-color: ${this.props.theme.scrollBarTrack};
 						-webkit-border-radius: 100px;
 						margin-bottom: 0.2em
 					}
@@ -314,4 +300,4 @@ export default class App extends Component {
 
 		);
 	}
-}
+})

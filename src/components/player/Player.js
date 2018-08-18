@@ -7,9 +7,11 @@ import IconButton from './IconButton';
 
 import TimeCodePromptModal from '../modal/TimeCodePromptModal';
 
+import withTheme from '../theme/withTheme';
+
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(class Player extends Component {
+export default withRouter(withTheme(class Player extends Component {
 	constructor(props) {
 		super(props);
 		this._player = props.player;
@@ -93,33 +95,33 @@ export default withRouter(class Player extends Component {
 				position: 'fixed',
 				bottom: 0,
 				width: '100%',
-				backgroundColor: this.props.styling.playerBackground,
+				backgroundColor: this.props.theme.playerBackground,
 				textAlign: 'left',
 				height: '3em'
 			}}>
-				<TimeCodePromptModal show={this.state.showTimePicker} styling={this.props.styling} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
-				<Timeline styling={this.props.styling} player={this._player} progress={this.state.progress} duration={this.state.duration}/>
+				<TimeCodePromptModal show={this.state.showTimePicker} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
+				<Timeline player={this._player} progress={this.state.progress} duration={this.state.duration}/>
 				<div className="controls" style={{height:'1em'}}>
 
-					<IconButton title="Previous Track" icon="backward" onClick={() => this._player.playPreviousTrack()} style={{...commonButtonStyling, color: this._player.hasPreviousTrack ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
-					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
-					<IconButton title="Next Track" icon="forward" onClick={() => this._player.playNextTrack()} style={{...commonButtonStyling, color: this._player.hasNextTrack ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
-					<IconButton title="Stop" icon="stop" onClick={() => this._player.stop()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
-					<IconButton title="Skip to Point" icon="map-marker-alt" onClick={() => this._player.isLoaded && this.setState({showTimePicker: true})} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.styling.activeText : this.props.styling.inactiveText}}/>
+					<IconButton title="Previous Track" icon="backward" onClick={() => this._player.playPreviousTrack()} style={{...commonButtonStyling, color: this._player.hasPreviousTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Next Track" icon="forward" onClick={() => this._player.playNextTrack()} style={{...commonButtonStyling, color: this._player.hasNextTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Stop" icon="stop" onClick={() => this._player.stop()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Skip to Point" icon="map-marker-alt" onClick={() => this._player.isLoaded && this.setState({showTimePicker: true})} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<span onMouseOver={() => this.displayVolume = true} onMouseOut={() => this.displayVolume = false}>
-						<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.styling.warning :this.props.styling.activeText}} svgStyle={{minWidth:'18px'}}/>
+						<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.theme.warning :this.props.theme.activeText}} svgStyle={{minWidth:'18px'}}/>
 						<span style={{display: !this.state.muted && this.displayVolume ? 'inline-flex' : 'none'}}>
-							<Volume styling={this.props.styling} player={this._player} progress={this.state.volume} duration={200}/>
+							<Volume player={this._player} progress={this.state.volume} duration={200}/>
 						</span>
 					</span>
-					<span style={{color:this.props.styling.activeText, cursor: this._player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
+					<span style={{color:this.props.theme.activeText, cursor: this._player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
 						if (this._player.isLoaded) return;
 						const path = `${this._player.work.$loki}${this._player.work.type === 'SERIES' ? `/${this._player._bookNameIfSeries}`: ''}`;
 						this.props.history.push(`/works/${path}`);
 					}}>
 						{this._player.isLoaded && this._player.book.name}
 					</span>
-					<span style={{color:this.props.styling.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
+					<span style={{color:this.props.theme.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
 						{this._player.isLoaded ? `${this.formatTime(this.state.progress)} / ${this.formatTime(this.state.duration)}` : `No Book Selected`}
 					</span>
 				</div>
@@ -131,4 +133,4 @@ export default withRouter(class Player extends Component {
 		if (!time) time = 0;
 		return new Date(1000 * time).toISOString().substr(11, 8);
 	}
-})
+}))

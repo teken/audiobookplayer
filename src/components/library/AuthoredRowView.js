@@ -15,7 +15,7 @@ export default class AuthoredRowView extends Component {
 
 	renderTile(author, series, work) {
 		return <Row author={author} series={series} work={work}
-					 onClick={() => this.props.itemClick(author, series, work)} styling={this.props.styling}
+					 onClick={() => this.props.itemClick(author, series, work)}
 		/>
 	}
 

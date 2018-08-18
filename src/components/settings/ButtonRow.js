@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 
-export default class ButtonRow extends Component {
+import withTheme from '../theme/withTheme';
+
+export default withTheme(class ButtonRow extends Component {
 	render() {
 		let buttonStyling = {
 			width: this.props.buttonWidth,
@@ -9,8 +11,8 @@ export default class ButtonRow extends Component {
 			border: 'none',
 			cursor: 'pointer',
 			margin: '0 .5em',
-			backgroundColor: this.props.styling.inputBackground,
-			color: this.props.styling.activeText,
+			backgroundColor: this.props.theme.inputBackground,
+			color: this.props.theme.activeText,
 		};
 		return (
 			<div style={{display:'flex', justifyContent:'center'}}>
@@ -20,5 +22,5 @@ export default class ButtonRow extends Component {
 			</div>
 		);
 	}
-}
+})
 

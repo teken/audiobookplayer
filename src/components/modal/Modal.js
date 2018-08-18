@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 
 import ButtonRow from '../settings/ButtonRow';
 
+import withTheme from '../theme/withTheme';
+
 export default class Modal extends Component {
 
 	constructor(props) {
@@ -66,15 +68,15 @@ export default class Modal extends Component {
 			}}>
 				<div style={{
 					display: this.state.hidden ? 'none' : 'grid',
-					background: this.props.styling.background,
+					background: this.props.theme.background,
 					gridTemplateRows: '1fr 1fr 1fr',
 					width: '90%',
 					height: '40%'
 				}}>
 					<div style={{padding:'0 1em', ...centreStyle}}><h1>{this.props.heading}</h1></div>
-					<div style={{padding:'0 1em', color: this.props.styling.secondaryText, ...centreStyle}}>{this.props.body}</div>
+					<div style={{padding:'0 1em', color: this.props.theme.secondaryText, ...centreStyle}}>{this.props.body}</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>
-						<ButtonRow styling={this.props.styling} buttonWidth={100} buttons={[
+						<ButtonRow buttonWidth={100} buttons={[
 							{value:"OK", onClick:this.okClick},
 							{value:"Cancel", onClick:this.cancelClick},
 						]}/>

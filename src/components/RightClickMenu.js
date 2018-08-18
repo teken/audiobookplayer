@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 
 import idGenerator from 'react-id-generator';
 
-export default class RightClickMenu extends Component {
+import withTheme from './theme/withTheme';
+
+export default withTheme(class RightClickMenu extends Component {
 	constructor(props) {
 		super(props);
 		this._onContextMenu = this._onContextMenu.bind(this);
@@ -80,7 +82,7 @@ export default class RightClickMenu extends Component {
 						const notLast = options.length > index + 1;
 						return <div key={idGenerator('right_click')} style={{
 							padding: index === 0 ? '0 0 0.15em' : notLast ? '0.15em 0' : '0.15em 0 0',
-							borderBottom: notLast ? `.1em solid ${this.props.styling.secondaryText}` : '',
+							borderBottom: notLast ? `.1em solid ${this.props.theme.secondaryText}` : '',
 							cursor: 'pointer'
 						}} onClick={() => this._click(item.onClick)}>
 							{item.name}
@@ -92,4 +94,4 @@ export default class RightClickMenu extends Component {
 			</div>
 		);
 	}
-}
+})

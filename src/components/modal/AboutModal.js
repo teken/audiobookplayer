@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import ButtonRow from '../settings/ButtonRow';
+import withTheme from '../theme/withTheme';
 
 const {app/*, process*/} = window.require('electron').remote;
 
@@ -63,12 +64,12 @@ export default class AboutModal extends Component {
 			}}>
 				<div style={{
 					display: this.state.hidden ? 'none' : 'grid',
-					background: this.props.styling.background,
+					background: this.props.theme.background,
 					gridTemplateRows: '1fr auto 1fr',
 					width: '90%',
 				}}>
 					<div style={{padding:'0 1em', ...centreStyle}}><h1>About</h1></div>
-					<div style={{padding:'0 1em', color: this.props.styling.secondaryText, ...centreStyle}}>
+					<div style={{padding:'0 1em', color: this.props.theme.secondaryText, ...centreStyle}}>
 						Audio Book Player: v{app.getVersion()}<br/>
 						Created By Duncan Haig<br/>
 						Copywrite 2018 Duncan Haig<br/>
@@ -79,7 +80,7 @@ export default class AboutModal extends Component {
 						<br/>
 					</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>
-						<ButtonRow styling={this.props.styling} buttonWidth={100} buttons={[
+						<ButtonRow buttonWidth={100} buttons={[
 							{value:"OK", onClick:this.okClick},
 						]}/>
 					</div>

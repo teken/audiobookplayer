@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome';
 
-export default class Dropdown extends Component {
+import withTheme from '../theme/withTheme';
+
+export default withTheme(class Dropdown extends Component {
 	constructor(props) {
 		super(props);
 		this.handleChange = this.handleChange.bind(this);
@@ -21,12 +23,12 @@ export default class Dropdown extends Component {
 
 	render() {
 		return (
-			<span style={{display:'flex', color: this.props.styling.activeText}}>
+			<span style={{display:'flex', color: this.props.theme.activeText}}>
 				<Icon icon="caret-down" onClick={this.handleClick} style={{
 					width:'10%',
 					fontSize: '1.5em',
 					padding: '.5em 0',
-					backgroundColor: this.props.styling.inputBackground,
+					backgroundColor: this.props.theme.inputBackground,
 					cursor:'pointer'
 				}} />
 				<select type="text" readOnly='false' value={this.props.value} ref={this.textInput} onChange={this.handleChange}
@@ -34,8 +36,8 @@ export default class Dropdown extends Component {
 						padding: '0.6em',
 						width:'90%',
 						borderColor: 'transparent',
-						color: this.props.styling.activeText,
-						backgroundColor: this.props.styling.inputBackground,
+						color: this.props.theme.activeText,
+						backgroundColor: this.props.theme.inputBackground,
 						cursor:'pointer'
 					}}>
 					{this.props.options.map(option => <option key={option.value} value={option.value}>{option.name}</option>)}
@@ -43,5 +45,5 @@ export default class Dropdown extends Component {
 			</span>
 		);
 	}
-}
+})
 

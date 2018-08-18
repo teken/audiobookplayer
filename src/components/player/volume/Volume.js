@@ -3,7 +3,9 @@ import React, {Component} from 'react';
 import ProgressBar from '../timeline/ProgressBar';
 import ProgressBarHandler from '../timeline/ProgressBarHandler';
 
-export default class Volume extends Component {
+import withTheme from '../../theme/withTheme';
+
+export default withTheme(class Volume extends Component {
 	constructor(props) {
 		super(props);
 		this._player = props.player;
@@ -115,8 +117,8 @@ export default class Volume extends Component {
 					onMouseDown={this._onMouseDownProgressBar}
 					onMouseOver={this._onMouseOverProgressBar}
 					onMouseOut={this._onMouseOutProgressBar}
-					colour={this.props.styling.activeText}
-					inactiveColour={this.props.styling.inactiveText}
+					colour={this.props.theme.activeText}
+					inactiveColour={this.props.theme.inactiveText}
 				>
 					<ProgressBarHandler
 						width={handlerWidth}
@@ -124,11 +126,11 @@ export default class Volume extends Component {
 						visibility={this.state.showHandler || this.holding}
 						translate={`translate(${this.state.translate - (handlerWidth / 2)})`}
 						onMouseDown={this._onMouseDownProgressBarHandler}
-						colour={this.props.styling.activeText}
-						inactiveColour={this.props.styling.inactiveText}
+						colour={this.props.theme.activeText}
+						inactiveColour={this.props.theme.inactiveText}
 					/>
 				</ProgressBar>
 			</span>
 		);
 	}
-}
+})
