@@ -85,6 +85,11 @@ export default withRouter(withTheme(class Player extends Component {
 		this.setState({showTimePicker: false});
 	}
 
+	get cleanedName() {
+		const number = this._player.book.name.slice(0, 3).trim();
+		return this._player.work && !isNaN(number) ? this._player.book.name.slice(3) : this._player.book.name;
+	}
+
 	render() {
 		let commonButtonStyling = {
 			padding: "1em",
@@ -119,7 +124,7 @@ export default withRouter(withTheme(class Player extends Component {
 						const path = `${this._player.work.$loki}${this._player.work.type === 'SERIES' ? `/${this._player._bookNameIfSeries}`: ''}`;
 						this.props.history.push(`/works/${path}`);
 					}}>
-						{this._player.isLoaded && this._player.book.name}
+						{ this._player.isLoaded && this.cleanedName }
 					</span>
 					<span style={{color:this.props.theme.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
 						{this._player.isLoaded ? `${this.formatTime(this.state.progress)} / ${this.formatTime(this.state.duration)}` : `No Book Selected`}

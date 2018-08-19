@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import ReactTable from 'react-table';
 
 import {FontAwesomeIcon as Icon} from '@fortawesome/react-fontawesome'
+import Loading from '../loading/Loading';
 
 import 'react-table/react-table.css'
 
@@ -130,6 +131,16 @@ export default withRouter(withTheme(class Detail extends Component {
 		return {name:name,data:data.slice(0,-1)};
 	}
 
+	get cleanedName() {
+		const number = this.state.book.name.slice(0, 3).trim();
+		return this.isSeries && !isNaN(number) ? this.state.book.name.slice(3) : this.state.book.name;
+	}
+
+	get seriesName() {
+		const number = this.state.book.name.slice(0, 3).trim();
+		return isNaN(number) ? this.state.work.name : `${this.state.work.name} #${number}`;
+	}
+
 	render() {
 		const tracks =  (this.state.book ? this.state.book.tracks : []);
 		const data = tracks.reduce((a,v,i) => {
@@ -148,12 +159,13 @@ export default withRouter(withTheme(class Detail extends Component {
 		return (
 			<div className="detail">
 				{this.state.loading ? (
-					<h1>Loading...</h1>
+					<Loading />
 				) : (
 					<div>
-						<h1>{this.title}</h1>
-						<h2>By {this.state.author.name}</h2>
-						<div  style={{color: this.props.theme.secondaryText}}>
+						<h1>{this.cleanedName}</h1>
+						{this.isSeries && <h3 style={{color:this.props.theme.secondaryText}}>({this.seriesName})</h3>}
+						<h2 style={{fontWeight:400}}>By {this.state.author.name}</h2>
+						<div style={{color: this.props.theme.secondaryText}}>
 							<div style={{display:'flex', justifyContent: 'space-between', color: this.props.theme.secondaryText, alignItems: 'flex-end'}}>
 								<div style={{width:'30%'}}>
 									{this.isSeries && this.hasPreviousBook && (

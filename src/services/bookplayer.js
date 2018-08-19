@@ -124,11 +124,11 @@ export default class BookPlayer {
 			let trackName = '';
 			for (let track of this._tracks) {
 				trackName = track.name;
-				if (remainingTime < (total + track.meta.format.duration)) {
+				if (remainingTime < (total + (track.meta ? track.meta.format.duration: 0 ))) {
 					remainingTime -= total;
 					break;
 				}
-				total += track.meta.format.duration;
+				total += (track.meta ? track.meta.format.duration: 0 )
 			}
 			this.setToTrack(trackName, () => {
 				this._audioPlayer.currentTime = remainingTime;
