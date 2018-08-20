@@ -26,12 +26,12 @@ export default withTheme(class Tile extends Component {
 	}
 
 	get cleanedName() {
-		const number = this.props.work.name.slice(0, 3).trim();
-		return this.props.series && !isNaN(number) ? this.props.work.name.slice(3) : this.props.work.name;
+		const number = this.props.work.name.split(' ', 1)[0];
+		return this.props.series && !isNaN(number) ? this.props.work.name.slice(number.length+1) : this.props.work.name;
 	}
 
 	get seriesName() {
-		const number = this.props.work.name.slice(0, 3).trim();
+		const number = this.props.work.name.split(' ', 1)[0];
 		return isNaN(number) ? this.props.series.name : `${this.props.series.name} #${number}`;
 	}
 

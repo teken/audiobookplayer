@@ -2,6 +2,7 @@ import AudioPlayer from './audioplayer';
 
 const {ipcRenderer} = window.require('electron');
 const mm = window.require('music-metadata');
+const fs = window.require('fs');
 
 export default class BookPlayer {
 	constructor(volume) {
@@ -199,5 +200,25 @@ export default class BookPlayer {
 
 	get currentTrack() {
 		return this._currentTrack;
+	}
+
+	loadCUEFileData(path) {
+		if (path === null) return [];
+		const buffer = fs.readFileSync(path);
+		const lines = buffer.toString('utf8').split('\n').map(line => line.trim()).filter(line => line.length > 0);
+		const name = lines.slice(0,1)[0].slice(6, -5);
+		const content = lines.slice(1);
+		let data = [];
+		for(let i = 0; i <= content.length; i+=3) {
+			let name = String(content[i+1]).slice(7,-1);
+			let timeCode = String(content[i+2]).slice(9);
+			data.push({name:name, time:timeCode})
+		}
+		return {name:name,data:data.slice(0,-1)};
+	}
+
+	get chapters() {
+		//TODO: finish chapter markers
+		return [];//this.isLoaded ? this.book.info.map(file => this.loadCUEFileData(file.path)) : [];
 	}
 }

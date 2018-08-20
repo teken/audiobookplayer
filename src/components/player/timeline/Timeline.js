@@ -13,7 +13,8 @@ export default withTheme(class Timeline extends Component {
 		this.state = {
 			showHandler: false,
 			barWidth: window.innerWidth,
-			translate: 0
+			translate: 0,
+			steps: []
 		};
 		this.holding = false;
 		this.shouldTogglePlayPause = this._player.isPlaying;
@@ -33,6 +34,11 @@ export default withTheme(class Timeline extends Component {
 			const length = nextProps.progress * lengthPerSecond;
 			this.changeTranslate(length);
 			this.shouldTogglePlayPause = nextProps.playing;
+
+		}
+		if (nextProps.chapters && nextProps.chapters.length > 0) {
+			const lengthPerSecond = nextProps.duration === 0 ? 0 : this.state.barWidth / nextProps.duration;
+			this.changeSteps(nextProps.chapters, lengthPerSecond);
 		}
 	}
 
@@ -102,6 +108,27 @@ export default withTheme(class Timeline extends Component {
 		this.setState({ translate });
 	}
 
+	changeSteps(chapters, lengthPerSecond) {
+		const flatternChapters = chapters.reduce((acc, val) => acc.concat(val.data),[]).map(x => {
+			x.time = this.formatCUETimeAsSecond(x.time) * lengthPerSecond;
+			return x;
+		});
+		this.setState({
+			steps: flatternChapters
+		});
+	}
+
+	formatCUETimeAsSecond(time) {
+		if (!isNaN(time)) return time;
+		if (!time) time = '0:0:00';
+		const parts = time.split(':');
+		let date = new Date(null);
+		date.setMinutes(Number(parts[0]));
+		date.setSeconds(Number(parts[1]));
+		date.setMilliseconds(Number(parts[2])*10);
+		return date.getTime()/1000;
+	}
+
 	setProgress(value) {
 		this._player.currentTime = value;
 	}
@@ -160,6 +187,7 @@ export default withTheme(class Timeline extends Component {
 					onMouseOut={this._onMouseOutProgressBar}
 					colour={this.props.theme.activeText}
 					inactiveColour={this.props.theme.inactiveText}
+					steps={this.state.steps}
 				>
 					<ProgressBarHandler
 						width={handlerWidth}

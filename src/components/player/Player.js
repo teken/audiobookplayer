@@ -21,7 +21,8 @@ export default withRouter(withTheme(class Player extends Component {
 			volumeIcon: "volume-up",
 			muted: false,
 			intervalId : null,
-			showTimePicker: false
+			showTimePicker: false,
+			chapters: []
 		};
 
 		this.update = this.update.bind(this);
@@ -52,6 +53,7 @@ export default withRouter(withTheme(class Player extends Component {
 			progress: this._player.currentTime,
 			duration: this._player.duration,
 			volume: this._player.volume,
+			chapters: this._player.chapters,
 			playButtonIcon: this._player.isPlaying ? `pause` : `play`,
 			volumeIcon: this.volumeIcon()
 		});
@@ -86,8 +88,8 @@ export default withRouter(withTheme(class Player extends Component {
 	}
 
 	get cleanedName() {
-		const number = this._player.book.name.slice(0, 3).trim();
-		return this._player.work && !isNaN(number) ? this._player.book.name.slice(3) : this._player.book.name;
+		const number = this._player.book.name.split(' ', 1)[0];
+		return this._player.work && !isNaN(number) ? this._player.book.name.slice(number.length+1) : this._player.book.name;
 	}
 
 	render() {
@@ -105,7 +107,7 @@ export default withRouter(withTheme(class Player extends Component {
 				height: '3em'
 			}}>
 				<TimeCodePromptModal show={this.state.showTimePicker} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
-				<Timeline player={this._player} progress={this.state.progress} duration={this.state.duration}/>
+				<Timeline player={this._player} progress={this.state.progress} duration={this.state.duration} chapters={this.state.chapters}/>
 				<div className="controls" style={{height:'1em'}}>
 
 					<IconButton title="Previous Track" icon="backward" onClick={() => this._player.playPreviousTrack()} style={{...commonButtonStyling, color: this._player.hasPreviousTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>

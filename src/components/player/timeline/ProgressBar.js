@@ -35,6 +35,19 @@ export default class ProgressBar extends Component {
 						height={this.props.barHeight}
 						fill={this.props.colour}
 					/>
+					{ (this.props.steps ? this.props.steps : []).map(step =>
+						<rect
+							x={step.time}
+							y={diff}
+							width={2}
+							height={this.props.barHeight}
+							fill='black'//{this.props.colour}
+						>
+							<title>
+								{step.name}
+							</title>
+						</rect>
+					)}
 				</g>
 				{ this.props.children }
 			</svg>
