@@ -25,5 +25,5 @@ publish_task:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
-    
+  build_script: yarn run build
   publish_script: yarn run release
