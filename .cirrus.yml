@@ -11,11 +11,14 @@ build_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: cat yarn.lock
-    populate_script: yarn build
+    populate_script: yarn install
+  build_script: jarn run build
 
 
 publish_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: cat yarn.lock
-    populate_script: yarn release
+    populate_script: yarn install
+    
+  publish_script: yarn run release
