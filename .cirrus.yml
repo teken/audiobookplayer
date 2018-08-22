@@ -6,7 +6,7 @@ windows_task:
     AWS_SECRET_ACCESS_KEY: ENCRYPTED[3fd7909c3b2e089d38da979bb3420cd7d6c68fc757129aef403f5f1f866183459afc5938d2fcb6403d57ba53543345ff]
   node_modules_cache:
     folder: node_modules
-    fingerprint_script: cat yarn.lock
+    fingerprint_script: print yarn.lock
     populate_script: yarn install
   build_script: yarn run build
   publish_script: yarn run release
