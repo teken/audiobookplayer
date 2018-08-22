@@ -7,14 +7,14 @@ check_task:
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
 
-build_task
+build_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn build
 
 
-publish_task
+publish_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: cat yarn.lock
