@@ -42,5 +42,6 @@ linux_task:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
+  presetup_script: sudo snap install snapcraft --classic
   build_script: yarn run build
   publish_script: yarn run release
