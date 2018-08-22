@@ -68,6 +68,7 @@
       }
     },
     "linux": {
+      "target": "AppImage"
       "category": "Audio",
       "publish": {
         "provider": "s3",
