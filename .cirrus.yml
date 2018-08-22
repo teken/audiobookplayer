@@ -7,9 +7,9 @@ windows_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: print yarn.lock
-    populate_script: yarn install
-  build_script: yarn run build
-  publish_script: yarn run release
+    populate_script: npm install
+  build_script: npm run build
+  publish_script: npm run release
 
 mac_task:
   osx_instance:
@@ -20,9 +20,9 @@ mac_task:
   node_modules_cache:
     folder: node_modules
     fingerprint_script: cat yarn.lock
-    populate_script: yarn install
-  build_script: yarn run build
-  publish_script: yarn run release
+    populate_script: npm install
+  build_script: npm run build
+  publish_script: npm run release
 
 linux_task:
   container:
