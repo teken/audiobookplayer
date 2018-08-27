@@ -1,16 +1,14 @@
 const {ipcMain} = require('electron');
 
-const DatabaseService = require('./database');
 const LibraryService = require('./library');
-const SettingsService = require('./settings');
 
 module.exports = class IPCService {
 
-	constructor(window) {
+	constructor(window, localLibrary, bookTimes, settings) {
 		this.window = window;
-		this.localLibrary = DatabaseService.localLibrary;
-		this.bookTimings = DatabaseService.bookTimes;
-		this.settings = new SettingsService();
+		this.localLibrary = localLibrary;
+		this.bookTimings = bookTimes;
+		this.settings = settings;
 		this.init();
 	}
 
@@ -67,7 +65,7 @@ module.exports = class IPCService {
 			{
 				name: "library.importdelta",
 				action: (event, args) => {
-					LibraryService.fileSystemToLibrary(true).then(result => {
+					LibraryService.fileSystemToLibrary(true, this.localLibrary, this.settings).then(result => {
 						event.sender.send('library.importdelta.reply', result)
 					});
 				}
@@ -75,7 +73,7 @@ module.exports = class IPCService {
 			{
 				name: "library.reimport",
 				action: (event, args) => {
-					LibraryService.fileSystemToLibrary(false).then(result => {
+					LibraryService.fileSystemToLibrary(false, this.localLibrary, this.settings).then(result => {
 						event.sender.send('library.reimport.reply', result)
 					});
 				}
@@ -83,7 +81,7 @@ module.exports = class IPCService {
 			{
 				name: "library.clear",
 				action: (event, args) => {
-					LibraryService.clearLibrary().then(result => {
+					LibraryService.clearLibrary(this.localLibrary).then(result => {
 						event.sender.send('library.clear.reply', result)
 					});
 				}

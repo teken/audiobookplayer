@@ -190,7 +190,7 @@ export default withRouter(withTheme(class Library extends Component {
 
 	noBooksFound() {
 		return <div style={{display:'flex', justifyContent:'center', alignItems: 'center'}}>
-			<div>
+			<div style={{lineHeight:'1.8em'}}>
 				<h1>no books to be found,<br />maybe try importing some...</h1>
 				<div style={{color:this.props.theme.secondaryText}}>
 					Head to the settings page using the cog icon on the menu bar

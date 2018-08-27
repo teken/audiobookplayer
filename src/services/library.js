@@ -2,14 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const mm = require('music-metadata');
 
-const DatabaseService = require('./database');
-const SettingsService = require('./settings');
-
 module.exports = class LibraryService {
 
-	static clearLibrary() {
+	static clearLibrary(localLibrary) {
 		return new Promise((res, rej) => {
-			let localLibrary = DatabaseService.localLibrary;
 			localLibrary.removeCollection('authors');
 			localLibrary.removeCollection('works');
 
@@ -23,12 +19,11 @@ module.exports = class LibraryService {
 	/**
 	 * @param {boolean} onlyLookForChanges
 	 */
-	static fileSystemToLibrary(onlyLookForChanges) {
+	static fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
 		return new Promise((res, rej) => {
-			const pathFile = new SettingsService().get('libraryPath');
+			const pathFile = settings.get('libraryPath');
 
 			let fileSystem = this.fileRecursiveStatLookup(pathFile),
-				localLibrary = DatabaseService.localLibrary,
 				authors = localLibrary.getCollection('authors'),
 				works = localLibrary.getCollection('works');
 

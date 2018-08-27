@@ -8,13 +8,18 @@ const { autoUpdater } = require("electron-updater");
 let mainWindow;
 let splash;
 
+const DatabaseService = require('../src/services/database');
+const localLibrary = DatabaseService.localLibrary;
+const bookTimes = DatabaseService.bookTimes;
+
 const IPCService = require('../src/services/ipc');
 const GlobalShortcutsService = require('../src/services/globalShortcuts');
-const SettingsService = require('../src/services/settings');
 
+const SettingsService = require('../src/services/settings');
 let ipcService;
 let globalShortcutService;
 const settings = new SettingsService();
+
 const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'development' : false;
 
 autoUpdater.checkForUpdatesAndNotify();
@@ -69,7 +74,7 @@ function createWindow() {
 	if (settings.get('windowState.maximised')) mainWindow.maximize();
 
 	if (!globalShortcutService) globalShortcutService = new GlobalShortcutsService(mainWindow);
-	if (!ipcService) ipcService = new IPCService(mainWindow);
+	if (!ipcService) ipcService = new IPCService(mainWindow, localLibrary, bookTimes, settings);
 
 	const startUrl = process.env.ELECTRON_START_URL || url.format({
 		pathname: `${getMainPath()}/index.html`,
