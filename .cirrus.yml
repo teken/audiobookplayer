@@ -7,6 +7,7 @@ windows_task:
     - Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     - choco install yarn -y
     - refreshenv
+    - yarn -v
   environment:
     AWS_ACCESS_KEY_ID: ENCRYPTED[9045ce6b930edefbd4c14d388a3e963cf6bcc938815aebcb0b331800bd0c3f76587533ce9207e7989138a7ed9afd7159]
     AWS_SECRET_ACCESS_KEY: ENCRYPTED[3fd7909c3b2e089d38da979bb3420cd7d6c68fc757129aef403f5f1f866183459afc5938d2fcb6403d57ba53543345ff]
