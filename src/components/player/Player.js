@@ -93,7 +93,7 @@ export default withRouter(withTheme(class Player extends Component {
 	}
 
 	render() {
-		let commonButtonStyling = {
+		const commonButtonStyling = {
 			padding: "1em",
 			cursor: "pointer",
 		};
@@ -109,7 +109,6 @@ export default withRouter(withTheme(class Player extends Component {
 				<TimeCodePromptModal show={this.state.showTimePicker} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
 				<Timeline player={this._player} progress={this.state.progress} duration={this.state.duration} chapters={this.state.chapters}/>
 				<div className="controls" style={{height:'1em'}}>
-
 					<IconButton title="Previous Track" icon="backward" onClick={() => this._player.playPreviousTrack()} style={{...commonButtonStyling, color: this._player.hasPreviousTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<IconButton title="Next Track" icon="forward" onClick={() => this._player.playNextTrack()} style={{...commonButtonStyling, color: this._player.hasNextTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>

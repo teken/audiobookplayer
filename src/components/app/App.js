@@ -76,7 +76,7 @@ export default withTheme(class App extends Component {
 				textAlign: 'center',
 				paddingTop: `${top}em`,
 				paddingBottom: `${bottom}em`,
-				backgroundImage: this.props.theme.background,
+				background: this.props.theme.background,
 				color: this.props.theme.primaryText,
 				WebkitFontSmoothing: 'antialiased',
 				fontFamily: 'Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -112,8 +112,8 @@ export default withTheme(class App extends Component {
 										Node: v{process.versions.node}<br/>
 										Chrome: v{process.versions.chrome}<br/>
 									</p>
+									<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 									<p>
-										<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 										<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>
 											AudioBookPlayer.app
 										</span><br/>
@@ -138,42 +138,42 @@ export default withTheme(class App extends Component {
 					  font-family: 'Archivo';
 					  font-style: normal;
 					  font-weight: normal;
-					  src: url('fonts/Archivo/OpenSans-Regular.ttf') format('truetype');
+					  src: url('fonts/Archivo/Archivo-Regular.ttf') format('truetype');
 					}
 
 					@font-face {
 					  font-family: 'Archivo';
 					  font-style: italic;
 					  font-weight: normal;
-					  src: url('fonts/Archivo/OpenSans-Italic.ttf') format('truetype');
+					  src: url('fonts/Archivo/Archivo-Italic.ttf') format('truetype');
 					}
 
 					@font-face {
 					  font-family: 'Archivo';
 					  font-style: normal;
 					  font-weight: 600;
-					  src: url('fonts/Archivo/OpenSans-SemiBold.ttf') format('truetype');
+					  src: url('fonts/Archivo/Archivo-SemiBold.ttf') format('truetype');
 					}
 
 					@font-face {
 					  font-family: 'Archivo';
 					  font-style: italic;
 					  font-weight: 600;
-					  src: url('fonts/Archivo/OpenSans-SemiBoldItalic.ttf') format('truetype');
+					  src: url('fonts/Archivo/Archivo-SemiBoldItalic.ttf') format('truetype');
 					}
 
 					@font-face {
 					  font-family: 'Archivo';
 					  font-style: normal;
 					  font-weight: 700;
-					  src: url('fonts/Archivo/OpenSans-Bold.ttf') format('truetype');
+					  src: url('fonts/Archivo/Archivo-Bold.ttf') format('truetype');
 					}
 
 					@font-face {
 					  font-family: 'Archivo';
 					  font-style: italic;
 					  font-weight: 700;
-					  src: url('fonts/Archivo/OpenSans-BoldItalic.ttf') format('truetype');
+					  src: url('fonts/Archivo/Archivo-BoldItalic.ttf') format('truetype');
 					}
 
 					@font-face {

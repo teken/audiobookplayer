@@ -1,5 +1,6 @@
 import React from 'react';
-import {ThemeContext} from './ThemeContext';
+
+export const ThemeContext = React.createContext();
 
 export default function withTheme(Component) {
 	return React.forwardRef((props, ref) => (
