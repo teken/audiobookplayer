@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
-import {HashRouter as Router, Route, Switch} from 'react-router-dom';
+import {HashRouter, Route, Switch} from 'react-router-dom';
 
 import Library from '../library/Library';
 import Player from '../player/Player';
 import Detail from '../detail/Detail';
 import WindowControls from "../WindowControls";
 import Settings from '../settings/Settings';
-
-import BookPlayer from '../../services/bookplayer';
+import About from '../about/About';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 
@@ -18,22 +17,21 @@ import { faPlay, faPause, faStop, faBackward, faForward, faVolumeOff, faVolumeDo
 
 
 import withTheme from '../theme/withTheme';
+import withPlayer from '../player/withPlayer';
 
 //import { faSquare } from '@fontawesome/free-regular-svg-icons';
 //import { } from '@fontawesome/free-brands-svg-icons';
 
-const {ipcRenderer, shell} = window.require('electron');
-const {app, process} = window.require('electron').remote;
+const {ipcRenderer} = window.require('electron');
 
 library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolumeDown, faVolumeOff, faMapMarkerAlt,
 			faMinus, faSquare, faTimes, faBookOpen, faCog, faSearch, faFolderOpen, faChevronLeft, faChevronRight,
 			faQuestion, faCaretDown, faCheckSquare
 );
 
-export default withTheme(class App extends Component {
+export default withTheme(withPlayer(class App extends Component {
 	constructor(props) {
 		super(props);
-		this._player = new BookPlayer(ipcRenderer.sendSync('settings.get', 'volume'));
 		this.registerIPCListeners();
 		this.state = {
 			height: window.innerHeight,
@@ -42,16 +40,16 @@ export default withTheme(class App extends Component {
 
 	registerIPCListeners() {
 		ipcRenderer.on('player.pauseplay', (event, arg) => {
-			this._player.playPause();
+			this.props.player.playPause();
 		});
 		ipcRenderer.on('player.previoustrack', (event, arg) => {
-			this._player.playPreviousTrack()
+			this.props.player.playPreviousTrack()
 		});
 		ipcRenderer.on('player.nexttrack', (event, arg) => {
-			this._player.playNextTrack()
+			this.props.player.playNextTrack()
 		});
 		ipcRenderer.on('player.stop', (event, arg) => {
-			this._player.stop();
+			this.props.player.stop();
 		});
 	}
 
@@ -71,233 +69,203 @@ export default withTheme(class App extends Component {
 	render() {
 		const top = 2, bottom = 3;
 		return (
-		<Router>
-			<div style={{
-				textAlign: 'center',
-				paddingTop: `${top}em`,
-				paddingBottom: `${bottom}em`,
-				background: this.props.theme.background,
-				color: this.props.theme.primaryText,
-				WebkitFontSmoothing: 'antialiased',
-				fontFamily: 'Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif',
-				lineHeight: '1em',
-				letterSpacing: '0.03em'
-			}}>
-				<WindowControls/>
-				<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
-					<Switch>
-						<Route exact path="/" render={() => (
-							<Library player={this._player}/>
-						)}/>
-						<Route path="/works/:workId/:bookName" render={({match}) => (
-							<Detail player={this._player} workId={match.params.workId} bookName={match.params.bookName}/>
-						)}/>
-						<Route path="/works/:workId" render={({match}) => (
-							<Detail player={this._player} workId={match.params.workId}/>
-						)}/>
-						<Route path="/settings" render={() => (
-							<Settings />
-						)}/>
-						<Route path="/about" render={() => (
-							<div>
-								<h1>About</h1>
-								<div style={{color: this.props.theme.secondaryText, lineHeight: '1.2em'}}>
-									<p>
-										Audio Book Player: v{app.getVersion()}<br/>
-										Created By Duncan Haig<br/>
-										Copywrite 2018 Duncan Haig<br/>
-									</p>
-									<p>
-										Electron: v{process.versions.electron}<br/>
-										Node: v{process.versions.node}<br/>
-										Chrome: v{process.versions.chrome}<br/>
-									</p>
-									<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
-									<p>
-										<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>
-											AudioBookPlayer.app
-										</span><br/>
-										<span style={{cursor:'pointer', textDecoration:'underline'}} onClick={() => shell.openExternal('https://www.patreon.com/AudioBookPlayer')}>
-											Patreon
-										</span>
-									</p>
+			<HashRouter>
+				<div style={{
+					textAlign: 'center',
+					paddingTop: `${top}em`,
+					paddingBottom: `${bottom}em`,
+					background: this.props.theme.background,
+					color: this.props.theme.primaryText,
+					WebkitFontSmoothing: 'antialiased',
+					fontFamily: 'Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif',
+					lineHeight: '1em',
+					letterSpacing: '0.03em'
+				}}>
+					<WindowControls/>
+					<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
+						<Switch>
+							<Route exact path="/" component={Library}/>
+							<Route path="/works/:workId/:bookName" render={({match}) => (
+								<Detail workId={match.params.workId} bookName={match.params.bookName}/>
+							)}/>
+							<Route path="/works/:workId" render={({match}) => (
+								<Detail workId={match.params.workId}/>
+							)}/>
+							<Route path="/settings" component={Settings}/>
+							<Route path="/about" component={About}/>
+							<Route render={({location}) => (
+								<div style={{lineHeight: '1.2em'}}>
+									<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
 								</div>
-							</div>
-						)}/>
-						<Route render={({location}) => (
-							<div>
-								<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
-							</div>
-						)}/>
-					</Switch>
+							)}/>
+						</Switch>
+					</div>
+					<Player />
+					<style dangerouslySetInnerHTML={{__html: `
+
+						@font-face {
+						  font-family: 'Archivo';
+						  font-style: normal;
+						  font-weight: normal;
+						  src: url('fonts/Archivo/Archivo-Regular.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Archivo';
+						  font-style: italic;
+						  font-weight: normal;
+						  src: url('fonts/Archivo/Archivo-Italic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Archivo';
+						  font-style: normal;
+						  font-weight: 600;
+						  src: url('fonts/Archivo/Archivo-SemiBold.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Archivo';
+						  font-style: italic;
+						  font-weight: 600;
+						  src: url('fonts/Archivo/Archivo-SemiBoldItalic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Archivo';
+						  font-style: normal;
+						  font-weight: 700;
+						  src: url('fonts/Archivo/Archivo-Bold.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Archivo';
+						  font-style: italic;
+						  font-weight: 700;
+						  src: url('fonts/Archivo/Archivo-BoldItalic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: normal;
+						  font-weight: 300;
+						  src: url('fonts/Open Sans/OpenSans-Light.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: italic;
+						  font-weight: 300;
+						  src: url('fonts/Open Sans/OpenSans-LightItalic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: normal;
+						  font-weight: normal;
+						  src: url('fonts/Open Sans/OpenSans-Regular.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: italic;
+						  font-weight: normal;
+						  src: url('fonts/Open Sans/OpenSans-Italic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: normal;
+						  font-weight: 600;
+						  src: url('fonts/Open Sans/OpenSans-SemiBold.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: italic;
+						  font-weight: 600;
+						  src: url('fonts/Open Sans/OpenSans-SemiBoldItalic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: normal;
+						  font-weight: 700;
+						  src: url('fonts/Open Sans/OpenSans-Bold.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: italic;
+						  font-weight: 700;
+						  src: url('fonts/Open Sans/OpenSans-BoldItalic.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: normal;
+						  font-weight: 800;
+						  src: url('fonts/Open Sans/OpenSans-ExtraBold.ttf') format('truetype');
+						}
+
+						@font-face {
+						  font-family: 'Open Sans';
+						  font-style: italic;
+						  font-weight: 800;
+						  src: url('fonts/Open Sans/OpenSans-ExtraBoldItalic.ttf') format('truetype');
+						}
+
+						body {
+							-webkit-user-select:none;
+							cursor:default;
+						}
+
+						.rt-expander::after {
+							border-top-color: ${this.props.theme.activeText} !important;
+						}
+
+						::-webkit-input-placeholder {
+							color: ${this.props.theme.inactiveText};
+						}
+
+						input:focus,
+						select:focus {
+							outline-color: transparent;
+						}
+
+						::-webkit-scrollbar {
+							width: 8px;
+							-webkit-border-radius: 100px;
+						}
+
+						::-webkit-scrollbar-thumb:vertical {
+							background: ${this.props.theme.inactiveText};
+							-webkit-border-radius: 100px;
+						}
+
+						::-webkit-scrollbar-thumb:vertical:active {
+							background: ${this.props.theme.activeText};
+							-webkit-border-radius: 100px;
+						}
+
+						::-webkit-scrollbar-track {
+							background-color: ${this.props.theme.scrollBarTrack};
+							-webkit-border-radius: 100px;
+							margin-bottom: 0.2em
+						}
+
+						.spinnerless::-webkit-outer-spin-button,
+						.spinnerless::-webkit-inner-spin-button {
+							-webkit-appearance: none;
+							margin: 0;
+						}
+
+						select {
+							-webkit-appearance: none;
+						}
+					`}} />
 				</div>
-				<Player player={this._player}/>
-				<style dangerouslySetInnerHTML={{__html: `
-				
-					@font-face {
-					  font-family: 'Archivo';
-					  font-style: normal;
-					  font-weight: normal;
-					  src: url('fonts/Archivo/Archivo-Regular.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Archivo';
-					  font-style: italic;
-					  font-weight: normal;
-					  src: url('fonts/Archivo/Archivo-Italic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Archivo';
-					  font-style: normal;
-					  font-weight: 600;
-					  src: url('fonts/Archivo/Archivo-SemiBold.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Archivo';
-					  font-style: italic;
-					  font-weight: 600;
-					  src: url('fonts/Archivo/Archivo-SemiBoldItalic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Archivo';
-					  font-style: normal;
-					  font-weight: 700;
-					  src: url('fonts/Archivo/Archivo-Bold.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Archivo';
-					  font-style: italic;
-					  font-weight: 700;
-					  src: url('fonts/Archivo/Archivo-BoldItalic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: normal;
-					  font-weight: 300;
-					  src: url('fonts/Open Sans/OpenSans-Light.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: italic;
-					  font-weight: 300;
-					  src: url('fonts/Open Sans/OpenSans-LightItalic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: normal;
-					  font-weight: normal;
-					  src: url('fonts/Open Sans/OpenSans-Regular.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: italic;
-					  font-weight: normal;
-					  src: url('fonts/Open Sans/OpenSans-Italic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: normal;
-					  font-weight: 600;
-					  src: url('fonts/Open Sans/OpenSans-SemiBold.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: italic;
-					  font-weight: 600;
-					  src: url('fonts/Open Sans/OpenSans-SemiBoldItalic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: normal;
-					  font-weight: 700;
-					  src: url('fonts/Open Sans/OpenSans-Bold.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: italic;
-					  font-weight: 700;
-					  src: url('fonts/Open Sans/OpenSans-BoldItalic.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: normal;
-					  font-weight: 800;
-					  src: url('fonts/Open Sans/OpenSans-ExtraBold.ttf') format('truetype');
-					}
-
-					@font-face {
-					  font-family: 'Open Sans';
-					  font-style: italic;
-					  font-weight: 800;
-					  src: url('fonts/Open Sans/OpenSans-ExtraBoldItalic.ttf') format('truetype');
-					}
-
-					body {
-						-webkit-user-select:none;
-						cursor:default;
-					}
-
-					.rt-expander::after {
-						border-top-color: ${this.props.theme.activeText} !important;
-					}
-
-					::-webkit-input-placeholder {
-						color: ${this.props.theme.inactiveText};
-					}
-
-					input:focus,
-					select:focus {
-						outline-color: transparent;
-					}
-
-					::-webkit-scrollbar {
-						width: 8px;
-						-webkit-border-radius: 100px;
-					}
-
-					::-webkit-scrollbar-thumb:vertical {
-						background: ${this.props.theme.inactiveText};
-						-webkit-border-radius: 100px;
-					}
-
-					::-webkit-scrollbar-thumb:vertical:active {
-						background: ${this.props.theme.activeText};
-						-webkit-border-radius: 100px;
-					}
-
-					::-webkit-scrollbar-track {
-						background-color: ${this.props.theme.scrollBarTrack};
-						-webkit-border-radius: 100px;
-						margin-bottom: 0.2em
-					}
-
-					.spinnerless::-webkit-outer-spin-button,
-					.spinnerless::-webkit-inner-spin-button {
-    					-webkit-appearance: none;
-    					margin: 0;
-					}
-
-					select {
-						-webkit-appearance: none;
-					}
-    			`}} />
-			</div>
-		</Router>
-
+			</HashRouter>
 		);
 	}
-})
+}))

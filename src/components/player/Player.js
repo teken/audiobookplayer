@@ -8,16 +8,16 @@ import IconButton from './IconButton';
 import TimeCodePromptModal from '../modal/TimeCodePromptModal';
 
 import withTheme from '../theme/withTheme';
+import withPlayer from './withPlayer';
 
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(withTheme(class Player extends Component {
+export default withRouter(withTheme(withPlayer(class Player extends Component {
 	constructor(props) {
 		super(props);
-		this._player = props.player;
 		this.state = {
 			playButtonIcon: 'pause',
-			volume: this._player.volume,
+			volume: this.props.player.volume,
 			volumeIcon: "volume-up",
 			muted: false,
 			intervalId : null,
@@ -35,11 +35,11 @@ export default withRouter(withTheme(class Player extends Component {
 	}
 
 	update() {
-		const timingKey = this._player.timingKey;
-		if (this._player.isPlaying && timingKey.length > 0) ipcRenderer.send('timings.set', {key: timingKey, time:this._player.currentTime});
+		const timingKey = this.props.player.timingKey;
+		if (this.props.player.isPlaying && timingKey.length > 0) ipcRenderer.send('timings.set', {key: timingKey, time:this.props.player.currentTime});
 		const progress = () => {
 			try {
-				return this._player.currentTime / this._player.duration;
+				return this.props.player.currentTime / this.props.player.duration;
 			} catch(e) {
 				return 0;
 			}
@@ -47,14 +47,14 @@ export default withRouter(withTheme(class Player extends Component {
 		ipcRenderer.send('window.progressbar.set', progress);
 		ipcRenderer.send('settings.set', {
 			name:'volume',
-			value: this._player.volume
+			value: this.props.player.volume
 		});
 		this.setState({
-			progress: this._player.currentTime,
-			duration: this._player.duration,
-			volume: this._player.volume,
-			chapters: this._player.chapters,
-			playButtonIcon: this._player.isPlaying ? `pause` : `play`,
+			progress: this.props.player.currentTime,
+			duration: this.props.player.duration,
+			volume: this.props.player.volume,
+			chapters: this.props.player.chapters,
+			playButtonIcon: this.props.player.isPlaying ? `pause` : `play`,
 			volumeIcon: this.volumeIcon()
 		});
 	}
@@ -64,7 +64,7 @@ export default withRouter(withTheme(class Player extends Component {
 	}
 
 	playPause() {
-		this._player.playPause();
+		this.props.player.playPause();
 		this.update();
 	}
 
@@ -77,19 +77,19 @@ export default withRouter(withTheme(class Player extends Component {
 	}
 
 	mute() {
-		if (this.state.muted) this._player.volume = this.state.volume;
-		else this._player.volume = 0;
+		if (this.state.muted) this.props.player.volume = this.state.volume;
+		else this.props.player.volume = 0;
 		this.setState({muted: !this.state.muted});
 	}
 
 	timePickerOk(time) {
-		this._player.currentTime = time;
+		this.props.player.currentTime = time;
 		this.setState({showTimePicker: false});
 	}
 
 	get cleanedName() {
-		const number = this._player.book.name.split(' ', 1)[0];
-		return this._player.work && !isNaN(number) ? this._player.book.name.slice(number.length+1) : this._player.book.name;
+		const number = this.props.player.book.name.split(' ', 1)[0];
+		return this.props.player.work && !isNaN(number) ? this.props.player.book.name.slice(number.length+1) : this.props.player.book.name;
 	}
 
 	render() {
@@ -107,28 +107,28 @@ export default withRouter(withTheme(class Player extends Component {
 				height: '3em'
 			}}>
 				<TimeCodePromptModal show={this.state.showTimePicker} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
-				<Timeline player={this._player} progress={this.state.progress} duration={this.state.duration} chapters={this.state.chapters}/>
+				<Timeline progress={this.state.progress} duration={this.state.duration} chapters={this.state.chapters}/>
 				<div className="controls" style={{height:'1em'}}>
-					<IconButton title="Previous Track" icon="backward" onClick={() => this._player.playPreviousTrack()} style={{...commonButtonStyling, color: this._player.hasPreviousTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
-					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
-					<IconButton title="Next Track" icon="forward" onClick={() => this._player.playNextTrack()} style={{...commonButtonStyling, color: this._player.hasNextTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
-					<IconButton title="Stop" icon="stop" onClick={() => this._player.stop()} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
-					<IconButton title="Skip to Point" icon="map-marker-alt" onClick={() => this._player.isLoaded && this.setState({showTimePicker: true})} style={{...commonButtonStyling, color: this._player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Previous Track" icon="backward" onClick={() => this.props.player.playPreviousTrack()} style={{...commonButtonStyling, color: this.props.player.hasPreviousTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Next Track" icon="forward" onClick={() => this.props.player.playNextTrack()} style={{...commonButtonStyling, color: this.props.player.hasNextTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Stop" icon="stop" onClick={() => this.props.player.stop()} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Skip to Point" icon="map-marker-alt" onClick={() => this.props.player.isLoaded && this.setState({showTimePicker: true})} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<span onMouseOver={() => this.displayVolume = true} onMouseOut={() => this.displayVolume = false}>
 						<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.theme.warning :this.props.theme.activeText}} svgStyle={{minWidth:'18px'}}/>
 						<span style={{display: !this.state.muted && this.displayVolume ? 'inline-flex' : 'none'}}>
-							<Volume player={this._player} progress={this.state.volume} duration={200}/>
+							<Volume progress={this.state.volume} duration={200}/>
 						</span>
 					</span>
-					<span style={{color:this.props.theme.activeText, cursor: this._player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
-						if (this._player.isLoaded) return;
-						const path = `${this._player.work.$loki}${this._player.work.type === 'SERIES' ? `/${this._player._bookNameIfSeries}`: ''}`;
+					<span style={{color:this.props.theme.activeText, cursor: this.props.player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
+						if (this.props.player.isLoaded) return;
+						const path = `${this.props.player.work.$loki}${this.props.player.work.type === 'SERIES' ? `/${this.props.player._bookNameIfSeries}`: ''}`;
 						this.props.history.push(`/works/${path}`);
 					}}>
-						{ this._player.isLoaded && this.cleanedName }
+						{ this.props.player.isLoaded && this.cleanedName }
 					</span>
 					<span style={{color:this.props.theme.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
-						{this._player.isLoaded ? `${this.formatTime(this.state.progress)} / ${this.formatTime(this.state.duration)}` : `No Book Selected`}
+						{this.props.player.isLoaded ? `${this.formatTime(this.state.progress)} / ${this.formatTime(this.state.duration)}` : `No Book Selected`}
 					</span>
 				</div>
 			</div>
@@ -139,4 +139,4 @@ export default withRouter(withTheme(class Player extends Component {
 		if (!time) time = 0;
 		return new Date(1000 * time).toISOString().substr(11, 8);
 	}
-}))
+})))

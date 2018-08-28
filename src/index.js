@@ -4,7 +4,12 @@ import './index.css';
 import App from './components/app/App';
 import registerServiceWorker from './registerServiceWorker';
 
+import BookPlayer from './services/bookplayer';
+
 import { ThemeContext } from './components/theme/withTheme';
+import { PlayerContext } from './components/player/withPlayer';
+
+const {ipcRenderer} = window.require('electron');
 
 
 //  rainbowBackground: 'linear-gradient(to right, #B294FF, #57E6E6, #FEFFB8, #57E6E6, #B294FF, #57E6E6)',
@@ -39,9 +44,13 @@ const theme = { //dark
 	warning: '#e81123'
 };
 
+const player = new BookPlayer(ipcRenderer.sendSync('settings.get', 'volume'));
+
 ReactDOM.render(
 	<ThemeContext.Provider value={theme}>
-		<App/>
+		<PlayerContext.Provider value={player}>
+			<App/>
+		</PlayerContext.Provider>
 	</ThemeContext.Provider>,
 	document.getElementById('root')
 );

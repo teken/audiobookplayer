@@ -8,15 +8,15 @@ import Loading from '../loading/Loading';
 import 'react-table/react-table.css'
 
 import withTheme from '../theme/withTheme';
+import withPlayer from '../player/withPlayer';
 
 const fs = window.require('fs');
 const mm = window.require('music-metadata');
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(withTheme(class Detail extends Component {
+export default withRouter(withTheme(withPlayer(class Detail extends Component {
 	constructor(props) {
 		super(props);
-		this._player = props.player;
 		this._tracks = [];
 		this.state = {
 			author: null,
@@ -186,9 +186,9 @@ export default withRouter(withTheme(class Detail extends Component {
 									{
 										this.state.saveTime !== null && (
 											<div style={{cursor:'pointer', color:this.props.theme.activeText}} onClick={() =>
-												this._player.open(this.state.work.$loki, this.props.bookName,() => {
-													this._player.play();
-													this._player.currentTime = this.state.saveTime;
+												this.props.player.open(this.state.work.$loki, this.props.bookName,() => {
+													this.props.player.play();
+													this.props.player.currentTime = this.state.saveTime;
 													})
 												}
 											>
@@ -227,8 +227,8 @@ export default withRouter(withTheme(class Detail extends Component {
 											style:{ cursor: 'pointer', color: this.props.theme.activeText},
 											onDoubleClick: (e, handleOriginal) => {
 												if (this.state.work.type === "SERIES")
-													this._player.openFromSpecificTrack(this.state.work.$loki, this.props.bookName, rowInfo.row.name, () => { this._player.play()});
-												else this._player.openFromSpecificTrack(this.state.work.$loki, null, rowInfo.row.name, () => { this._player.play()});
+													this.props.player.openFromSpecificTrack(this.state.work.$loki, this.props.bookName, rowInfo.row.name, () => { this.props.player.play()});
+												else this.props.player.openFromSpecificTrack(this.state.work.$loki, null, rowInfo.row.name, () => { this.props.player.play()});
 
 												if (handleOriginal) handleOriginal();
 											}
@@ -267,13 +267,13 @@ export default withRouter(withTheme(class Detail extends Component {
 																style:{ cursor: 'pointer', color: this.props.theme.activeText},
 																onDoubleClick: (e, handleOriginal) => {
 																	if (this.state.work.type === "SERIES")
-																		this._player.open(this.state.work.$loki, this.props.bookName, () => {
-																			this._player.play();
-																			this._player.currentTime = this.formatCUETimeAsSecond(rowInfo.row.time);
+																		this.props.player.open(this.state.work.$loki, this.props.bookName, () => {
+																			this.props.player.play();
+																			this.props.player.currentTime = this.formatCUETimeAsSecond(rowInfo.row.time);
 																		});
-																	else this._player.open(this.state.work.$loki, null, () => {
-																		this._player.play();
-																		this._player.currentTime = this.formatCUETimeAsSecond(rowInfo.row.time);
+																	else this.props.player.open(this.state.work.$loki, null, () => {
+																		this.props.player.play();
+																		this.props.player.currentTime = this.formatCUETimeAsSecond(rowInfo.row.time);
 																	});
 																	if (handleOriginal) handleOriginal();
 																}
@@ -328,5 +328,5 @@ export default withRouter(withTheme(class Detail extends Component {
 		date.setMilliseconds(Number(parts[2])*10);
 		return date.getTime()/1000;
 	}
-}))
+})))
 

@@ -4,11 +4,11 @@ import ProgressBar from '../timeline/ProgressBar';
 import ProgressBarHandler from '../timeline/ProgressBarHandler';
 
 import withTheme from '../../theme/withTheme';
+import withPlayer from '../../player/withPlayer';
 
-export default withTheme(class Volume extends Component {
+export default withTheme(withPlayer(class Volume extends Component {
 	constructor(props) {
 		super(props);
-		this._player = props.player;
 
 		this.state = {
 			showHandler: false,
@@ -82,11 +82,11 @@ export default withTheme(class Volume extends Component {
 	}
 
 	setProgress(value) {
-		this._player.volume = value;
+		this.props.player.volume = value;
 	}
 
 	updateProgressTime(value) {
-		this._player.volume = value;
+		this.props.player.volume = value;
 	}
 
 	get current() {
@@ -133,4 +133,4 @@ export default withTheme(class Volume extends Component {
 			</span>
 		);
 	}
-})
+}))

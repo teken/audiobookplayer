@@ -14,12 +14,13 @@ import Fuse from 'fuse.js';
 import Loading from '../loading/Loading';
 
 import withTheme from '../theme/withTheme';
+import withPlayer from '../player/withPlayer';
 
 const {ipcRenderer, shell} = window.require('electron');
 const path = window.require('path');
 
 
-export default withRouter(withTheme(class Library extends Component {
+export default withRouter(withTheme(withPlayer(class Library extends Component {
 	constructor(props) {
 		super(props);
 		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
@@ -291,5 +292,5 @@ export default withRouter(withTheme(class Library extends Component {
 		if (!time) time = 0;
 		return new Date(1000 * time).toISOString().substr(11, 8);
 	}
-}))
+})))
 

@@ -4,11 +4,11 @@ import ProgressBar from './ProgressBar';
 import ProgressBarHandler from './ProgressBarHandler';
 
 import withTheme from '../../theme/withTheme';
+import withPlayer from '../withPlayer';
 
-export default withTheme(class Timeline extends Component {
+export default withTheme(withPlayer(class Timeline extends Component {
 	constructor(props) {
 		super(props);
-		this._player = props.player;
 
 		this.state = {
 			showHandler: false,
@@ -17,7 +17,7 @@ export default withTheme(class Timeline extends Component {
 			steps: []
 		};
 		this.holding = false;
-		this.shouldTogglePlayPause = this._player.isPlaying;
+		this.shouldTogglePlayPause = this.props.player.isPlaying;
 		this.changeTranslate = this.changeTranslate.bind(this);
 		this._onMouseDownProgressBar = this._onMouseDownProgressBar.bind(this);
 		this._onMouseOverProgressBar = this._onMouseOverProgressBar.bind(this);
@@ -52,7 +52,7 @@ export default withTheme(class Timeline extends Component {
 
 	_onMouseDownProgressBar(e) {
 		e.stopPropagation();
-		if (!this._player.isLoaded) return;
+		if (!this.props.player.isLoaded) return;
 		// console.log('Timeline: _onMouseDownProgressBar');
 		if (this.shouldTogglePlayPause) { this.togglePlayPause(); }
 		const timelineDisToLeft = e.target.parentNode.getBoundingClientRect().left;
@@ -66,7 +66,7 @@ export default withTheme(class Timeline extends Component {
 
 	_onMouseDownProgressBarHandler(e) {
 		e.stopPropagation();
-		if (!this._player.isLoaded) return;
+		if (!this.props.player.isLoaded) return;
 		this.holding = true;
 		// console.log('Timeline: _onMouseDownProgressBarHandler');
 		if (this.shouldTogglePlayPause) { this.togglePlayPause(); }
@@ -89,9 +89,9 @@ export default withTheme(class Timeline extends Component {
 		// console.log('Timeline: _onMouseUp()');
 		/* When the _onMouseUp() event happen really quick after the _onMouseDownProgressBar(),
 		 i.e. React hasn't called setState, enqueue a togglePlayPause() to the loop. */
-		if (this.shouldTogglePlayPause && this._player.isPlaying) setTimeout(() => this._player.playPause(), 0);
+		if (this.shouldTogglePlayPause && this.props.player.isPlaying) setTimeout(() => this.props.player.playPause(), 0);
 		// Normally, when this.shouldTogglePlayPause is true, this.props.playing should be false, except the case above.
-		if (this.shouldTogglePlayPause && !this._player.isPlaying) this._player.playPause();
+		if (this.shouldTogglePlayPause && !this.props.player.isPlaying) this.props.player.playPause();
 
 		this.holding = false;
 		this.setProgress((this.state.translate / this.state.barWidth) * this.duration);
@@ -130,15 +130,15 @@ export default withTheme(class Timeline extends Component {
 	}
 
 	setProgress(value) {
-		this._player.currentTime = value;
+		this.props.player.currentTime = value;
 	}
 
 	updateProgressTime(value) {
-		this._player.currentTime = value;
+		this.props.player.currentTime = value;
 	}
 
 	togglePlayPause() {
-		this._player.playPause();
+		this.props.player.playPause();
 	}
 
 	get current() {
@@ -165,7 +165,7 @@ export default withTheme(class Timeline extends Component {
 		const lengthPerSecond = this.duration === 0 ? 0 : this.state.barWidth / this.duration;
 		const length = this.current * lengthPerSecond;
 		this.changeTranslate(length);
-		this.shouldTogglePlayPause = this._player.isPlaying;
+		this.shouldTogglePlayPause = this.props.player.isPlaying;
 	}
 
 	render() {
@@ -192,7 +192,7 @@ export default withTheme(class Timeline extends Component {
 					<ProgressBarHandler
 						width={handlerWidth}
 						height={handlerHeight}
-						visibility={this._player.isLoaded && (this.state.showHandler || this.holding)}
+						visibility={this.props.player.isLoaded && (this.state.showHandler || this.holding)}
 						translate={`translate(${this.state.translate - (handlerWidth / 2)})`}
 						onMouseDown={this._onMouseDownProgressBarHandler}
 						colour={this.props.theme.activeText}
@@ -202,4 +202,4 @@ export default withTheme(class Timeline extends Component {
 			</div>
 		);
 	}
-})
+}))
