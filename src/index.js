@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './components/app/App';
 import registerServiceWorker from './registerServiceWorker';
 
-import BookPlayer from './services/bookplayer';
+import App from './components/app/App';
+import BookPlayer from './uiservices/bookplayer';
 
 import { ThemeContext } from './components/theme/withTheme';
 import { PlayerContext } from './components/player/withPlayer';

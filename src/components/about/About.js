@@ -2,10 +2,28 @@ import React, {Component} from 'react';
 
 import withTheme from '../theme/withTheme';
 
-const {shell} = window.require('electron');
-const {app, process} = window.require('electron').remote;
+const {shell, ipcRenderer} = window.require('electron');
+const {app/*, process*/} = window.require('electron').remote;
 
 export default withTheme(class About extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			stats: {}
+		}
+	}
+
+	componentDidMount() {
+		const stats = ipcRenderer.sendSync('library.getAllCounts');
+		this.setState({
+			stats: stats
+		});
+	}
+
+	stat(name, value) {
+		return <div><span>{name}: </span><span>{this.state.stats[value]}</span></div>
+	}
+
 	render() {
 		return (
 			<div>
@@ -16,11 +34,11 @@ export default withTheme(class About extends Component {
 						Created By Duncan Haig<br/>
 						Copywrite 2018 Duncan Haig<br/>
 					</p>
-					<p>
+					{/*<p>
 						Electron: v{process.versions.electron}<br/>
 						Node: v{process.versions.node}<br/>
 						Chrome: v{process.versions.chrome}<br/>
-					</p>
+					</p>*/}
 					<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 					<p>
 						<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>
@@ -30,6 +48,11 @@ export default withTheme(class About extends Component {
 							Patreon
 						</span>
 					</p>
+					<h2 style={{color:this.props.theme.primaryText}}>Stats about your library:</h2>
+					{this.stat('Number of Authors', 'authors')}
+					{this.stat('Number of Series', 'series')}
+					{this.stat('Number of Books', 'books')}
+					{this.stat('Number of Books Not in a Series', 'singleBooks')}
 				</div>
 			</div>
 		);

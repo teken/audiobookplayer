@@ -37,14 +37,7 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 	update() {
 		const timingKey = this.props.player.timingKey;
 		if (this.props.player.isPlaying && timingKey.length > 0) ipcRenderer.send('timings.set', {key: timingKey, time:this.props.player.currentTime});
-		const progress = () => {
-			try {
-				return this.props.player.currentTime / this.props.player.duration;
-			} catch(e) {
-				return 0;
-			}
-		};
-		ipcRenderer.send('window.progressbar.set', progress);
+		ipcRenderer.send('window.progressbar.set', this.props.player.progress);
 		ipcRenderer.send('settings.set', {
 			name:'volume',
 			value: this.props.player.volume
@@ -71,8 +64,8 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 	volumeIcon() {
 		let volume = this.state.volume;
 		if (this.state.muted) return 'volume-off';//"volume-muted";
-		else if (volume <= 0) return 'volume-off';
-		else if (volume <= 50) return 'volume-down';
+		else if (volume <= this.props.player.minVolume) return 'volume-off';
+		else if (volume <= this.props.player.maxVolume/2) return 'volume-down';
 		else return 'volume-up';
 	}
 
@@ -90,6 +83,18 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 	get cleanedName() {
 		const number = this.props.player.book.name.split(' ', 1)[0];
 		return this.props.player.work && !isNaN(number) ? this.props.player.book.name.slice(number.length+1) : this.props.player.book.name;
+	}
+
+
+	get seriesName() {
+		const number = this.props.player.book.name.split(' ', 1)[0];
+		return isNaN(number) ? this.props.player.work.name : `${this.props.player.work.name} #${number}`;
+	}
+
+	displayName() {
+		return <span style={{fontWeight:600, fontSize: '1.1em'}}>
+			{this.cleanedName} {this.props.player.work.type === 'SERIES' && <span style={{color:this.props.theme.secondaryText, fontSize:'.9em'}}>({this.seriesName})</span>}
+		</span>
 	}
 
 	render() {
@@ -117,7 +122,7 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 					<span onMouseOver={() => this.displayVolume = true} onMouseOut={() => this.displayVolume = false}>
 						<IconButton title="Volume/Mute" icon={this.state.volumeIcon} onClick={() => this.mute()} style={{...commonButtonStyling, color:this.state.muted ? this.props.theme.warning :this.props.theme.activeText}} svgStyle={{minWidth:'18px'}}/>
 						<span style={{display: !this.state.muted && this.displayVolume ? 'inline-flex' : 'none'}}>
-							<Volume progress={this.state.volume} duration={200}/>
+							<Volume progress={this.state.volume} duration={this.props.player.volumeRange}/>
 						</span>
 					</span>
 					<span style={{color:this.props.theme.activeText, cursor: this.props.player.isLoaded ? 'pointer' : 'default', padding: "0 1em", fontSize: '0.9em'}} onClick={() => {
@@ -125,7 +130,7 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 						const path = `${this.props.player.work.$loki}${this.props.player.work.type === 'SERIES' ? `/${this.props.player._bookNameIfSeries}`: ''}`;
 						this.props.history.push(`/works/${path}`);
 					}}>
-						{ this.props.player.isLoaded && this.cleanedName }
+						{ this.props.player.isLoaded && this.displayName()}
 					</span>
 					<span style={{color:this.props.theme.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
 						{this.props.player.isLoaded ? `${this.formatTime(this.state.progress)} / ${this.formatTime(this.state.duration)}` : `No Book Selected`}

@@ -10,9 +10,16 @@ export default withTheme(class Checkbox extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleClick = this.handleClick.bind(this);
 		this.textInput = React.createRef();
+
 		this.state = {
-			value: this.props.value === 'true'
+			value: Boolean(this.props.value)
 		};
+	}
+	componentDidUpdate(oldProps) {
+		if (oldProps.value !== this.props.value)
+			this.setState({
+				value: Boolean(this.props.value)
+			});
 	}
 
 	handleChange(event) {

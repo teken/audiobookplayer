@@ -1,24 +1,8 @@
-import React, {Component} from 'react';
+import React from 'react';
 
-import Row from './tile/Row';
+import View from './View';
 
-export default class AuthoredRowView extends Component {
-
-	constructor(props) {
-		super(props);
-		this.renderTile = this.renderTile.bind(this);
-	}
-
-	get gridWidthCellCount() {
-		return Math.round(window.innerWidth / 300);
-	}
-
-	renderTile(author, series, work) {
-		return <Row author={author} series={series} work={work}
-					 onClick={() => this.props.itemClick(author, series, work)}
-		/>
-	}
-
+export default class AuthoredView extends View {
 	render() {
 		const orderAuthors = [...new Set(this.props.libraryWorks ? this.props.libraryWorks.map(x => x.author) : [])];
 		return (
@@ -26,7 +10,7 @@ export default class AuthoredRowView extends Component {
 				{
 					this.props.displaySavedTimesSection && (
 						<div>
-							<h1 style={{letterSpacing: '0.03em'}}>{this.props.savedTimesTitle}</h1>
+							<h1 style={{letterSpacing:'0.03em'}}>{this.props.savedTimesTitle}</h1>
 							<div style={{
 								display: 'grid',
 								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,

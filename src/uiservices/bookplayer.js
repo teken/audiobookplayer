@@ -13,6 +13,12 @@ export default class BookPlayer {
 		this._author = null;
 		this._currentTrack = null;
 		this._tracks = [];
+		this.minVolume = 0;
+		this.maxVolume = 200;
+	}
+
+	get volumeRange() {
+		return Number(this.maxVolume - this.minVolume);
 	}
 
 	get author () {
@@ -138,6 +144,11 @@ export default class BookPlayer {
 		}
 	}
 
+	get progress() {
+		const value = this.currentTime / this.duration;
+		return isNaN(value) ? 0 : value;
+	}
+
 	get isPlaying() {
 		return this._audioPlayer.isPlaying;
 	}
@@ -195,7 +206,7 @@ export default class BookPlayer {
 	}
 
 	get currentTrackIndex() {
-		return this._tracks.findIndex(track => track.name === this._currentTrack);
+		return this.getTrackIndex(this._currentTrack);
 	}
 
 	get currentTrack() {

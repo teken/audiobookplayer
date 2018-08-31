@@ -8,19 +8,21 @@ module.exports = class SettingsService {
 	constructor() {
 		const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 		const fileName = development ? 'settings.development.json' : 'settings.json';
-		let filePath = path.join(userDataPath, fileName);
+		const filePath = path.join(userDataPath, fileName);
 
 		nconf.argv().env()
 			.file({ file: filePath })
 			.defaults({
+				firstRun: true,
 				dataPath: userDataPath,
 				libraryPath: '',
 				libraryStyle: 'grid',
 				libraryDisplayAuthors: false,
+				importStyle: 'folders',
 				volume: 100,
 				windowState: {
-					width: 800,
-					height: 600,
+					width: 1200,
+					height: 800,
 					x: null,
 					y: null,
 					maximised: false,

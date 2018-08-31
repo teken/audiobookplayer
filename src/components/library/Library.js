@@ -4,10 +4,10 @@ import { withRouter } from 'react-router-dom'
 import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome';
 import RightClickMenu from '../RightClickMenu';
 
-import GridView from './GridView';
-import AuthoredGridView from './AuthoredGridView';
-import RowView from './RowView';
-import AuthoredRowView from './AuthoredRowView';
+import AuthoredView from './AuthoredView';
+import View from './View';
+import Tile from './tile/Tile';
+import Row from './tile/Row';
 
 import Fuse from 'fuse.js';
 
@@ -23,8 +23,8 @@ const path = window.require('path');
 export default withRouter(withTheme(withPlayer(class Library extends Component {
 	constructor(props) {
 		super(props);
-		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
-		const displayAuthors = ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors') === 'true';
+		const settings = ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']);
+		console.log(settings)
 		this.state = {
 			authors: [],
 			works: [],
@@ -32,7 +32,8 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			flattenedWorks:[],
 			searchTerm: "",
 			//intervalId: null,
-			libraryDisplayFormat: (displayAuthors ? 'authored' : '') + libraryStyle,
+			libraryDisplayAuthors: Boolean(ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors')),
+			libraryStyle: ipcRenderer.sendSync('settings.get', 'libraryStyle'),
 			loading: true
 		};
 		this.fuse = null;
@@ -62,25 +63,22 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 	}
 
 	componentDidMount() {
+		const firstRun = ipcRenderer.sendSync('settings.get', 'firstRun');
+		if (firstRun === 'true') {
+			this.props.history.push("/setup");
+			return;
+		}
 		setTimeout(() => {
 			this.loadData();
 			this.setState({
 				loading:false
 			});
 		},0);
-		// const id = setInterval(() => {
-		// 		this.loadData();
-		// 		this.forceUpdate();
-		// 	}, 1000);
-		// this.setState({
-		// 	intervalId: id
-		// });
 		window.addEventListener('keydown', this.listenKeyboard.bind(this), true);
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener('keydown', this.listenKeyboard.bind(this), true);
-		//if (this.state.intervalId !== null) clearInterval(this.state.intervalId);
 	}
 
 	listenKeyboard(event) {
@@ -90,8 +88,6 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 	loadData() {
 		const {works, authors} = ipcRenderer.sendSync('library.getAll');
 		const {times} = ipcRenderer.sendSync('timings.getAll');
-		const libraryStyle = ipcRenderer.sendSync('settings.get', 'libraryStyle');
-		const displayAuthors = ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors') === 'true';
 		const flattenedWorks = works.map(work => {
 			work.author = authors.find(x => x.$loki === work.author_id);
 			if (work.type === 'SERIES') work.books = work.books.map(book => {
@@ -107,7 +103,8 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			authors: authors,
 			flattenedWorks: flattenedWorks,
 			states: times,
-			libraryDisplayFormat: (displayAuthors ? 'authored' : '') + libraryStyle
+			libraryDisplayAuthors: Boolean(ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors')),
+			libraryStyle: ipcRenderer.sendSync('settings.get', 'libraryStyle'),
 		});
 	}
 
@@ -131,23 +128,21 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		return (
 			<div>
 				<div style={{ margin: '1em', padding: '1em', color:this.props.theme.activeText, backgroundColor:this.props.theme.inputBackground }}>
-					<input type="text" value={this.state.searchTerm} onChange={this.onSearchBoxChange} placeholder="Search"
-					   style={{
-						   width: '97%',
-						   border:'none',
-						   backgroundColor: 'transparent',
-						   color: this.props.theme.activeText,
-						   fontSize: '1em',
-						   paddingLeft:'0.3em'
-						}}
-					/>
+					<input type="text" value={this.state.searchTerm} onChange={this.onSearchBoxChange} placeholder="Search" style={{
+					   width: '97%',
+					   border:'none',
+					   backgroundColor: 'transparent',
+					   color: this.props.theme.activeText,
+					   fontSize: '1em',
+					   paddingLeft:'0.3em'
+					}} />
 					<Icon icon="search" style={{
 						borderBottom:`'1em solid ${this.props.theme.activeColour}`,
 						fontSize: '1em',
 						transform: 'translateY(.25em)',
 						paddingBottom: '0.1em',
 						color: this.props.theme.inactiveText
-					}}/>
+					}} />
 				</div>
 				{
 					this.state.loading ?
@@ -163,29 +158,36 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		const properties = {
 			libraryTitle: 'Library',
 			savedTimesTitle: 'Saved Times',
-			noBooksFound: this.noBooksFound(),
+			noBooksFound: this.noBooksFound.bind(this),
 			displaySavedTimesSection: displaySavedTimesSection,
 			displayLibrary: displayLibrary,
-			authors: this.state.authors,
 			savedTimeWorks: savedTimeWorks,
 			savedTimes: savedTimes,
 			libraryWorks: libraryWorks,
-			searchTerm: this.state.searchTerm.toLowerCase(),
 			libraryBook: this.libraryBook.bind(this),
 			savedBook: this.savedBook.bind(this),
-			getStateKey: this.getStateKey.bind(this),
+			getStateKey: (author, series, work) => `${author.name}-${series ? `${series.name}-` : ''}${work.name}`,
 			itemClick: this.handleClick.bind(this),
 		};
+
+		let itemComponent;
+		let cellWidth;
 		switch (this.state.libraryDisplayFormat) {
 			default:
 			case 'grid':
-				return <GridView {...properties} />;
-			case 'authoredgrid':
-				return <AuthoredGridView {...properties} />;
+				itemComponent = Tile;
+				cellWidth = 200;
+				break;
 			case 'row':
-				return <RowView {...properties} />;
-			case 'authoredrow':
-				return <AuthoredRowView {...properties} />;
+				itemComponent = Row;
+				cellWidth = 300;
+				break;
+		}
+
+		if (this.state.libraryDisplayAuthors) {
+			return <AuthoredView itemComponent={itemComponent} cellWidthDivider={cellWidth} {...properties} />;
+		} else {
+			return <View itemComponent={itemComponent} cellWidthDivider={cellWidth} {...properties} />;
 		}
 	}
 
@@ -200,10 +202,6 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		</div>;
 	}
 
-	getStateKey(author, series, work) {
-		return `${author.name}-${series ? `${series.name}-` : ''}${work.name}`;
-	}
-
 	book(renderFunction, author, series, work, stateKey, rightClickOptions) {
 		return <RightClickMenu style={{
 			backgroundColor: this.props.theme.inputBackground,
@@ -214,7 +212,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		}}
 		   key={author.name + work.name} options={rightClickOptions}
 		>
-			{renderFunction(author, series, work)}
+			{renderFunction(author, series, work, stateKey)}
 		</RightClickMenu>;
 	}
 
@@ -225,7 +223,8 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			{ name:'Play', onClick:() => this.play(author, series, work) },
 			{ name:'Search for author', onClick:() => this.search(author.name)},
 			series && { name:'Search for series', onClick:() => this.search(series.name)},
-			{ name:'Open location', onClick:() => shell.openItem(filePath)}
+			{ name:'Open', onClick:() => this.handleClick(author, series, work)},
+			{ name:'Open file location', onClick:() => shell.openItem(filePath)}
 		]);
 	}
 
@@ -237,7 +236,8 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			{ name:'Play from beginning', onClick:() => this.play(author, series, work) },
 			{ name:'Search for author', onClick:() => this.search(author.name)},
 			series && { name:'Search for series', onClick:() => this.search(series.name)},
-			{ name:'Open location', onClick:() => shell.openItem(filePath)},
+			{ name:'Open', onClick:() => this.handleClick(author, series, work)},
+			{ name:'Open file location', onClick:() => shell.openItem(filePath)},
 			{ name:'Clear saved time', onClick:() => this.clearTimingData(stateKey)}
 		]);
 	}

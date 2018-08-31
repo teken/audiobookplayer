@@ -23,31 +23,50 @@ export default withRouter(withTheme(class Settings extends Component {
 			{name:'dataDataFolder', dataName:'dataPath'},
 			{name:'libraryStyle', dataName:'libraryStyle'},
 			{name:'libraryDisplayAuthors', dataName:'libraryDisplayAuthors', type:'boolean'},
+			{name:'libraryImportStyle', dataName:'importStyle'},
+			//{name:'displayFirstRunWizard', dataName:'firstRun', type:'boolean'},
 		];
-
-		this.oldSettings = {};
-		this.settingsObjects.forEach(item => {
-			switch (item.type) {
-				default:
-				case 'string':
-					this.oldSettings[item.name] = ipcRenderer.sendSync('settings.get', item.dataName);
-					break;
-				case 'boolean':
-					this.oldSettings[item.name] = ipcRenderer.sendSync('settings.get', item.dataName) === 'true';
-					break;
-				case 'number':
-					this.oldSettings[item.name] = Number(ipcRenderer.sendSync('settings.get', item.dataName));
-					break;
-			}
-		});
-
 		this.state = {
-			settings: Object.assign({}, this.oldSettings)
+			oldSettings:{},
+			settings:{}
 		};
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.clearLibrary = this.clearLibrary.bind(this);
 		this.reimportLibrary = this.reimportLibrary.bind(this);
 		this.addDeltasToLibrary = this.addDeltasToLibrary.bind(this);
+		this.getSettings = this.getSettings.bind(this);
+	}
+
+	getSettings() {
+		//const {ipcRenderer} = window.require('electron').remote;
+		const oldSettings = {};
+		const settings = this.settingsObjects.reduce((a, v) => {
+			a.push(v.dataName);
+			return a;
+		},[]);
+		const fetch = (name) => ipcRenderer.sendSync('settings.get', name);
+		this.settingsObjects.forEach(item => {
+			switch (item.type) {
+				default:
+				case 'string':
+					oldSettings[item.name] = fetch(item.dataName);
+					break;
+				case 'boolean':
+					oldSettings[item.name] = Boolean(fetch(item.dataName));
+					break;
+				case 'number':
+					oldSettings[item.name] = Number(fetch(item.dataName));
+					break;
+			}
+		});
+		this.setState({
+			settings: Object.assign({}, oldSettings),
+			oldSettings: oldSettings
+		});
+	}
+
+	componentDidMount() {
+		this.getSettings();
 	}
 
 	handleChange(event, name) {
@@ -59,14 +78,15 @@ export default withRouter(withTheme(class Settings extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 		this.settingsObjects.forEach(item => {
-			if (this.oldSettings[item.name] !== this.state.settings[item.name])
+			console.log(item.name, this.state.oldSettings[item.name], this.state.settings[item.name], this.state.oldSettings[item.name] !== this.state.settings[item.name])
+			if (this.state.oldSettings[item.name] !== this.state.settings[item.name])
 				ipcRenderer.send('settings.set', {name: item.dataName, value: this.state.settings[item.name]});
 		});
 		this.props.history.push('/');
 	}
 
 	get isDirty() {
-		return !equal(this.oldSettings, this.state.settings);
+		return !equal(this.state.oldSettings, this.state.settings);
 	}
 
 	clearLibrary() {
@@ -98,6 +118,7 @@ export default withRouter(withTheme(class Settings extends Component {
 	}
 
 	buttons = [
+		{value:"Show Setup Wizard", onClick:() => this.props.history.push('/setup')},
 		{value:"Clear Library", onClick:() => this.setState({showClear: true})},
 		{value:"Re-Import Library", onClick:() => this.setState({showReimport: true})},
 		{value:"Scan for changes in Library", onClick:this.addDeltasToLibrary},
@@ -116,7 +137,7 @@ export default withRouter(withTheme(class Settings extends Component {
 							  okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
 				<h1>Settings</h1>
 				<form onSubmit={this.handleSubmit} style={{color:this.props.theme.secondaryText}}>
-					<Setting label="Library Actions">
+					<Setting label="Actions">
 						<ButtonRow buttons={this.buttons}/>
 					</Setting>
 					<Setting label="Library Folder Path">
@@ -133,6 +154,12 @@ export default withRouter(withTheme(class Settings extends Component {
 					</Setting>
 					<Setting label="Display Authors in Library">
 						<Checkbox value={this.state.settings.libraryDisplayAuthors} onChange={(event) => this.handleChange(event, "libraryDisplayAuthors")} />
+					</Setting>
+					<Setting label="Library Import Style">
+						<Dropdown value={this.state.settings.libraryImportStyle} options={[
+							{name:'Folder Structure', value:'folder'},
+							{name:'File Metadata', value:'metadata'}
+						]} onChange={(event) => this.handleChange(event, "libraryImportStyle")} />
 					</Setting>
 					<Setting>
 						<input type="submit" value="Save" disabled={!this.isDirty} style={{

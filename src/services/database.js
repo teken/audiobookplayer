@@ -19,11 +19,8 @@ module.exports = class DatabaseService {
 	static loadDatabase(path) {
 		return new loki(path, {
 			autoload: true,
-			//autoloadCallback : resolve,
 			autosave: true,
 			autosaveInterval: 4000
 		});
-		//database.loadDatabase({}, (err) => console.log(err ? "error : " + err : "database loaded."));
-		//return database;
 	}
 };

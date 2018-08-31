@@ -12,6 +12,7 @@ export default withTheme(class Tile extends Component {
 		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
 			return <img src={p} alt={this.props.work.name} style={{
+				minWidth: '5em',
 				minHeight: '5em',
 				maxWidth: '100%',
 				maxHeight: '6.75em'

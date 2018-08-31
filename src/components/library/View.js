@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 
-import Row from './tile/Row';
-
-export default class RowView extends Component {
+export default class View extends Component {
 
 	constructor(props) {
 		super(props);
@@ -10,11 +8,11 @@ export default class RowView extends Component {
 	}
 
 	get gridWidthCellCount() {
-		return Math.round(window.innerWidth / 400);
+		return Math.round(window.innerWidth / this.props.cellWidthDivider);
 	}
 
-	renderTile(author, series, work) {
-		return <Row author={author} series={series} work={work}
+	renderTile(author, series, work, key) {
+		return <this.props.itemComponent key={key} author={author} series={series} work={work}
 			onClick={() => this.props.itemClick(author, series, work)}
 			/>
 	}
@@ -42,7 +40,7 @@ export default class RowView extends Component {
 				{
 					!this.props.displayLibrary ?
 						this.props.noBooksFound
-					: (
+					 : (
 						<div>
 							<h1 style={{
 								display: !this.props.displaySavedTimesSection ? 'none' : 'block',

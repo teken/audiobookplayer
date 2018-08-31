@@ -87,48 +87,37 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 		return this.state.work !== null && this.state.work.type === 'SERIES';
 	}
 
+	get bookIndex() {
+		return this.state.work.books.findIndex(x=> x.name === this.props.bookName);
+	}
+
 	get hasNextBook() {
 		if (!this.isSeries) return false;
-		let index = this.state.work.books.findIndex(x=> x.name === this.props.bookName);
+		const index = this.bookIndex;
 		return index >= 0 && (index + 1) < this.state.work.books.length
 	}
 
 	get hasPreviousBook() {
 		if (!this.isSeries) return false;
-		let index = this.state.work.books.findIndex(x=> x.name === this.props.bookName);
+		const index = this.bookIndex;
 		return index > 0 && index - 1 <= this.state.work.books.length
 	}
 
 	get nextBook() {
 		if (!this.isSeries || !this.hasNextBook) return false;
-		let index = this.state.work.books.findIndex(x=> x.name === this.props.bookName);
+		const index = this.bookIndex;
 		return this.state.work.books[index+1]
 	}
 
 	get previousBook() {
 		if (!this.isSeries || !this.hasPreviousBook) return false;
-		let index = this.state.work.books.findIndex(x=> x.name === this.props.bookName);
+		const index = this.bookIndex;
 		return this.state.work.books[index-1]
 	}
 
 	get title() {
 		if (this.isSeries) return `${this.state.book.name} (${this.state.work.name})`;
 		else return this.state.book.name;
-	}
-
-	loadCUEFileData(path) {
-		if (path === null) return [];
-		const buffer = fs.readFileSync(path);
-		const lines = buffer.toString('utf8').split('\n').map(line => line.trim()).filter(line => line.length > 0);
-		const name = lines.slice(0,1)[0].slice(6, -5);
-		const content = lines.slice(1);
-		let data = [];
-		for(let i = 0; i <= content.length; i+=3) {
-			let name = String(content[i+1]).slice(7,-1);
-			let timeCode = String(content[i+2]).slice(9);
-			data.push({name:name, time:timeCode})
-		}
-		return {name:name,data:data.slice(0,-1)};
 	}
 
 	get cleanedName() {
@@ -139,6 +128,9 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 	get seriesName() {
 		const number = this.state.book.name.slice(0, 3).trim();
 		return isNaN(number) ? this.state.work.name : `${this.state.work.name} #${number}`;
+	}
+	get hasArtwork() {
+		return this.state.book && this.state.book.art.length > 0;
 	}
 
 	render() {
@@ -154,7 +146,9 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 		const totalLength = data.map( track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0);
 
 		const infos = this.state.book ? this.state.book.info.map(file => file.path) : [];
-		const chapters = infos.map(path => this.loadCUEFileData(path));
+		const chapters = infos.map(path => this.props.player.loadCUEFileData(path));
+
+		const widths = this.hasArtwork ? '25%' : '33%';
 
 		return (
 			<div className="detail">
@@ -162,12 +156,9 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 					<Loading />
 				) : (
 					<div>
-						<h1>{this.cleanedName}</h1>
-						{this.isSeries && <h3 style={{color:this.props.theme.secondaryText}}>({this.seriesName})</h3>}
-						<h2 style={{fontWeight:400}}>By {this.state.author.name}</h2>
 						<div style={{color: this.props.theme.secondaryText}}>
 							<div style={{display:'flex', justifyContent: 'space-between', color: this.props.theme.secondaryText, alignItems: 'flex-end'}}>
-								<div style={{width:'30%'}}>
+								<div style={{width:widths}}>
 									{this.isSeries && this.hasPreviousBook && (
 										<span style={{cursor:'pointer', color: this.props.theme.activeText, display: 'flex', justifyContent: 'flex-start'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.previousBook.name}`)}>
 											<Icon style={{padding:'0 .5em'}} icon="chevron-left"/>
@@ -175,29 +166,44 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 										</span>
 									)}
 								</div>
-								<div style={{width:'30%'}}>
-									<div>
-										Total Length: {this.formatTime(totalLength)}
+								{this.hasArtwork && <div style={{width:widths}}>
+									<img src={this.state.book.art[0].path} alt={this.cleanedName} style={{
+										minWidth: '11em',
+										minHeight: '11em',
+										maxWidth: '100%',
+										maxHeight: '12.5em',
+										float: 'right',
+										paddingRight: '.5em',
+									}}/>
+								</div>}
+								<div style={{width:widths}}>
+									<div style={this.hasArtwork ? {float:'left', textAlign:'left', paddingLeft:'.5em'} : {}}>
+										<h1 style={{color:this.props.theme.primaryText}}>{this.cleanedName}</h1>
+										{this.isSeries && <h3 style={{color:this.props.theme.secondaryText}}>({this.seriesName})</h3>}
+										<h2 style={{fontWeight:400, color:this.props.theme.primaryText}}>By {this.state.author.name}</h2>
+										<div>
+											Total Length: {this.formatTime(totalLength)}
+										</div>
+										<div>
+											Total Size: {this.formatBytes(totalSize)}
+										</div>
+										<br/>
+										{
+											this.state.saveTime !== null && (
+												<div style={{cursor:'pointer', color:this.props.theme.activeText}} onClick={() =>
+													this.props.player.open(this.state.work.$loki, this.props.bookName,() => {
+														this.props.player.play();
+														this.props.player.currentTime = this.state.saveTime;
+														})
+													}
+												>
+													Saved Time: {this.formatTime(this.state.saveTime)}
+												</div>
+											)
+										}
 									</div>
-									<div>
-										Total Size: {this.formatBytes(totalSize)}
-									</div>
-									<br/>
-									{
-										this.state.saveTime !== null && (
-											<div style={{cursor:'pointer', color:this.props.theme.activeText}} onClick={() =>
-												this.props.player.open(this.state.work.$loki, this.props.bookName,() => {
-													this.props.player.play();
-													this.props.player.currentTime = this.state.saveTime;
-													})
-												}
-											>
-												Saved Time: {this.formatTime(this.state.saveTime)}
-											</div>
-										)
-									}
 								</div>
-								<div style={{width:'30%'}}>
+								<div style={{width:widths}}>
 									{this.isSeries && this.hasNextBook && (
 										<span style={{cursor:'pointer', color: this.props.theme.activeText, display: 'flex', justifyContent: 'flex-end'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.nextBook.name}`)}>
 											{this.nextBook.name}
@@ -235,7 +241,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 										};
 									}}
 									SubComponent={row => {
-										const data = chapters.find(x => x.name === row.row.name);
+										const rows = chapters.find(x => x.name === row.row.name);
 										const track = row.original;
 										return (
 											<div style={{padding:'1em'}}>
@@ -247,19 +253,20 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 													<div>Start Time: {this.formatTime(track.startTime)}</div>
 													<div>End Time: {this.formatTime(track.endTime)}</div>
 													<div>Size: {this.formatBytes(track.size)}</div>
+													<div>Chapters: {rows.data.length}</div>
 												</div>
 
-												{data && (
+												{rows && (
 													<ReactTable
 														className="-striped -highlight"
-														data={data.data}
+														data={rows.data}
 														noDataText="No chapters found"
 														columns={[
 															{Header: 'Chapter Name', accessor: 'name'},
 															{Header: 'Time Code', maxWidth: 200, accessor: 'time', Cell: props => this.formatCUETime(props.value)},
 														]}
 														minRows={0}
-														defaultPageSize={data.length}
+														defaultPageSize={rows.data.length}
 														showPagination={false}
 														sortable={false}
 														getTdProps={(state, rowInfo) => {

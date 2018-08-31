@@ -1,6 +1,7 @@
 const {ipcMain} = require('electron');
 
 const LibraryService = require('./library');
+const SettingService = require('./settings');
 
 module.exports = class IPCService {
 
@@ -18,7 +19,15 @@ module.exports = class IPCService {
 
 	get calls() {
 		return  [
-			//Library calls
+			...this.libraryCalls,
+			...this.settingsCalls,
+			...this.timingsCalls,
+			...this.windowCalls,
+		];
+	}
+
+	get libraryCalls() {
+		return  [
 			{
 				name: "library.getAll",
 				action: (event, args) => {
@@ -35,10 +44,13 @@ module.exports = class IPCService {
 				action: (event, args) => {
 					const authors = this.localLibrary.getCollection('authors');
 					const works = this.localLibrary.getCollection('works');
+					const fetchWorks = (mapFunction) => works ? works.mapReduce(mapFunction, x => x.reduce((a,v) => a + v,0)) : 0;
 					event.returnValue = {
 						authors: authors ? authors.count() : 0,
-						works: works ? works.count() : 0
-					};
+						series: fetchWorks(x => x.type === 'SERIES' ? 1 : 0),
+						books: fetchWorks(x => x.type === 'SERIES' ? x.books.length : 1),
+						singleBooks: fetchWorks(x => x.type === 'BOOK' ? 1 : 0)
+					}
 				}
 			},
 			{
@@ -85,22 +97,56 @@ module.exports = class IPCService {
 						event.sender.send('library.clear.reply', result)
 					});
 				}
-			},
-			//settings calls
+			}
+		];
+	}
+
+	get settingsCalls() {
+		return [
 			{
 				name: "settings.get",
-				action: (event, args) => event.returnValue = this.settings.get(String(args))
+				action: (event, args) => {
+					const result = this.settings.get(String(args));
+					event.returnValue = result;
+					//event.sender.send('settings.get.reply', result);
+				}
+			},
+			{
+				name: "settings.gets",
+				action: (event, args) => {
+					event.returnValue = args.reduce((acc, val) => {
+						const name = String(val);
+						acc[(name)] = this.settings.get(name);
+						return acc;
+					}, []);
+					//event.sender.send('settings.gets.reply', results);
+				}
 			},
 			{
 				name: "settings.set",
 				action: (event, args) => {
 					this.settings.set(String(args.name), String(args.value));
 					this.settings.save()
-						.then(() => event.sender.send('settings.set.reply', {success:true}))
-						.catch(err => event.sender.send('settings.set.reply', {success:true, error:err}));
+						.then(() => event.sender.send('settings.set.reply', {success: true}))
+						.catch(err => event.sender.send('settings.set.reply', {success: false, error: err}));
 				}
 			},
-			//timing calls
+			{
+				name: "settings.sets",
+				action: (event, args) => {
+					args.forEach(setting => {
+						this.settings.set(String(setting.name), String(setting.value));
+					});
+					this.settings.save()
+						.then(() => event.sender.send('settings.sets.reply', {success: true}))
+						.catch(err => event.sender.send('settings.sets.reply', {success: false, error: err}));
+				}
+			}
+		]
+	}
+
+	get timingsCalls() {
+		return [
 			{
 				name: "timings.getAll",
 				action: (event, args) => {
@@ -168,8 +214,12 @@ module.exports = class IPCService {
 						timings.update(item);
 					}
 				}
-			},
-			// window calls
+			}
+		];
+	}
+
+	get windowCalls() {
+		return [
 			{
 				name: "window.title.set",
 				action: (event, args) => this.window.setTitle(String(args))
@@ -185,7 +235,7 @@ module.exports = class IPCService {
 			{
 				name: "window.progressbar.set",
 				action: (event, args) => this.window.setProgressBar(Number(args))
-			},
+			}
 		];
 	}
 };

@@ -7,6 +7,7 @@ import Detail from '../detail/Detail';
 import WindowControls from "../WindowControls";
 import Settings from '../settings/Settings';
 import About from '../about/About';
+import Setup from '../setup/Setup';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 
@@ -14,7 +15,6 @@ import { faPlay, faPause, faStop, faBackward, faForward, faVolumeOff, faVolumeDo
 		faMinus, faSquare, faTimes, faBookOpen, faCog, faSearch, faFolderOpen, faChevronLeft, faChevronRight,
 		faQuestion, faCaretDown, faCheckSquare
 } from '@fortawesome/free-solid-svg-icons';
-
 
 import withTheme from '../theme/withTheme';
 import withPlayer from '../player/withPlayer';
@@ -93,8 +93,9 @@ export default withTheme(withPlayer(class App extends Component {
 							)}/>
 							<Route path="/settings" component={Settings}/>
 							<Route path="/about" component={About}/>
+							<Route path="/setup" component={Setup}/>
 							<Route render={({location}) => (
-								<div style={{lineHeight: '1.2em'}}>
+								<div style={{lineHeight: '1.5em'}}>
 									<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
 								</div>
 							)}/>

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import withTheme from '../../theme/withTheme';
 
-const fs = window.require('fs');
+//const fs = window.require('fs');
 
 export default withTheme(class Tile extends Component {
 
@@ -11,9 +11,10 @@ export default withTheme(class Tile extends Component {
 	}
 
 	get tilePicture() {
-		if (this.hasArtWork && fs.existsSync(this.props.work.art[0].path)) {
+		if (this.hasArtWork) { // && fs.existsSync(this.props.work.art[0].path)
 			const p = this.props.work.art[0].path;
 			return <img src={p} alt={this.props.work.name} style={{
+				minWidth: '11em',
 				minHeight: '11em',
 				maxWidth: '100%',
 				maxHeight: '12.5em'
