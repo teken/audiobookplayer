@@ -92,7 +92,7 @@ export default withTheme(withPlayer(class App extends Component {
 								<Detail workId={match.params.workId}/>
 							)}/>
 							<Route path="/settings" component={Settings}/>
-							<Route path="/about" component={About}/>
+							<Route path="/about" component={() => About}/>
 							<Route path="/setup" component={Setup}/>
 							<Route render={({location}) => (
 								<div style={{lineHeight: '1.5em'}}>
@@ -219,6 +219,8 @@ export default withTheme(withPlayer(class App extends Component {
 						body {
 							-webkit-user-select:none;
 							cursor:default;
+							margin: 0;
+  							padding: 0;
 						}
 
 						.rt-expander::after {

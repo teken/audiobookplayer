@@ -10,7 +10,6 @@ import 'react-table/react-table.css'
 import withTheme from '../theme/withTheme';
 import withPlayer from '../player/withPlayer';
 
-const fs = window.require('fs');
 const mm = window.require('music-metadata');
 const {ipcRenderer} = window.require('electron');
 

@@ -83,6 +83,11 @@ function createWindow() {
 	});
 	mainWindow.loadURL(startUrl);
 
+	mainWindow.on('app-command', (e,cmd) => {
+		if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) mainWindow.webContents.goBack();
+		else if (cmd === 'browser-forward' && mainWindow.webContents.canGoForward()) mainWindow.webContents.goForward();
+	});
+
 	mainWindow.on('closed', () => {
 		mainWindow = null
 	});

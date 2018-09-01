@@ -168,7 +168,10 @@ export default class AudioPlayer {
 		});
 		this._audio.addEventListener('ended', () => {
 			if (endCallback) endCallback()
-		})
+		});
+		this._audio.addEventListener('error', error => {
+			console.error('error event', error)
+		});
 	}
 
 	/**
@@ -177,7 +180,12 @@ export default class AudioPlayer {
 	play () {
 		if (!(this._audio) || this._isPlaying) return;
 
-		this._audio.play();
+		try {
+			this._audio.play(); //here
+		} catch(e) {
+			console.error('audio play error: ', e)
+			return;
+		}
 		this._isPlaying = true;
 	}
 

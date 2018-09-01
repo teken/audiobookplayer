@@ -38,12 +38,11 @@ export default withRouter(withTheme(class Settings extends Component {
 	}
 
 	getSettings() {
-		//const {ipcRenderer} = window.require('electron').remote;
 		const oldSettings = {};
-		const settings = this.settingsObjects.reduce((a, v) => {
-			a.push(v.dataName);
-			return a;
-		},[]);
+		// const settings = this.settingsObjects.reduce((a, v) => {
+		// 	a.push(v.dataName);
+		// 	return a;
+		// },[]);
 		const fetch = (name) => ipcRenderer.sendSync('settings.get', name);
 		this.settingsObjects.forEach(item => {
 			switch (item.type) {
@@ -78,7 +77,6 @@ export default withRouter(withTheme(class Settings extends Component {
 	handleSubmit(event) {
 		event.preventDefault();
 		this.settingsObjects.forEach(item => {
-			console.log(item.name, this.state.oldSettings[item.name], this.state.settings[item.name], this.state.oldSettings[item.name] !== this.state.settings[item.name])
 			if (this.state.oldSettings[item.name] !== this.state.settings[item.name])
 				ipcRenderer.send('settings.set', {name: item.dataName, value: this.state.settings[item.name]});
 		});

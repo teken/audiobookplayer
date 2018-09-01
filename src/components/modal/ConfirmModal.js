@@ -1,6 +1,3 @@
-import React, {Component} from 'react';
-
-
 import Modal from './Modal'
 
 import withTheme from '../theme/withTheme';
