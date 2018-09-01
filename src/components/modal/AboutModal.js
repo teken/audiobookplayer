@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 
 import ButtonRow from '../settings/ButtonRow';
 import withTheme from '../theme/withTheme';

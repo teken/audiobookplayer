@@ -92,35 +92,35 @@ module.exports = class LibraryService {
 		return record;
 	};
 
-	static getTrackMetaData(filePath) {
-		return mm.parseFile(filePath);
-	}
-
-	static mapTrackLengths(authorsCollection, worksCollection) {
-		let works = worksCollection.chain().data();
-		works.forEach(work => {
-			const author = authorsCollection.get(work.author_id);
-			if (work.type === 'SERIES') {
-				work.books.filter(x => x !== undefined).forEach(book => {
-					book.tracks.forEach(track => {
-						this.getTrackMetaData(track.path).then( metadata => {
-							console.log(track.path, metadata)
-							track.meta = metadata;
-							worksCollection.update(work);
-						});
-
-					});
-				});
-			} else {
-				work.tracks.forEach(track => {
-					this.getTrackMetaData(track.path).then( metadata => {
-						console.log(track.path, metadata)
-						track.meta = metadata;
-						worksCollection.update(work);
-					});
-
-				})
-			}
-		});
-	}
+	// static getTrackMetaData(filePath) {
+	// 	return mm.parseFile(filePath);
+	// }
+	//
+	// static mapTrackLengths(authorsCollection, worksCollection) {
+	// 	let works = worksCollection.chain().data();
+	// 	works.forEach(work => {
+	// 		//const author = authorsCollection.get(work.author_id);
+	// 		if (work.type === 'SERIES') {
+	// 			work.books.filter(x => x !== undefined).forEach(book => {
+	// 				book.tracks.forEach(track => {
+	// 					this.getTrackMetaData(track.path).then( metadata => {
+	// 						console.log(track.path, metadata);
+	// 						track.meta = metadata;
+	// 						worksCollection.update(work);
+	// 					});
+	//
+	// 				});
+	// 			});
+	// 		} else {
+	// 			work.tracks.forEach(track => {
+	// 				this.getTrackMetaData(track.path).then( metadata => {
+	// 					console.log(track.path, metadata);
+	// 					track.meta = metadata;
+	// 					worksCollection.update(work);
+	// 				});
+	//
+	// 			})
+	// 		}
+	// 	});
+	// }
 };
