@@ -20,8 +20,19 @@ export default withTheme(class About extends Component {
 		});
 	}
 
-	stat(name, value) {
-		return <div><span>{name}: </span><span>{this.state.stats[value]}</span></div>
+	stat(displayName, valueName) {
+		const value = valueName in this.state.stats ? this.state.stats[valueName] : 0;
+		return <div><span>{displayName}: </span><span>{value}</span></div>
+	}
+
+	dateRange() {
+		const startDate = 2018;
+		const endDate = (new Date()).getFullYear();
+		if (startDate === endDate) {
+			return startDate;
+		} else {
+			return `${startDate}-${endDate}`;
+		}
 	}
 
 	render() {
@@ -32,7 +43,7 @@ export default withTheme(class About extends Component {
 					<p>
 						Audio Book Player: v{app.getVersion()}<br/>
 						Created By Duncan Haig<br/>
-						Copywrite 2018 Duncan Haig<br/>
+						&copy; {this.dateRange()} Duncan Haig All Rights Reserved<br/>
 					</p>
 					{/*<p>
 						Electron: v{process.versions.electron}<br/>
