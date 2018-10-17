@@ -1,12 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import registerServiceWorker from './registerServiceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import registerServiceWorker from "./registerServiceWorker";
 
-import App from './components/app/App';
-import BookPlayer from './uiservices/bookplayer';
+import App from "./components/app/App";
+import BookPlayer from "./uiservices/bookplayer";
 
-import { ThemeContext } from './components/theme/withTheme';
-import { PlayerContext } from './components/player/withPlayer';
+import {ThemeContext} from "./components/theme/withTheme";
+import {PlayerContext} from "./components/player/withPlayer";
 
 const {ipcRenderer} = window.require('electron');
 

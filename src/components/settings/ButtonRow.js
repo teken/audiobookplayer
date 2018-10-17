@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import withTheme from '../theme/withTheme';
+import withTheme from "../theme/withTheme";
 
 export default withTheme(class ButtonRow extends Component {
 	render() {

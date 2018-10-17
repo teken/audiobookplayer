@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import ButtonRow from '../settings/ButtonRow';
-import Model from './Modal';
+import ButtonRow from "../settings/ButtonRow";
+import Model from "./Modal";
 
-import Loading from '../loading/Loading';
+import Loading from "../loading/Loading";
 
-import withTheme from '../theme/withTheme';
+import withTheme from "../theme/withTheme";
 
 export default withTheme(class TimeCodePromptModal extends Model {
 

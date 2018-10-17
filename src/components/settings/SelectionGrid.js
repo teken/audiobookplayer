@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import withTheme from '../theme/withTheme';
+import withTheme from "../theme/withTheme";
 
 export default withTheme(class SelectionGrid extends Component {
 	constructor(props) {

@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome';
+import React, {Component} from "react";
+import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
 
-import withTheme from '../theme/withTheme';
+import withTheme from "../theme/withTheme";
 
 const {dialog} = window.require('electron').remote;
 

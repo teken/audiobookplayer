@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import idGenerator from 'react-id-generator';
+import idGenerator from "react-id-generator";
 
-import withTheme from './theme/withTheme';
+import withTheme from "./theme/withTheme";
 
 export default withTheme(class RightClickMenu extends Component {
 	constructor(props) {

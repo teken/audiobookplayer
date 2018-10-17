@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
 export default class ProgressBar extends Component {
 	render() {
@@ -36,12 +36,12 @@ export default class ProgressBar extends Component {
 						fill={this.props.colour}
 					/>
 					{ (this.props.steps ? this.props.steps : []).map(step =>
-						<rect
+						<rect key={step.name}
 							x={step.time}
 							y={diff}
 							width={2}
 							height={this.props.barHeight}
-							fill='black'//{this.props.colour}
+							fill={this.props.chapterColour}
 						>
 							<title>
 								{step.name}

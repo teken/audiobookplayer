@@ -1,14 +1,15 @@
-import React, {Component} from 'react';
-import { withRouter } from 'react-router-dom'
-import ReactTable from 'react-table';
+import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
+import ReactTable from "react-table";
 
-import {FontAwesomeIcon as Icon} from '@fortawesome/react-fontawesome'
-import Loading from '../loading/Loading';
+import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
+import Loading from "../loading/Loading";
 
-import 'react-table/react-table.css'
+import "react-table/react-table.css";
 
-import withTheme from '../theme/withTheme';
-import withPlayer from '../player/withPlayer';
+import withTheme from "../theme/withTheme";
+import withPlayer from "../player/withPlayer";
+import ChapterService from "../../uiservices/chapters";
 
 const mm = window.require('music-metadata');
 const {ipcRenderer} = window.require('electron');
@@ -34,7 +35,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 			author.name,
 			work.type === 'SERIES' ? work.name : '',
 			book.name,
-		].filter(x => x.length > 0).join('-');
+		].filter(x => x.length > 0).join('##');
 		let time = ipcRenderer.sendSync('timings.get', {key:key});
 		this.setState({
 			author: author,
@@ -44,6 +45,8 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 			saveTime: time.success ? time.time : null
 		});
 		this.loadTrackLengthData(book);
+
+		this.chapterService = new ChapterService(book);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -53,7 +56,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 				this.state.author.name,
 				this.state.work.type === 'SERIES' ? this.state.work.name : '',
 				book.name,
-			].filter(x => x.length > 0).join('-');
+			].filter(x => x.length > 0).join('##');
 			let time = ipcRenderer.sendSync('timings.get', {key:key});
 			this.setState({
 				book: book,
@@ -78,7 +81,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 	}
 
 	get item() {
-		if (this.state.work) return this.state.work.type === 'BOOK' ? this.state.work : this.state.work.books.find(x=> x.name === this.props.bookName);
+		if (this.state.work) return this.state.work.type === 'BOOK' ? this.state.work : this.state.work.books.find(x => x.name === this.props.bookName);
 		return false;
 	}
 
@@ -144,8 +147,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 		const totalSize = data.map( track => track.size).reduce((a,v) => a + v, 0);
 		const totalLength = data.map( track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0);
 
-		const infos = this.state.book ? this.state.book.info.map(file => file.path) : [];
-		const chapters = infos.map(path => this.props.player.loadCUEFileData(path));
+		const chapters = this.chapterService ? this.chapterService.chapters : [];
 
 		const widths = this.hasArtwork ? '25%' : '33%';
 
@@ -165,7 +167,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 										</span>
 									)}
 								</div>
-								{this.hasArtwork && <div style={{width:widths}}>
+								{this.hasArtwork && <div style={{width:widths, alignSelf: 'center'}}>
 									<img src={this.state.book.art[0].path} alt={this.cleanedName} style={{
 										minWidth: '11em',
 										minHeight: '11em',
@@ -252,7 +254,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 													<div>Start Time: {this.formatTime(track.startTime)}</div>
 													<div>End Time: {this.formatTime(track.endTime)}</div>
 													<div>Size: {this.formatBytes(track.size)}</div>
-													<div>Chapters: {rows.data.length}</div>
+													<div>Chapters: {rows ? rows.data.length : 1}</div>
 												</div>
 
 												{rows && (
@@ -262,7 +264,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 														noDataText="No chapters found"
 														columns={[
 															{Header: 'Chapter Name', accessor: 'name'},
-															{Header: 'Time Code', maxWidth: 200, accessor: 'time', Cell: props => this.formatCUETime(props.value)},
+															{Header: 'Time Code', maxWidth: 200, accessor: 'time', Cell: props => this.formatTime(props.value)},
 														]}
 														minRows={0}
 														defaultPageSize={rows.data.length}
@@ -275,11 +277,11 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 																	if (this.state.work.type === "SERIES")
 																		this.props.player.open(this.state.work.$loki, this.props.bookName, () => {
 																			this.props.player.play();
-																			this.props.player.currentTime = this.formatCUETimeAsSecond(rowInfo.row.time);
+																			this.props.player.currentTime = rowInfo.row.time;
 																		});
 																	else this.props.player.open(this.state.work.$loki, null, () => {
 																		this.props.player.play();
-																		this.props.player.currentTime = this.formatCUETimeAsSecond(rowInfo.row.time);
+																		this.props.player.currentTime = rowInfo.row.time;
 																	});
 																	if (handleOriginal) handleOriginal();
 																}
@@ -313,26 +315,6 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 	formatTime(time) {
 		if (!time) time = 0;
 		return new Date(1000 * time).toISOString().substr(11, 8);
-	}
-
-	formatCUETime(time) {
-		if (!time) time = '0:0:00';
-		const parts = time.split(':');
-		let date = new Date(null);
-		date.setMinutes(Number(parts[0]));
-		date.setSeconds(Number(parts[1]));
-		date.setMilliseconds(Number(parts[2])*10);
-		return date.toISOString().substr(11, 8);
-	}
-
-	formatCUETimeAsSecond(time) {
-		if (!time) time = '0:0:00';
-		const parts = time.split(':');
-		let date = new Date(null);
-		date.setMinutes(Number(parts[0]));
-		date.setSeconds(Number(parts[1]));
-		date.setMilliseconds(Number(parts[2])*10);
-		return date.getTime()/1000;
 	}
 })))
 

@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import withTheme from '../theme/withTheme';
+import withTheme from "../theme/withTheme";
 
 const {shell, ipcRenderer} = window.require('electron');
-const {app/*, process*/} = window.require('electron').remote;
+const {app} = window.require('electron').remote;
 
 export default withTheme(class About extends Component {
 	constructor(props) {
@@ -45,11 +45,6 @@ export default withTheme(class About extends Component {
 						Created By Duncan Haig<br/>
 						&copy; {this.dateRange()} Duncan Haig All Rights Reserved<br/>
 					</p>
-					{/*<p>
-						Electron: v{process.versions.electron}<br/>
-						Node: v{process.versions.node}<br/>
-						Chrome: v{process.versions.chrome}<br/>
-					</p>*/}
 					<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 					<p>
 						<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>

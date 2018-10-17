@@ -1,8 +1,8 @@
-import AudioPlayer from './audioplayer';
+import AudioPlayer from "./audioplayer";
+import ChapterService from "./chapters";
 
 const {ipcRenderer} = window.require('electron');
 const mm = window.require('music-metadata');
-const fs = window.require('fs');
 
 export default class BookPlayer {
 	constructor(volume) {
@@ -15,6 +15,13 @@ export default class BookPlayer {
 		this._tracks = [];
 		this.minVolume = 0;
 		this.maxVolume = 200;
+	}
+
+	get chapterService() {
+		if (this.work)
+			return new ChapterService(this.book);
+		else
+			return new ChapterService(null);
 	}
 
 	get volumeRange() {
@@ -40,7 +47,7 @@ export default class BookPlayer {
 			this._work.type === 'SERIES' ? this._work.name : '',
 			this.book.name,
 		];
-		return parts.filter(x => x.length > 0).join('-');
+		return parts.filter(x => x.length > 0).join('##');
 
 	}
 
@@ -92,7 +99,7 @@ export default class BookPlayer {
 		this._currentTrack = trackName;
 		const filePath = this._tracks.find(track => track.name === this._currentTrack).path;
 		this._audioPlayer.open(filePath, callback, () => {
-			if (this.hasNextTrack) this.playNextTrack();
+			if (this.hasNext) this.playNext();
 			else {
 				this.stop();
 				if (endedCallback) endedCallback();
@@ -117,7 +124,7 @@ export default class BookPlayer {
 	}
 
 	get currentTime() {
-		if (this._tracks.length === 0) return 0;
+		if (!this.isLoaded || this._tracks.length === 0) return 0;
 		else if (this._tracks.length === 1) return this.currentTrackTime;
 		else return this._tracks.slice(0, this.currentTrackIndex).map(track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0) + this.currentTrackTime;
 	}
@@ -166,6 +173,7 @@ export default class BookPlayer {
 	}
 
 	get duration() {
+		if (!this.isLoaded) return 1;
 		return this._tracks.map( track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0);
 	}
 
@@ -173,32 +181,61 @@ export default class BookPlayer {
 		return this._audioPlayer.duration;
 	}
 
-	get hasPreviousTrack() {
-		return this.isLoaded && this.currentTrackIndex > 0;
+	get hasPrevious() {
+		if (this.isLoaded) {
+			if (this.chapters) {
+				return this.currentChapterIndex > 0
+			} else {
+				return this.currentTrackIndex > 0;
+			}
+		}
 	}
 
-	get hasNextTrack() {
-		return this.isLoaded && this.currentTrackIndex < (this._tracks.length -1);
+	get hasNext() {
+		if (this.isLoaded) {
+			if (this.chapters) {
+				return this.currentChapterIndex < (this.flattenedChapters.length - 1)
+			} else {
+				return this.currentTrackIndex < (this._tracks.length - 1);
+			}
+		}
 	}
 
-	get nextTrack() {
-		if (!this.hasNextTrack) return;
-		return this._tracks[this.currentTrackIndex + 1];
+	get next() {
+		if (!this.hasNext) return;
+		if (this.chapters) {
+			return this.flattenedChapters[this.currentChapterIndex + 1]
+		} else {
+			return this._tracks[this.currentTrackIndex + 1];
+		}
 	}
 
-	get previousTrack() {
-		if (!this.hasPreviousTrack) return;
-		return this._tracks[this.currentTrackIndex - 1];
+	get previous() {
+		if (!this.hasPrevious) return;
+		if (this.chapters) {
+			return this.flattenedChapters[this.currentChapterIndex - 1]
+		} else {
+			return this._tracks[this.currentTrackIndex - 1];
+		}
 	}
 
-	playNextTrack() {
-		if (!this.hasNextTrack) return;
-		this.setToTrack(this.nextTrack.name, () => this.play());
+	playNext() {
+		if (!this.hasNext) return;
+		if (this.chapters) {
+			this.currentTime = this.next.time;
+		} else {
+			this.setToTrack(this.next.name, () => this.play());
+		}
+
 	}
 
-	playPreviousTrack() {
-		if (!this.hasPreviousTrack) return;
-		this.setToTrack(this.previousTrack.name, () => this.play());
+	playPrevious() {
+		if (!this.hasPrevious) return;
+		if (this.chapters) {
+			this.currentTime = this.previous.time;
+		} else {
+			this.setToTrack(this.previous.name, () => this.play());
+		}
 	}
 
 	getTrackIndex(trackName) {
@@ -209,27 +246,25 @@ export default class BookPlayer {
 		return this.getTrackIndex(this._currentTrack);
 	}
 
+	get currentChapterIndex() {
+		let index = 0;
+		let current = this.currentTime;
+		for (let i = 0; i < this.flattenedChapters.length; i++) {
+			if (current > this.flattenedChapters[i].time) index = i;
+			else break;
+		}
+		return index;
+	}
+
 	get currentTrack() {
 		return this._currentTrack;
 	}
 
-	loadCUEFileData(path) {
-		if (path === null) return [];
-		const buffer = fs.readFileSync(path);
-		const lines = buffer.toString('utf8').split('\n').map(line => line.trim()).filter(line => line.length > 0);
-		const name = lines.slice(0,1)[0].slice(6, -5);
-		const content = lines.slice(1);
-		let data = [];
-		for(let i = 0; i <= content.length; i+=3) {
-			let name = String(content[i+1]).slice(7,-1);
-			let timeCode = String(content[i+2]).slice(9);
-			data.push({name:name, time:timeCode})
-		}
-		return {name:name,data:data.slice(0,-1)};
+	get flattenedChapters() {
+		return this.chapters.reduce((acc, val) => acc.concat(val.data),[]);
 	}
 
 	get chapters() {
-		//TODO: finish chapter markers
-		return [];//this.isLoaded ? this.book.info.map(file => this.loadCUEFileData(file.path)) : [];
+		return this.chapterService.chapters;
 	}
 }

@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import ProgressBar from '../timeline/ProgressBar';
-import ProgressBarHandler from '../timeline/ProgressBarHandler';
+import ProgressBar from "../timeline/ProgressBar";
+import ProgressBarHandler from "../timeline/ProgressBarHandler";
 
-import withTheme from '../../theme/withTheme';
-import withPlayer from '../../player/withPlayer';
+import withTheme from "../../theme/withTheme";
+import withPlayer from "../../player/withPlayer";
 
 export default withTheme(withPlayer(class Volume extends Component {
 	constructor(props) {

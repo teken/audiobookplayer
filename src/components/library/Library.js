@@ -1,20 +1,20 @@
-import React, {Component} from 'react';
-import { withRouter } from 'react-router-dom'
+import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
 
-import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome';
-import RightClickMenu from '../RightClickMenu';
+import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
+import RightClickMenu from "../RightClickMenu";
 
-import AuthoredView from './AuthoredView';
-import View from './View';
-import Tile from './tile/Tile';
-import Row from './tile/Row';
+import AuthoredView from "./AuthoredView";
+import View from "./View";
+import Tile from "./tile/Tile";
+import Row from "./tile/Row";
 
-import Fuse from 'fuse.js';
+import Fuse from "fuse.js";
 
-import Loading from '../loading/Loading';
+import Loading from "../loading/Loading";
 
-import withTheme from '../theme/withTheme';
-import withPlayer from '../player/withPlayer';
+import withTheme from "../theme/withTheme";
+import withPlayer from "../player/withPlayer";
 
 const {ipcRenderer, shell} = window.require('electron');
 const path = window.require('path');
@@ -23,8 +23,7 @@ const path = window.require('path');
 export default withRouter(withTheme(withPlayer(class Library extends Component {
 	constructor(props) {
 		super(props);
-		const settings = ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']);
-		console.log(settings)
+		const settings = JSON.parse(ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
 		this.state = {
 			authors: [],
 			works: [],
@@ -32,8 +31,8 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			flattenedWorks:[],
 			searchTerm: "",
 			//intervalId: null,
-			libraryDisplayAuthors: Boolean(ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors')),
-			libraryStyle: ipcRenderer.sendSync('settings.get', 'libraryStyle'),
+			libraryDisplayAuthors: settings.libraryDisplayAuthors,
+			libraryStyle: settings.libraryStyle,
 			loading: true
 		};
 		this.fuse = null;
@@ -63,17 +62,17 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 	}
 
 	componentDidMount() {
-		const firstRun = ipcRenderer.sendSync('settings.get', 'firstRun');
-		if (firstRun === 'true') {
+		const firstRun = JSON.parse(ipcRenderer.sendSync('settings.get', 'firstRun'));
+		if (firstRun) {
 			this.props.history.push("/setup");
 			return;
 		}
-		setTimeout(() => {
+		//setTimeout(() => {
 			this.loadData();
 			this.setState({
 				loading:false
 			});
-		},0);
+		//}, 0);
 		window.addEventListener('keydown', this.listenKeyboard.bind(this), true);
 	}
 
@@ -98,13 +97,14 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			return work;
 		}).reduce((a,v) => a.concat(v.type === 'SERIES' ? v.books : v) ,[]).filter(item => item.type === 'BOOK');
 		this.fuse = new Fuse(flattenedWorks, this.fuseOptions);
+		const settings = JSON.parse(ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
 		this.setState({
 			works: works,
 			authors: authors,
 			flattenedWorks: flattenedWorks,
 			states: times,
-			libraryDisplayAuthors: Boolean(ipcRenderer.sendSync('settings.get', 'libraryDisplayAuthors')),
-			libraryStyle: ipcRenderer.sendSync('settings.get', 'libraryStyle'),
+			libraryDisplayAuthors: Boolean(settings.libraryDisplayAuthors),
+			libraryStyle: settings.libraryStyle,
 		});
 	}
 
@@ -115,7 +115,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 	render() {
 		const libraryWorks = this.isSearching ? this.state.results : this.state.flattenedWorks;
 		const savedTimes = this.state.states.map(x => {
-			const parts = x.key.split('-');
+			const parts = x.key.split('##');
 			x.author = parts[0];
 			x.work = parts[1];
 			if (parts.length === 3) x.bookName = parts[2];
@@ -125,6 +125,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 
 		const displaySavedTimesSection = !this.isSearching && savedTimeWorks && savedTimeWorks.length > 0;
 		const displayLibrary = libraryWorks && libraryWorks.length > 0;
+		const searchIcon = this.isSearching ? 'times' : 'search';
 		return (
 			<div>
 				<div style={{ margin: '1em', padding: '1em', color:this.props.theme.activeText, backgroundColor:this.props.theme.inputBackground }}>
@@ -136,13 +137,14 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 					   fontSize: '1em',
 					   paddingLeft:'0.3em'
 					}} />
-					<Icon icon="search" style={{
+					<Icon icon={searchIcon} style={{
 						borderBottom:`'1em solid ${this.props.theme.activeColour}`,
 						fontSize: '1em',
-						transform: 'translateY(.25em)',
+						transform: 'translateY(.1em)',
 						paddingBottom: '0.1em',
-						color: this.props.theme.inactiveText
-					}} />
+						color: this.props.theme.inactiveText,
+						cursor: 'pointer'
+					}} onClick={() => this.isSearching ? this.search('') : null} />
 				</div>
 				{
 					this.state.loading ?
@@ -166,7 +168,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			libraryWorks: libraryWorks,
 			libraryBook: this.libraryBook.bind(this),
 			savedBook: this.savedBook.bind(this),
-			getStateKey: (author, series, work) => `${author.name}-${series ? `${series.name}-` : ''}${work.name}`,
+			getStateKey: (author, series, work) => `${author.name}##${series ? `${series.name}##` : ''}${work.name}`,
 			itemClick: this.handleClick.bind(this),
 		};
 
@@ -283,9 +285,13 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 	}
 
 	clearTimingData(key) {
-		ipcRenderer.send('timings.clear', {key:key});
-		this.loadData();
-		this.forceUpdate();
+		let result = ipcRenderer.sendSync('timings.clear', {key:key});
+		if (result && result.success) {
+			this.loadData();
+			this.forceUpdate();
+		} else {
+			console.error(result)
+		}
 	}
 
 	formatTime(time) {

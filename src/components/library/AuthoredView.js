@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import View from './View';
+import View from "./View";
 
 export default class AuthoredView extends View {
 	render() {
@@ -50,7 +50,7 @@ export default class AuthoredView extends View {
 										.slice(1);
 
 									return [
-										items.length > 0 && <h2 key={`title-${author.name}`} style={{textAlign:'left', lineHeight:'1em'}}>{author.name}</h2>,
+										items.length > 0 && <h2 key={`title-${author.name}`} style={{textAlign:'left'}}>{author.name}</h2>,
 										...items,
 										items.length > 0 && [...new Array(this.gridWidthCellCount-((items.length+1)%this.gridWidthCellCount)).keys()].map(x => <span key={`spacer-end-${author.name}-${x}`}/>)
 									]})

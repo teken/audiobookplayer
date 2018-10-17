@@ -1,23 +1,42 @@
-import React, {Component} from 'react';
-import {HashRouter, Route, Switch} from 'react-router-dom';
+import React, {Component} from "react";
+import {HashRouter, Route, Switch} from "react-router-dom";
 
-import Library from '../library/Library';
-import Player from '../player/Player';
-import Detail from '../detail/Detail';
+import Library from "../library/Library";
+import Player from "../player/Player";
+import Detail from "../detail/Detail";
 import WindowControls from "../WindowControls";
-import Settings from '../settings/Settings';
-import About from '../about/About';
-import Setup from '../setup/Setup';
+import Settings from "../settings/Settings";
+import About from "../about/About";
+import Setup from "../setup/Setup";
 
-import { library } from '@fortawesome/fontawesome-svg-core';
+import {library} from "@fortawesome/fontawesome-svg-core";
 
-import { faPlay, faPause, faStop, faBackward, faForward, faVolumeOff, faVolumeDown, faVolumeUp, faMapMarkerAlt,
-		faMinus, faSquare, faTimes, faBookOpen, faCog, faSearch, faFolderOpen, faChevronLeft, faChevronRight,
-		faQuestion, faCaretDown, faCheckSquare
-} from '@fortawesome/free-solid-svg-icons';
+import {
+	faBackward,
+	faBookOpen,
+	faCaretDown,
+	faCheckSquare,
+	faChevronLeft,
+	faChevronRight,
+	faCog,
+	faFolderOpen,
+	faForward,
+	faMapMarkerAlt,
+	faMinus,
+	faPause,
+	faPlay,
+	faQuestion,
+	faSearch,
+	faSquare,
+	faStop,
+	faTimes,
+	faVolumeDown,
+	faVolumeOff,
+	faVolumeUp
+} from "@fortawesome/free-solid-svg-icons";
 
-import withTheme from '../theme/withTheme';
-import withPlayer from '../player/withPlayer';
+import withTheme from "../theme/withTheme";
+import withPlayer from "../player/withPlayer";
 
 //import { faSquare } from '@fontawesome/free-regular-svg-icons';
 //import { } from '@fontawesome/free-brands-svg-icons';
@@ -43,10 +62,10 @@ export default withTheme(withPlayer(class App extends Component {
 			this.props.player.playPause();
 		});
 		ipcRenderer.on('player.previoustrack', (event, arg) => {
-			this.props.player.playPreviousTrack()
+			this.props.player.playPrevious()
 		});
 		ipcRenderer.on('player.nexttrack', (event, arg) => {
-			this.props.player.playNextTrack()
+			this.props.player.playNext()
 		});
 		ipcRenderer.on('player.stop', (event, arg) => {
 			this.props.player.stop();
@@ -265,6 +284,11 @@ export default withTheme(withPlayer(class App extends Component {
 
 						select {
 							-webkit-appearance: none;
+						}
+
+						h1, h2, h3, h4, h5, h6 {
+							line-height:1em;
+							margin: .5em 0;
 						}
 					`}} />
 				</div>

@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import ProgressBar from './ProgressBar';
-import ProgressBarHandler from './ProgressBarHandler';
+import ProgressBar from "./ProgressBar";
+import ProgressBarHandler from "./ProgressBarHandler";
 
-import withTheme from '../../theme/withTheme';
-import withPlayer from '../withPlayer';
+import withTheme from "../../theme/withTheme";
+import withPlayer from "../withPlayer";
 
 export default withTheme(withPlayer(class Timeline extends Component {
 	constructor(props) {
@@ -110,23 +110,12 @@ export default withTheme(withPlayer(class Timeline extends Component {
 
 	changeSteps(chapters, lengthPerSecond) {
 		const flatternChapters = chapters.reduce((acc, val) => acc.concat(val.data),[]).map(x => {
-			x.time = this.formatCUETimeAsSecond(x.time) * lengthPerSecond;
+			x.time *= lengthPerSecond;
 			return x;
 		});
 		this.setState({
 			steps: flatternChapters
 		});
-	}
-
-	formatCUETimeAsSecond(time) {
-		if (!isNaN(time)) return time;
-		if (!time) time = '0:0:00';
-		const parts = time.split(':');
-		let date = new Date(null);
-		date.setMinutes(Number(parts[0]));
-		date.setSeconds(Number(parts[1]));
-		date.setMilliseconds(Number(parts[2])*10);
-		return date.getTime()/1000;
 	}
 
 	setProgress(value) {
@@ -187,6 +176,7 @@ export default withTheme(withPlayer(class Timeline extends Component {
 					onMouseOut={this._onMouseOutProgressBar}
 					colour={this.props.theme.activeText}
 					inactiveColour={this.props.theme.inactiveText}
+					chapterColour={this.props.theme.inputBackground}
 					steps={this.state.steps}
 				>
 					<ProgressBarHandler

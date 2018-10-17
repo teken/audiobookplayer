@@ -3,6 +3,8 @@ const {ipcMain} = require('electron');
 const LibraryService = require('./library');
 const SettingService = require('./settings');
 
+const j = o => JSON.stringify(o);
+
 module.exports = class IPCService {
 
 	constructor(window, localLibrary, bookTimes, settings) {
@@ -18,7 +20,7 @@ module.exports = class IPCService {
 	}
 
 	get calls() {
-		return  [
+		return [
 			...this.libraryCalls,
 			...this.settingsCalls,
 			...this.timingsCalls,
@@ -114,11 +116,12 @@ module.exports = class IPCService {
 			{
 				name: "settings.gets",
 				action: (event, args) => {
-					event.returnValue = args.reduce((acc, val) => {
+					let data = args.reduce((acc, val) => {
 						const name = String(val);
 						acc[(name)] = this.settings.get(name);
 						return acc;
-					}, []);
+					}, {});
+					event.returnValue = JSON.stringify(data)
 					//event.sender.send('settings.gets.reply', results);
 				}
 			},
@@ -202,16 +205,27 @@ module.exports = class IPCService {
 			{
 				name: "timings.clear",
 				action: (event, args) => {
-					if (!args.key || args.key.length <= 0) event.returnValue = {success: false, error:'Key length to short'};
-					let timings = this.bookTimings.getCollection('timings');
-					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
-						timings = this.bookTimings.getCollection('timings');
-					}
-					let item = timings.findOne({key:args.key});
-					if (item !== null) {
-						delete item.time;
-						timings.update(item);
+					try {
+						if (!args.key || args.key.length <= 0) event.returnValue =  { success: false, error: 'Key length to short'};
+						let timings = this.bookTimings.getCollection('timings');
+						if (timings === null) {
+							this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
+							timings = this.bookTimings.getCollection('timings');
+						}
+						let items = timings.find({key: args.key});
+						if (items.length > 1) {
+							items.slice(1).map(x => timings.remove(x));
+						}
+						let item = items.length > 0 ? items[0] : null;
+						if (item !== null) {
+							delete item.time;
+							timings.update(item);
+							event.returnValue = {success: true};
+						} else {
+							event.returnValue = {success: false, error: 'Failed to find time for provided key'};
+						}
+					} catch (e) {
+						event.returnValue = {success: false, error: 'Exception in clear: '+e};
 					}
 				}
 			}

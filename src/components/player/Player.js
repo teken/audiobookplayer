@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
-import { withRouter } from 'react-router-dom'
+import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
 
-import Timeline from './timeline/Timeline';
-import Volume from './volume/Volume';
-import IconButton from './IconButton';
+import Timeline from "./timeline/Timeline";
+import Volume from "./volume/Volume";
+import IconButton from "./IconButton";
 
-import TimeCodePromptModal from '../modal/TimeCodePromptModal';
+import TimeCodePromptModal from "../modal/TimeCodePromptModal";
 
-import withTheme from '../theme/withTheme';
-import withPlayer from './withPlayer';
+import withTheme from "../theme/withTheme";
+import withPlayer from "./withPlayer";
 
 const {ipcRenderer} = window.require('electron');
 
@@ -114,9 +114,9 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 				<TimeCodePromptModal show={this.state.showTimePicker} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
 				<Timeline progress={this.state.progress} duration={this.state.duration} chapters={this.state.chapters}/>
 				<div className="controls" style={{height:'1em'}}>
-					<IconButton title="Previous Track" icon="backward" onClick={() => this.props.player.playPreviousTrack()} style={{...commonButtonStyling, color: this.props.player.hasPreviousTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Previous" icon="backward" onClick={() => this.props.player.playPrevious()} style={{...commonButtonStyling, color: this.props.player.hasPrevious ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
-					<IconButton title="Next Track" icon="forward" onClick={() => this.props.player.playNextTrack()} style={{...commonButtonStyling, color: this.props.player.hasNextTrack ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
+					<IconButton title="Next" icon="forward" onClick={() => this.props.player.playNext()} style={{...commonButtonStyling, color: this.props.player.hasNext ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<IconButton title="Stop" icon="stop" onClick={() => this.props.player.stop()} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<IconButton title="Skip to Point" icon="map-marker-alt" onClick={() => this.props.player.isLoaded && this.setState({showTimePicker: true})} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<span onMouseOver={() => this.displayVolume = true} onMouseOut={() => this.displayVolume = false}>

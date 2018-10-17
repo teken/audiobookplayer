@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import { FontAwesomeIcon as Icon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
 
 export default class IconButton extends Component {
 	constructor(props) {

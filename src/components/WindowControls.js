@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
-import { withRouter } from 'react-router-dom'
+import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
 
-import IconButton from './player/IconButton';
+import IconButton from "./player/IconButton";
+import withTheme from "./theme/withTheme";
 //import AboutModule from './modal/AboutModal';
-
-import withTheme from './theme/withTheme';
 
 const remote = window.require('electron').remote;
 

@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import ButtonRow from '../settings/ButtonRow';
-import Loading from '../loading/Loading';
+import ButtonRow from "../settings/ButtonRow";
+import Loading from "../loading/Loading";
 
 export default class Modal extends Component {
 

@@ -1,17 +1,17 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import FolderSelector from '../settings/FolderSelector';
-import SelectionGrid from '../settings/SelectionGrid';
+import FolderSelector from "../settings/FolderSelector";
+import SelectionGrid from "../settings/SelectionGrid";
 
-import AuthoredView from '../library/AuthoredView';
-import View from '../library/View';
-import Tile from '../library/tile/Tile';
-import Row from '../library/tile/Row';
+import AuthoredView from "../library/AuthoredView";
+import View from "../library/View";
+import Tile from "../library/tile/Tile";
+import Row from "../library/tile/Row";
 
-import ReactTable from 'react-table';
+import ReactTable from "react-table";
 
-import withTheme from '../theme/withTheme';
-import {withRouter} from 'react-router-dom';
+import withTheme from "../theme/withTheme";
+import {withRouter} from "react-router-dom";
 
 const {ipcRenderer} = window.require('electron');
 
@@ -135,7 +135,7 @@ export default withRouter(withTheme(class About extends Component {
 			libraryWorks: works,
 			libraryBook: (rt, a, s, b, k) => rt(a,s,b,k),
 			savedBook: null,
-			getStateKey: (a,s,w) => `setup-${a.name}-${s ? `${s.name}-` : ''}${w.name}`,
+			getStateKey: (a,s,w) => `setup##${a.name}##${s ? `${s.name}##` : ''}${w.name}`,
 			itemClick: () => {},
 		};
 	}

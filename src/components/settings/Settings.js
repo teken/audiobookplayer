@@ -1,16 +1,16 @@
-import React, {Component} from 'react';
-import { withRouter } from 'react-router-dom'
-import equal from 'deep-equal';
+import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
+import equal from "deep-equal";
 
-import Setting from './Setting';
-import FolderSelector from './FolderSelector';
-import ButtonRow from './ButtonRow';
-import Dropdown from './Dropdown';
-import Checkbox from './Checkbox';
+import Setting from "./Setting";
+import FolderSelector from "./FolderSelector";
+import ButtonRow from "./ButtonRow";
+import Dropdown from "./Dropdown";
+import Checkbox from "./Checkbox";
 
-import ConfirmModal from '../modal/ConfirmModal';
+import ConfirmModal from "../modal/ConfirmModal";
 
-import withTheme from '../theme/withTheme';
+import withTheme from "../theme/withTheme";
 
 const {ipcRenderer} = window.require('electron');
 
@@ -117,9 +117,9 @@ export default withRouter(withTheme(class Settings extends Component {
 
 	buttons = [
 		{value:"Show Setup Wizard", onClick:() => this.props.history.push('/setup')},
-		{value:"Clear Library", onClick:() => this.setState({showClear: true})},
+		// {value:"Clear Library", onClick:() => this.setState({showClear: true})},
 		{value:"Re-Import Library", onClick:() => this.setState({showReimport: true})},
-		{value:"Scan for changes in Library", onClick:this.addDeltasToLibrary},
+		// {value:"Scan for changes in Library", onClick:this.addDeltasToLibrary},
 	];
 
 	render() {

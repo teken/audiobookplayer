@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
-import ButtonRow from '../settings/ButtonRow';
-import withTheme from '../theme/withTheme';
+import ButtonRow from "../settings/ButtonRow";
+import withTheme from "../theme/withTheme";
 
-import Model from './Modal';
-import About from '../about/About';
+import Model from "./Modal";
+import About from "../about/About";
 
 export default withTheme(class AboutModal extends Model {
 
