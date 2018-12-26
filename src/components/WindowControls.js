@@ -28,6 +28,7 @@ export default withRouter(withTheme(class WindowControls extends Component {
 			<div style={{cursor:'point', WebkitAppRegion:'drag', position:'fixed', top:0, width: '100%', display:'flex', justifyContent:'space-between', background: this.props.theme.windowBarBackground, height: '1em', alignItems:'baseline', padding:'.5em 0'}}>
 				<div>
 					<IconButton title="Library" icon="book-open" onClick={() => this.props.history.push(`/`)} hoverStyle={{backgroundColor:this.props.theme.iconButtonHoverBackground}} style={{...commonButtonStyling}} svgStyle={{transform: 'translateY(1.5px)'}}/>
+					<IconButton title="Downloads" icon="cloud-download-alt" onClick={() => this.props.history.push(`/downloads`)} hoverStyle={{backgroundColor:this.props.theme.iconButtonHoverBackground}} style={{...commonButtonStyling}} svgStyle={{transform: 'translateY(1.5px)'}}/>
 					<IconButton title="Settings" icon="cog" onClick={() => this.props.history.push(`/settings`)} hoverStyle={{backgroundColor:this.props.theme.iconButtonHoverBackground}} style={{...commonButtonStyling}}/>
 					<IconButton title="About" icon="question" onClick={() => this.props.history.push(`/about`)} hoverStyle={{backgroundColor:this.props.theme.iconButtonHoverBackground}} style={{...commonButtonStyling}}/>
 				</div>

@@ -32,11 +32,15 @@ import {
 	faTimes,
 	faVolumeDown,
 	faVolumeOff,
-	faVolumeUp
+	faVolumeUp,
+	faCloudDownloadAlt,
+	faArrowDown,
+	faArrowUp
 } from "@fortawesome/free-solid-svg-icons";
 
 import withTheme from "../theme/withTheme";
 import withPlayer from "../player/withPlayer";
+import Downloads from "../downloads/Downloads";
 
 //import { faSquare } from '@fontawesome/free-regular-svg-icons';
 //import { } from '@fontawesome/free-brands-svg-icons';
@@ -45,7 +49,7 @@ const {ipcRenderer} = window.require('electron');
 
 library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolumeDown, faVolumeOff, faMapMarkerAlt,
 			faMinus, faSquare, faTimes, faBookOpen, faCog, faSearch, faFolderOpen, faChevronLeft, faChevronRight,
-			faQuestion, faCaretDown, faCheckSquare
+			faQuestion, faCaretDown, faCheckSquare, faCloudDownloadAlt, faArrowDown, faArrowUp
 );
 
 export default withTheme(withPlayer(class App extends Component {
@@ -111,6 +115,7 @@ export default withTheme(withPlayer(class App extends Component {
 								<Detail workId={match.params.workId}/>
 							)}/>
 							<Route path="/settings" component={Settings}/>
+							<Route path="/downloads" component={Downloads}/>
 							<Route path="/about" component={About}/>
 							<Route path="/setup" component={Setup}/>
 							<Route render={({location}) => (
