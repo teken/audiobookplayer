@@ -1,8 +1,5 @@
 const {ipcMain} = require('electron');
-const mp = require('msgpack-lite');
-
 const LibraryService = require('./library');
-const SettingService = require('./settings');
 
 module.exports = class IPCService {
 
@@ -33,14 +30,14 @@ module.exports = class IPCService {
 		return  [
 			{
 				name: "library.getAll",
-				action: async (event, args) => {
+				action: async (event) => {
 					const results = await this.remoteLibrary.list();
 					event.returnValue = this.remoteLibrary.cleanUpResults(results);
 				}
 			},
 			{
 				name: "library.getAllCounts",
-				action: async (event, args) => {
+				action: async (event) => {
 					const results = (await this.remoteLibrary.list()).map(x => x[0].key);
 					const slashCounts = results.map(x => (x.match(/\//g) || []).length);
 					const authors = new Set(results.map(x => x.slice(0,x.indexOf('/'))));
@@ -57,7 +54,7 @@ module.exports = class IPCService {
 			{
 				name: "library.getWork",
 				action: async (event, key) => {
-					if (!key) throw Error(`Key '${key}' is invalid`)
+					if (!key) throw Error(`Key '${key}' is invalid`);
 					const results = await this.remoteLibrary.get(String(key));
 					const i = this.remoteLibrary.cleanUpResults(results);
 					event.returnValue = i[0];
@@ -65,7 +62,7 @@ module.exports = class IPCService {
 			},
 			{
 				name: "library.importdelta",
-				action: (event, args) => {
+				action: (event) => {
 					LibraryService.fileSystemToLibrary(true, this.remoteLibrary, this.localLibrary, this.settings).then(result => {
 						event.sender.send('library.importdelta.reply', result)
 					}).catch(err => {
@@ -75,7 +72,7 @@ module.exports = class IPCService {
 			},
 			{
 				name: "library.reimport",
-				action: (event, args) => {
+				action: (event) => {
 					LibraryService.fileSystemToLibrary(false, this.remoteLibrary, this.localLibrary, this.settings).then(result => {
 						event.sender.send('library.reimport.reply', result)
 					}).catch(err => {
@@ -101,7 +98,7 @@ module.exports = class IPCService {
 			{
 				name: "file.path.lookup",
 				action: async (event, key) => {
-					if (!key) throw Error(`Key '${key}' is invalid`)
+					if (!key) throw Error(`Key '${key}' is invalid`);
 					const results = await this.localLibrary.get(String(key));
 					const t = this.remoteLibrary.cleanUpResults(results);
 					event.returnValue = t.length > 0 ? t[0] : '';
@@ -115,15 +112,14 @@ module.exports = class IPCService {
 			{
 				name: "settings.get",
 				action: (event, key) => {
-					if (!key) throw Error(`Key '${key}' is invalid`)
-					const result = this.settings.get(String(key));
-					event.returnValue = result;
+					if (!key) throw Error(`Key '${key}' is invalid`);
+					event.returnValue = this.settings.get(String(key));
 				}
 			},
 			{
 				name: "settings.gets",
 				action: (event, keys) => {
-					if (!keys) throw Error(`Keys '${keys}' is invalid`)
+					if (!keys) throw Error(`Keys '${keys}' is invalid`);
 					let data = keys.reduce((acc, val) => {
 						const name = String(val);
 						acc[(name)] = this.settings.get(name);
@@ -135,7 +131,7 @@ module.exports = class IPCService {
 			{
 				name: "settings.set",
 				action: async (event, key, value) => {
-					if (!key) throw Error(`Key '${key}' is invalid`)
+					if (!key) throw Error(`Key '${key}' is invalid`);
 					this.settings.set(String(key), String(value));
 					await this.settings.save();
 				}
@@ -143,7 +139,7 @@ module.exports = class IPCService {
 			{
 				name: "settings.sets",
 				action: async (event, keys) => {
-					if (!keys) throw Error(`Keys '${keys}' is invalid`)
+					if (!keys) throw Error(`Keys '${keys}' is invalid`);
 					for (const setting of keys) {
 						this.settings.set(String(setting.name), String(setting.value));
 					}
@@ -165,7 +161,7 @@ module.exports = class IPCService {
 			{
 				name: "states.get",
 				action: async (event, key) => {
-					if (!key) throw Error(`Key '${key}' is invalid`)
+					if (!key) throw Error(`Key '${key}' is invalid`);
 					const results = await this.states.get(String(key));
 					const clean = this.remoteLibrary.cleanUpResults(results);
 					event.returnValue = clean.length > 0 ? clean[0] : {};
@@ -174,14 +170,14 @@ module.exports = class IPCService {
 			{
 				name: "states.set",
 				action: async (event, key, value) => {
-					if (!key) throw Error(`Key '${key}' is invalid`)
+					if (!key) throw Error(`Key '${key}' is invalid`);
 					const results = await this.states.put(String(key), value);
 					event.returnValue = this.remoteLibrary.cleanUpResults(results);
 				}
 			},
 			{
 				name: "states.clear",
-				action: (event, args) => {
+				action: () => {
 					throw Error('Not Implemented')
 				}
 			}
@@ -196,11 +192,11 @@ module.exports = class IPCService {
 			},
 			{
 				name: "window.flashframe.start",
-				action: (event) => this.window.flashFrame(true)
+				action: () => this.window.flashFrame(true)
 			},
 			{
 				name: "window.flashframe.stop",
-				action: (event) => this.window.flashFrame(false)
+				action: () => this.window.flashFrame(false)
 			},
 			{
 				name: "window.progressbar.set",
