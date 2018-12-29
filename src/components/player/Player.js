@@ -9,8 +9,9 @@ import TimeCodePromptModal from "../modal/TimeCodePromptModal";
 
 import withTheme from "../theme/withTheme";
 import withPlayer from "./withPlayer";
-
-const {ipcRenderer} = window.require('electron');
+import WindowService from "../../uiservices/window";
+import SettingsService from "../../uiservices/settings";
+import StateService from "../../uiservices/state";
 
 export default withRouter(withTheme(withPlayer(class Player extends Component {
 	constructor(props) {
@@ -35,13 +36,15 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 	}
 
 	update() {
-		const timingKey = this.props.player.timingKey;
-		if (this.props.player.isPlaying && timingKey.length > 0) ipcRenderer.send('timings.set', {key: timingKey, time:this.props.player.currentTime});
-		ipcRenderer.send('window.progressbar.set', this.props.player.progress);
-		ipcRenderer.send('settings.set', {
-			name:'volume',
-			value: this.props.player.volume
-		});
+		const stateKey = this.props.player.work ? this.props.player.work.key : '';
+		if (this.props.player.isPlaying && stateKey.length > 0) {
+			let state = StateService.getState(stateKey);
+			if (!state) state = {};
+			state.savedTime = this.props.player.currentTime;
+			StateService.setState(stateKey, state);
+		}
+		WindowService.setProgressBar(this.props.player.progress);
+		SettingsService.setSetting('volume', this.props.player.volume);
 		this.setState({
 			progress: this.props.player.currentTime,
 			duration: this.props.player.duration,
@@ -81,10 +84,9 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 	}
 
 	get cleanedName() {
-		const number = this.props.player.book.name.split(' ', 1)[0];
-		return this.props.player.work && !isNaN(number) ? this.props.player.book.name.slice(number.length+1) : this.props.player.book.name;
+		const number = this.props.player.work.name.split(' ', 1)[0];
+		return !isNaN(number) ? this.props.player.work.name.slice(number.length+1) : this.props.player.work.name;
 	}
-
 
 	get seriesName() {
 		const number = this.props.player.book.name.split(' ', 1)[0];

@@ -12,6 +12,7 @@
 locallibrary
 booktimes
 /.idea
+/*.db
 
 # misc
 .DS_Store

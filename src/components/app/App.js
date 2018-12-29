@@ -104,12 +104,8 @@ export default withTheme(withPlayer(class App extends Component {
 					<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
 						<Switch>
 							<Route exact path="/" component={Library}/>
-							<Route path="/works/:workId/:bookName" render={({match}) => (
-								<Detail workId={match.params.workId} bookName={match.params.bookName}/>
-							)}/>
-							<Route path="/works/:workId" render={({match}) => (
-								<Detail workId={match.params.workId}/>
-							)}/>
+							<Route path="/works/:author/:series/:book" component={Detail}/>
+							<Route path="/works/:author/:book" component={Detail}/>
 							<Route path="/settings" component={Settings}/>
 							<Route path="/about" component={About}/>
 							<Route path="/setup" component={Setup}/>

@@ -12,16 +12,16 @@ import ReactTable from "react-table";
 
 import withTheme from "../theme/withTheme";
 import {withRouter} from "react-router-dom";
-
-const {ipcRenderer} = window.require('electron');
+import SettingsService from "../../uiservices/settings";
 
 export default withRouter(withTheme(class About extends Component {
 	constructor(props) {
 		super(props);
+		const settings = SettingsService.getSettings('libraryPath', 'importStyle', 'libraryDisplayAuthors', 'libraryStyle');
 		this.state = {
-			libraryDataFolder: ipcRenderer.sendSync('settings.get','libraryPath'),
-			importStyle: ipcRenderer.sendSync('settings.get','importStyle'),
-			libraryStyle: (Boolean(ipcRenderer.sendSync('settings.get','libraryDisplayAuthors'))?'authored':'')+ipcRenderer.sendSync('settings.get','libraryStyle'),
+			libraryDataFolder: settings.libraryPath,
+			importStyle: settings.importStyle,
+			libraryStyle: (settings.libraryDisplayAuthors?'authored':'')+settings.libraryStyle,
 			currentStep:0,
 			maxSteps:3,
 		};
@@ -50,11 +50,11 @@ export default withRouter(withTheme(class About extends Component {
 		}
 		const libraryDisplayAuthors = this.state.libraryStyle.includes('authored');
 		const libraryStyle = this.state.libraryStyle.replace('authored', '');
-		ipcRenderer.send('settings.set', {name:'libraryDisplayAuthors', value:libraryDisplayAuthors});
-		ipcRenderer.send('settings.set', {name:'libraryStyle', value:libraryStyle});
-		ipcRenderer.send('settings.set', {name:'libraryPath', value:this.state.libraryDataFolder});
-		ipcRenderer.send('settings.set', {name:'importStyle', value:this.state.importStyle});
-		ipcRenderer.send('settings.set', {name:'firstRun', value:false});
+		SettingsService.setSetting('libraryDisplayAuthors', libraryDisplayAuthors);
+		SettingsService.setSetting('libraryStyle', libraryStyle);
+		SettingsService.setSetting('libraryPath', this.state.libraryDataFolder);
+		SettingsService.setSetting('importStyle', this.state.importStyle);
+		SettingsService.setSetting('firstRun', false);
 		this.props.history.push('/');
 
 	}
@@ -115,14 +115,11 @@ export default withRouter(withTheme(class About extends Component {
 	}
 
 	get _libraryProperties() {
-		const authors = [{
-			name: 'Charlie Smith', $loki:1
-		}];
 		const works = [
-			{type:'BOOK', name:'Adventure Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1)},
-			{type:'BOOK', name:'01 First Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
-			{type:'BOOK', name:'02 Second Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
-			{type:'BOOK', name:'03 Third Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
+			{name:'Adventure Book', art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:'Charlie Smith'},
+			{name:'01 First Book', art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:'Charlie Smith', series: 'Adventure Series'},
+			{name:'02 Second Book', art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:'Charlie Smith', series: 'Adventure Series'},
+			{name:'03 Third Book', art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:'Charlie Smith', series: 'Adventure Series'},
 		];
 		return {
 			libraryTitle: '',
@@ -135,7 +132,6 @@ export default withRouter(withTheme(class About extends Component {
 			libraryWorks: works,
 			libraryBook: (rt, a, s, b, k) => rt(a,s,b,k),
 			savedBook: null,
-			getStateKey: (a,s,w) => `setup##${a.name}##${s ? `${s.name}##` : ''}${w.name}`,
 			itemClick: () => {},
 		};
 	}

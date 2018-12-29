@@ -11,8 +11,8 @@ import Checkbox from "./Checkbox";
 import ConfirmModal from "../modal/ConfirmModal";
 
 import withTheme from "../theme/withTheme";
-
-const {ipcRenderer} = window.require('electron');
+import SettingsService from "../../uiservices/settings";
+import LibraryService from "../../uiservices/library";
 
 export default withRouter(withTheme(class Settings extends Component {
 	constructor(props) {
@@ -43,7 +43,7 @@ export default withRouter(withTheme(class Settings extends Component {
 		// 	a.push(v.dataName);
 		// 	return a;
 		// },[]);
-		const fetch = (name) => ipcRenderer.sendSync('settings.get', name);
+		const fetch = (name) => SettingsService.getSetting(name);
 		this.settingsObjects.forEach(item => {
 			switch (item.type) {
 				default:
@@ -78,7 +78,7 @@ export default withRouter(withTheme(class Settings extends Component {
 		event.preventDefault();
 		this.settingsObjects.forEach(item => {
 			if (this.state.oldSettings[item.name] !== this.state.settings[item.name])
-				ipcRenderer.send('settings.set', {name: item.dataName, value: this.state.settings[item.name]});
+				SettingsService.setSetting(item.dataName, this.state.settings[item.name]);
 		});
 		this.props.history.push('/');
 	}
@@ -88,31 +88,27 @@ export default withRouter(withTheme(class Settings extends Component {
 	}
 
 	clearLibrary() {
-		this.setState({
-			showClear: true
-		});
-		ipcRenderer.once('library.clear.reply', (event, arg) => {
+		LibraryService.clearLibrary().then((arg) => {
 			console.log('Database cleared', arg);
+			this.setState({
+				showClear: true
+			});
 		});
-		ipcRenderer.send('library.clear');
-
 	}
 
 	reimportLibrary() {
-		this.setState({
-			showReimport: true
+		LibraryService.reimportLibrary().then((arg) => {
+			console.log('Database Re-Imported finished with', arg);
+			this.setState({
+				showReimport: false
+			});
 		});
-		ipcRenderer.once('library.reimport.reply', (event, arg) => {
-			console.log('Database Re-Imported', arg);
-		});
-		ipcRenderer.send('library.reimport');
 	}
 
 	addDeltasToLibrary() {
-		ipcRenderer.once('library.importdelta.reply', (event, arg) => {
+		LibraryService.importDifferencesToLibrary().then((arg) => {
 			console.log('Database Deltas Imported', arg);
 		});
-		ipcRenderer.send('library.importdelta');
 	}
 
 	buttons = [

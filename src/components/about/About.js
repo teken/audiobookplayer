@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 
 import withTheme from "../theme/withTheme";
+import LibraryService from "../../uiservices/library";
 
-const {shell, ipcRenderer} = window.require('electron');
+const {shell} = window.require('electron');
 const {app} = window.require('electron').remote;
 
 export default withTheme(class About extends Component {
@@ -14,7 +15,7 @@ export default withTheme(class About extends Component {
 	}
 
 	componentDidMount() {
-		const stats = ipcRenderer.sendSync('library.getAllCounts');
+		const stats = LibraryService.getAllCounts();
 		this.setState({
 			stats: stats
 		});

@@ -1,16 +1,16 @@
 const {ipcMain} = require('electron');
+const mp = require('msgpack-lite');
 
 const LibraryService = require('./library');
 const SettingService = require('./settings');
 
-const j = o => JSON.stringify(o);
-
 module.exports = class IPCService {
 
-	constructor(window, localLibrary, bookTimes, settings) {
+	constructor(window, remoteLibrary, localLibrary, states, settings) {
 		this.window = window;
+		this.remoteLibrary = remoteLibrary;
 		this.localLibrary = localLibrary;
-		this.bookTimings = bookTimes;
+		this.states = states;
 		this.settings = settings;
 		this.init();
 	}
@@ -22,8 +22,9 @@ module.exports = class IPCService {
 	get calls() {
 		return [
 			...this.libraryCalls,
+			...this.fileCalls,
 			...this.settingsCalls,
-			...this.timingsCalls,
+			...this.stateCalls,
 			...this.windowCalls,
 		];
 	}
@@ -32,74 +33,75 @@ module.exports = class IPCService {
 		return  [
 			{
 				name: "library.getAll",
-				action: (event, args) => {
-					const authors = this.localLibrary.getCollection('authors');
-					const works = this.localLibrary.getCollection('works');
-					event.returnValue = {
-						authors: authors ? authors.chain().data() : [],
-						works: works ? works.chain().data() : []
-					};
+				action: async (event, args) => {
+					const results = await this.remoteLibrary.list();
+					event.returnValue = this.remoteLibrary.cleanUpResults(results);
 				}
 			},
 			{
 				name: "library.getAllCounts",
 				action: (event, args) => {
-					const authors = this.localLibrary.getCollection('authors');
-					const works = this.localLibrary.getCollection('works');
-					const fetchWorks = (mapFunction) => works ? works.mapReduce(mapFunction, x => x.reduce((a,v) => a + v,0)) : 0;
 					event.returnValue = {
-						authors: authors ? authors.count() : 0,
-						series: fetchWorks(x => x.type === 'SERIES' ? 1 : 0),
-						books: fetchWorks(x => x.type === 'SERIES' ? x.books.length : 1),
-						singleBooks: fetchWorks(x => x.type === 'BOOK' ? 1 : 0)
+						authors: 0,
+						series: 0,
+						books: 0,
+						singleBooks: 0
 					}
 				}
 			},
 			{
-				name: "library.getAuthor",
-				action: (event, args) => {
-					event.returnValue = this.localLibrary.getCollection('authors').get(Number(args));
-				}
-			},
-			{
 				name: "library.getWork",
-				action: (event, args) => {
-					event.returnValue = this.localLibrary.getCollection('works').get(Number(args));
-				}
-			},
-			{
-				name: "library.getAuthorAndWork",
-				action: (event, args) => {
-					event.returnValue = {
-						author: this.localLibrary.getCollection('authors').get(Number(args.author)),
-						work: this.localLibrary.getCollection('works').get(Number(args.work))
-					};
+				action: async (event, key) => {
+					if (!key) throw Error(`Key '${key}' is invalid`)
+					const results = await this.remoteLibrary.get(String(key));
+					const i = this.remoteLibrary.cleanUpResults(results);
+					event.returnValue = i[0];
 				}
 			},
 			{
 				name: "library.importdelta",
 				action: (event, args) => {
-					LibraryService.fileSystemToLibrary(true, this.localLibrary, this.settings).then(result => {
+					LibraryService.fileSystemToLibrary(true, this.remoteLibrary, this.localLibrary, this.settings).then(result => {
 						event.sender.send('library.importdelta.reply', result)
+					}).catch(err => {
+						event.sender.send('library.importdelta.reply', err)
 					});
 				}
 			},
 			{
 				name: "library.reimport",
 				action: (event, args) => {
-					LibraryService.fileSystemToLibrary(false, this.localLibrary, this.settings).then(result => {
+					LibraryService.fileSystemToLibrary(false, this.remoteLibrary, this.localLibrary, this.settings).then(result => {
 						event.sender.send('library.reimport.reply', result)
+					}).catch(err => {
+						event.sender.send('library.reimport.reply', err)
 					});
 				}
 			},
 			{
 				name: "library.clear",
-				action: (event, args) => {
-					LibraryService.clearLibrary(this.localLibrary).then(result => {
+				action: (event) => {
+					LibraryService.clearLibrary(this.remoteLibrary, this.localLibrary).then(result => {
 						event.sender.send('library.clear.reply', result)
+					}).catch(err => {
+						event.sender.send('library.clear.reply', err)
 					});
 				}
 			}
+		];
+	}
+
+	get fileCalls() {
+		return [
+			{
+				name: "file.path.lookup",
+				action: async (event, key) => {
+					if (!key) throw Error(`Key '${key}' is invalid`)
+					const results = await this.localLibrary.get(String(key));
+					const t = this.remoteLibrary.cleanUpResults(results);
+					event.returnValue = t.length > 0 ? t[0] : '';
+				}
+			},
 		];
 	}
 
@@ -107,126 +109,75 @@ module.exports = class IPCService {
 		return [
 			{
 				name: "settings.get",
-				action: (event, args) => {
-					const result = this.settings.get(String(args));
+				action: (event, key) => {
+					if (!key) throw Error(`Key '${key}' is invalid`)
+					const result = this.settings.get(String(key));
 					event.returnValue = result;
-					//event.sender.send('settings.get.reply', result);
 				}
 			},
 			{
 				name: "settings.gets",
-				action: (event, args) => {
-					let data = args.reduce((acc, val) => {
+				action: (event, keys) => {
+					if (!keys) throw Error(`Keys '${keys}' is invalid`)
+					let data = keys.reduce((acc, val) => {
 						const name = String(val);
 						acc[(name)] = this.settings.get(name);
 						return acc;
 					}, {});
 					event.returnValue = JSON.stringify(data)
-					//event.sender.send('settings.gets.reply', results);
 				}
 			},
 			{
 				name: "settings.set",
-				action: (event, args) => {
-					this.settings.set(String(args.name), String(args.value));
-					this.settings.save()
-						.then(() => event.sender.send('settings.set.reply', {success: true}))
-						.catch(err => event.sender.send('settings.set.reply', {success: false, error: err}));
+				action: async (event, key, value) => {
+					if (!key) throw Error(`Key '${key}' is invalid`)
+					this.settings.set(String(key), String(value));
+					await this.settings.save();
 				}
 			},
 			{
 				name: "settings.sets",
-				action: (event, args) => {
-					args.forEach(setting => {
+				action: async (event, keys) => {
+					if (!keys) throw Error(`Keys '${keys}' is invalid`)
+					for (const setting of keys) {
 						this.settings.set(String(setting.name), String(setting.value));
-					});
-					this.settings.save()
-						.then(() => event.sender.send('settings.sets.reply', {success: true}))
-						.catch(err => event.sender.send('settings.sets.reply', {success: false, error: err}));
+					}
+					await this.settings.save();
 				}
 			}
 		]
 	}
 
-	get timingsCalls() {
+	get stateCalls() {
 		return [
 			{
-				name: "timings.getAll",
-				action: (event, args) => {
-					let timings = this.bookTimings.getCollection('timings');
-					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
-						timings = this.bookTimings.getCollection('timings');
-					}
-					let items = timings.chain().data();
-					if (items === null) {
-						event.returnValue = {success: false, error:'No items found'};
-					} else {
-						event.returnValue = {success: true, times:items};
-					}
+				name: "states.getAll",
+				action: async (event) => {
+					const results = await this.states.list();
+					event.returnValue = this.remoteLibrary.cleanUpResults(results);
 				}
 			},
 			{
-				name: "timings.get",
-				action: (event, args) => {
-					if (!args.key || args.key.length <= 0) event.returnValue = {success: false, error:'Key length to short'};
-					let timings = this.bookTimings.getCollection('timings');
-					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
-						timings = this.bookTimings.getCollection('timings');
-					}
-					let item = timings.findOne({key:args.key});
-					if (item === null) {
-						event.returnValue = {success: false, error:'No item found'};
-					} else {
-						event.returnValue = {success: true, time:item.time};
-					}
+				name: "states.get",
+				action: async (event, key) => {
+					if (!key) throw Error(`Key '${key}' is invalid`)
+					const results = await this.states.get(String(key));
+					const clean = this.remoteLibrary.cleanUpResults(results);
+					event.returnValue = clean.length > 0 ? clean[0] : {};
 				}
 			},
 			{
-				name: "timings.set",
-				action: (event, args) => {
-					if (!args.key || args.key.length <= 0) return;
-					let timings = this.bookTimings.getCollection('timings');
-					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
-						timings = this.bookTimings.getCollection('timings');
-					}
-
-					let item = timings.findOne({key:args.key});
-					if (item === null) {
-						timings.insert({key:args.key, time: args.time});
-					} else {
-						item.time = args.time;
-						timings.update(item);
-					}
+				name: "states.set",
+				action: async (event, key, value) => {
+					if (!key) throw Error(`Key '${key}' is invalid`)
+					const results = await this.states.put(String(key), value);
+					event.returnValue = this.remoteLibrary.cleanUpResults(results);
 				}
 			},
 			{
-				name: "timings.clear",
+				name: "states.clear",
 				action: (event, args) => {
-					try {
-						if (!args.key || args.key.length <= 0) event.returnValue =  { success: false, error: 'Key length to short'};
-						let timings = this.bookTimings.getCollection('timings');
-						if (timings === null) {
-							this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
-							timings = this.bookTimings.getCollection('timings');
-						}
-						let items = timings.find({key: args.key});
-						if (items.length > 1) {
-							items.slice(1).map(x => timings.remove(x));
-						}
-						let item = items.length > 0 ? items[0] : null;
-						if (item !== null) {
-							delete item.time;
-							timings.update(item);
-							event.returnValue = {success: true};
-						} else {
-							event.returnValue = {success: false, error: 'Failed to find time for provided key'};
-						}
-					} catch (e) {
-						event.returnValue = {success: false, error: 'Exception in clear: '+e};
-					}
+					throw Error('Not Implemented')
 				}
 			}
 		];
@@ -236,19 +187,19 @@ module.exports = class IPCService {
 		return [
 			{
 				name: "window.title.set",
-				action: (event, args) => this.window.setTitle(String(args))
+				action: (event, title) => this.window.setTitle(String(title))
 			},
 			{
 				name: "window.flashframe.start",
-				action: (event, args) => this.window.flashFrame(true)
+				action: (event) => this.window.flashFrame(true)
 			},
 			{
 				name: "window.flashframe.stop",
-				action: (event, args) => this.window.flashFrame(false)
+				action: (event) => this.window.flashFrame(false)
 			},
 			{
 				name: "window.progressbar.set",
-				action: (event, args) => this.window.setProgressBar(Number(args))
+				action: (event, value) => this.window.setProgressBar(Number(value))
 			}
 		];
 	}

@@ -11,9 +11,9 @@ export default class View extends Component {
 		return Math.round(window.innerWidth / this.props.cellWidthDivider);
 	}
 
-	renderTile(author, series, work, key) {
-		return <this.props.itemComponent key={key} author={author} series={series} work={work}
-			onClick={() => this.props.itemClick(author, series, work)}
+	renderTile(work) {
+		return <this.props.itemComponent key={work.key} work={work}
+			onClick={() => this.props.itemClick(work)}
 			/>
 	}
 
@@ -31,7 +31,7 @@ export default class View extends Component {
 								margin: '1em'
 							}}>
 								{
-									this.props.savedTimeWorks.map(book => this.props.savedBook(this.renderTile, book.author, book.series, book, this.props.getStateKey(book.author, book.series, book)))
+									this.props.savedTimeWorks.map(book => this.props.savedBook(this.renderTile, book))
 								}
 							</div>
 						</div>
@@ -53,7 +53,7 @@ export default class View extends Component {
 								margin: '1em'
 							}}>
 								{
-									this.props.libraryWorks.map( book => this.props.libraryBook(this.renderTile, book.author, book.series, book, this.props.getStateKey(book.author, book.series, book)))
+									this.props.libraryWorks.map( book => this.props.libraryBook(this.renderTile, book))
 								}
 							</div>
 						</div>

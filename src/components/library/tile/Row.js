@@ -26,12 +26,12 @@ export default withTheme(class Tile extends Component {
 
 	get cleanedName() {
 		const number = this.props.work.name.split(' ', 1)[0];
-		return this.props.series && !isNaN(number) ? this.props.work.name.slice(number.length+1) : this.props.work.name;
+		return this.props.work.hasOwnProperty('series') && !isNaN(number) ? this.props.work.name.slice(number.length+1) : this.props.work.name;
 	}
 
 	get seriesName() {
 		const number = this.props.work.name.split(' ', 1)[0];
-		return isNaN(number) ? this.props.series.name : `${this.props.series.name} #${number}`;
+		return isNaN(number) ? this.props.work.series : `${this.props.work.series} #${number}`;
 	}
 
 	render() {
@@ -50,8 +50,8 @@ export default withTheme(class Tile extends Component {
 				<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width:'100%', ...s}}>
 					<div style={{margin:'0.2em 0.1em 0.4em'}}>
 						<div style={{fontWeight:600}}>{this.cleanedName}</div>
-						{this.props.series && <div style={{color:this.props.theme.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.seriesName})</div>}
-						<div style={{padding:'0.1em 0 0'}}>{this.props.author.name}</div>
+						{this.props.work.hasOwnProperty('series') && <div style={{color:this.props.theme.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.seriesName})</div>}
+						<div style={{padding:'0.1em 0 0'}}>{this.props.work.author}</div>
 					</div>
 				</div>
 			</div>

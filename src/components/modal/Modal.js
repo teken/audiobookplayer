@@ -23,13 +23,13 @@ export default class Modal extends Component {
 	okClick() {
 		this.setState({ loading: true });
 		this.props.okOnClick && this.props.okOnClick();
-		this.hide();
+		//this.hide();
 	}
 
 	cancelClick() {
 		this.setState({ loading: true });
 		this.props.cancelOnClick && this.props.cancelOnClick();
-		this.hide();
+		//this.hide();
 	}
 
 	show() {

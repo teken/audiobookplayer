@@ -1,3 +1,5 @@
+import FileService from "./file";
+
 const fs = window.require('fs');
 
 export default class ChapterService {
@@ -57,16 +59,15 @@ export default class ChapterService {
 	get chapters() {
 		if (this._book) {
 			let i = this._book.info.map(file => {
-				let parts = file.path.split('.');
+				let parts = file.split('.');
+				const path = FileService.lookupFilePath(file);
 				switch (parts[parts.length - 1].toLowerCase()) {
-					case 'cue': return [this.loadCUEFileData(file.path)];
-					case 'm3u': return this.loadM3UFileData(file.path);
+					case 'cue': return [this.loadCUEFileData(path)];
+					case 'm3u': return this.loadM3UFileData(path);
 					default: return [];
 				}
 			});
 			return i[0]; //TODO: Fix this
-		 }// else {
-		// 	return [];
-		// }
+		}
 	}
 }

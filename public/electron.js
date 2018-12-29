@@ -1,7 +1,6 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu, contentTracing} = require('electron');
 
 const url = require('url');
-const path = require('path');
 
 const { autoUpdater } = require("electron-updater");
 
@@ -9,18 +8,21 @@ let mainWindow;
 let splash;
 
 const DatabaseService = require('../src/services/database');
-const localLibrary = DatabaseService.localLibrary;
-const bookTimes = DatabaseService.bookTimes;
+const remoteLibrary = DatabaseService.library;
+const localLibrary = DatabaseService.local;
+const states = DatabaseService.states;
 
+const LibraryService = require('../src/services/library');
 const IPCService = require('../src/services/ipc');
 const GlobalShortcutsService = require('../src/services/globalShortcuts');
+const UpdatePreStartService = require('../src/services/updatePreStart');
 
 const SettingsService = require('../src/services/settings');
 let ipcService;
 let globalShortcutService;
 const settings = new SettingsService();
 
-const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'development' : false;
+const development = process.env.NODE_ENV && process.env.NODE_ENV.trim() === 'development';
 
 autoUpdater.checkForUpdatesAndNotify();
 
@@ -37,7 +39,22 @@ if (!development) {
 	}
 }
 
-function createWindow() {
+function start() {
+	console.info("App Ready, Starting")
+	// const options = {
+	// 	categoryFilter: '*',
+	// 	traceOptions: 'record-until-full,enable-sampling'
+	// }
+	//
+	// contentTracing.startRecording(options, () => {
+	// 	console.log('Tracing started')
+	//
+	// 	setTimeout(() => {
+	// 		contentTracing.stopRecording('', (path) => {
+	// 			console.log('Tracing data recorded to ' + path)
+	// 		})
+	// 	}, 60000)
+	// })
 	const splashStartUrl = url.format({
 		pathname: `${getMainPath()}/splash.html`,
 		protocol: 'file:',
@@ -53,28 +70,51 @@ function createWindow() {
 		icon: getIconPath()
 	});
 	splash.loadURL(splashStartUrl);
+
+	console.info("Splash Launched");
+
+	const splashMessage = (message) => {
+		splash.webContents.send("message", message);
+		console.info("Sent to Splash: "+message)
+	};
+
+	splashMessage("Checking For Migrations");
+
+	if (UpdatePreStartService.checkForMigration()) {
+		splashMessage("Migration Found; Running Migration");
+		UpdatePreStartService.runMigration();
+		splashMessage("Migration Complete");
+	}
+
+	splashMessage("Starting App");
+
 	const preferences = {
 		width: settings.get('windowState.width'),
 		height: settings.get('windowState.height'),
 		x: settings.get('windowState.x'),
 		y: settings.get('windowState.y'),
-		frame: false,
+		frame: development,
 		icon: getIconPath(),
 		show: false,
 		darkTheme: true,
 		backgroundColor:'#1d1e26',
 		overlayScrollbars: true
 	};
+
 	if (process.env.ELECTRON_START_URL) {
 		preferences["webPreferences"] = {webSecurity: false};
 	}
 
+	console.info("Main Launching")
+
 	mainWindow = new BrowserWindow(preferences);
+
+	if (development) Menu.setApplicationMenu(Menu.buildFromTemplate(devMenuTemplate));
 
 	if (settings.get('windowState.maximised')) mainWindow.maximize();
 
 	if (!globalShortcutService) globalShortcutService = new GlobalShortcutsService(mainWindow);
-	if (!ipcService) ipcService = new IPCService(mainWindow, localLibrary, bookTimes, settings);
+	if (!ipcService) ipcService = new IPCService(mainWindow, remoteLibrary, localLibrary, states, settings);
 
 	const startUrl = process.env.ELECTRON_START_URL || url.format({
 		pathname: `${getMainPath()}/index.html`,
@@ -82,6 +122,8 @@ function createWindow() {
 		slashes: true
 	});
 	mainWindow.loadURL(startUrl);
+
+	console.info("Main URL Loaded")
 
 	mainWindow.on('app-command', (e,cmd) => {
 		if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) mainWindow.webContents.goBack();
@@ -101,9 +143,10 @@ function createWindow() {
 	['resize', 'move', 'close' ].forEach((e) => {
 		mainWindow.on(e, () => storeWindowState());
 	});
+	console.info("App Ready, Started")
 }
 
-app.on('ready', createWindow);
+app.on('ready', start);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -118,7 +161,7 @@ app.on('activate', () => {
 	// On OS X it's common to re-create a window in the app when the
 	// dock icon is clicked and there are no other windows open.
 	if (mainWindow === null) {
-		createWindow()
+		start()
 	}
 });
 
@@ -150,3 +193,37 @@ function getIconPath() {
 function getMainPath() {
 	return `${__dirname}/../${development ? 'public' : 'build'}`;
 }
+
+const devMenuTemplate = [{
+	label: "Library",
+	submenu:[
+		{
+			label: "Load Library From Folders",
+			click() {
+				LibraryService.fileSystemToLibrary(false, remoteLibrary, localLibrary, settings)
+			}
+		},
+		{
+			label: "Load Changes Library From Folders",
+			click() {
+				LibraryService.fileSystemToLibrary(true, remoteLibrary, localLibrary, settings)
+			}
+		},
+		{
+			label: "Load Library From MetaData",
+			click() {
+				console.log("Not Implemented")
+			}
+		},
+		{
+			label: "Test",
+			async click() {
+				const results = await remoteLibrary.list('Brent Weeks/Night Angel/01 Way of Shadows');
+				const clean = remoteLibrary.cleanUpResults(results);
+				console.log(clean)
+			}
+		}
+	]
+}, {
+	role: 'reload'
+}];

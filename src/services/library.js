@@ -1,8 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const mm = require('music-metadata');
+const mp = require('msgpack-lite');
+
+const audioFileExtensions = ["mp3", "m4b", "m4a"],
+	imageFileExtensions = ["jpg", "jpeg", "png"],
+	infoFileExtensions = ["cue", "m3u"];
 
 module.exports = class LibraryService {
+
 
 	static clearLibrary(localLibrary) {
 		return new Promise((res, rej) => {
@@ -19,49 +25,78 @@ module.exports = class LibraryService {
 	/**
 	 * @param {boolean} onlyLookForChanges
 	 */
-	static fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
-		return new Promise((res, rej) => {
-			const pathFile = settings.get('libraryPath');
+	static fileSystemToLibrary(onlyLookForChanges, remoteLibrary, localLibrary, settings) {
+		return new Promise(async (res, rej) => {
+			try {
+				const pathFile = settings.get('libraryPath');
 
-			let fileSystem = this.fileRecursiveStatLookup(pathFile),
-				authors = localLibrary.getCollection('authors'),
-				works = localLibrary.getCollection('works');
+				let fileSystem = this.fileRecursiveStatLookup(pathFile);
 
-			if (!authors) authors = localLibrary.addCollection('authors', {autoupdate: true});
-			if (!works) works = localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
+				if (!onlyLookForChanges) {
+					//clear all records
+				}
 
-			if (!onlyLookForChanges) {
-				authors.clear();
-				works.clear();
-			}
+				const remoteItems = [];
+				const localItems = [];
 
-			fileSystem.forEach(file => {
-				let author = null;
-				if (onlyLookForChanges) author = authors.findOne({'name':file.name});
-				if (author === null) author = authors.insert({name:file.name});
+				const addRemoteItem = (key, value) => remoteItems.push({type: 'put', key: key, value: mp.encode(value)});
+				const addLocalItem = (key, value) => localItems.push({type: 'put', key: key, value: mp.encode(value)});
+				const addLocalItems = (list) => {
+					for (const [key, value] of Object.entries(list)) addLocalItem(key, value);
+				};
 
-				if (file.isDirectory()) file.children.forEach( work => {
-					if (work.isFile()) return;
-					let record = null;
-					if (onlyLookForChanges) record = works.findOne({'name':file.name});
-					if (record === null) record = {name: work.name, author_id: author.$loki};
+				for (const file of fileSystem) {
+					const author = file.name;
 
-					if (work.children[0].isDirectory()) { //series
-						record.type = 'SERIES';
-						record.books = work.children.map( child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
-					} else { //file
-						record = Object.assign(record, this.mapBookObject(work, author.$loki));
+					if (file.isDirectory()) for (const work of file.children) {
+						if (work.isFile()) break;
+
+						if (work.children[0].isDirectory()) { //series
+							for (const child of work.children.filter(i => i.isDirectory())) {
+								console.log(`${author}/${work.name}/${child.name}`)
+								const book = this.mapBookObject(`${author}/${work.name}/${child.name}`, child);
+								if (book) {
+									try {
+										//await this.loadTrackMetadata(book);
+									}catch(e) {
+										console.error(e)
+									}
+									addLocalItems(book.local);
+									addRemoteItem(`${author}/${work.name}/${child.name}`, book.remote)
+								} else {
+									console.error(`failed to import book: ${author}/${work.name}/${child.name}`);
+								}
+							}
+
+						} else { //file
+							console.log(`${author}/${work.name}`)
+							const book = this.mapBookObject(`${author}/${work.name}/`, work);
+							if (book) {
+								try {
+									//await this.loadTrackMetadata(book);
+								}catch(e) {
+									console.error(e)
+								}
+								addLocalItems(book.local);
+								addRemoteItem(`${author}/${work.name}`, book.remote);
+							} else {
+								console.error(`failed to import book: ${author}/${work.name}`);
+							}
+						}
 					}
+				}
 
-					if (record.$loki) works.update(record);
-					else works.insert(record);
-				});
-			});
+				console.info("Saving");
 
-			localLibrary.saveDatabase((err) => {
-				console.log(new Date().toISOString()+": "+(err ? "error : " + err : "database saved."));
-				!err ? res() : rej(err);
-			});
+				await remoteLibrary.batch(remoteItems);
+				await localLibrary.batch(localItems);
+
+				console.info("Saved");
+				res();
+			} catch (e) {
+				console.error(e)
+				rej(e);
+			}
 		});
 	}
 
@@ -76,51 +111,41 @@ module.exports = class LibraryService {
 		});
 	}
 
-	static mapBookObject(book, authorId) {
-		if (book.isFile()) return;
-		const audioFileExtensions = ["mp3", "m4b", "m4a"],
-			imageFileExtensions = ["jpg", "jpeg", "png"],
-			infoFileExtensions = ["cue", "m3u"];
-		let record = {type : 'BOOK', name:book.name, author_id:authorId, art:[], tracks:[], info:[]};
-		book.children.forEach(file => {
+	static async loadTrackMetadata(record) {
+		let promises = record.remote.tracks.map(file => new Promise(async (res, rej) => {
+			try {
+				const metadata = await mm.parseFile(record.local[file.key], {duration: true, skipCovers: true});
+				file.duration = metadata.format.duration;
+			} catch (e) {
+				console.error(e);
+				rej(e);
+			}
+			res(file);
+		}));
+
+		record.remote.tracks = await Promise.all(promises);
+	}
+
+	static mapBookObject(filePrefix, book) {
+		let record = {
+			remote: {art: [], tracks: [], info: []},
+			local: []
+		};
+
+		for (const file of book.children.filter(x => x.isFile())) {
 			const fileParts = file.name.split("."),
-				fileExtension = fileParts[fileParts.length - 1].toLowerCase();
-			if (audioFileExtensions.indexOf(fileExtension) > -1) record.tracks.push(file);
-			else if (imageFileExtensions.indexOf(fileExtension) > -1) record.art.push(file);
-			else if (infoFileExtensions.indexOf(fileExtension) > -1) record.info.push(file);
-		});
+				fileExtension = fileParts[fileParts.length - 1].toLowerCase(),
+				key = `${filePrefix}/${file.name}`;
+			if (audioFileExtensions.indexOf(fileExtension) > -1) record.remote.tracks.push({
+				key: key,
+				size: file.size,
+				duration: 0,
+			});
+			else if (imageFileExtensions.indexOf(fileExtension) > -1) record.remote.art.push(key);
+			else if (infoFileExtensions.indexOf(fileExtension) > -1) record.remote.info.push(key);
+
+			record.local[key] = file.path;
+		}
 		return record;
 	};
-
-	// static getTrackMetaData(filePath) {
-	// 	return mm.parseFile(filePath);
-	// }
-	//
-	// static mapTrackLengths(authorsCollection, worksCollection) {
-	// 	let works = worksCollection.chain().data();
-	// 	works.forEach(work => {
-	// 		//const author = authorsCollection.get(work.author_id);
-	// 		if (work.type === 'SERIES') {
-	// 			work.books.filter(x => x !== undefined).forEach(book => {
-	// 				book.tracks.forEach(track => {
-	// 					this.getTrackMetaData(track.path).then( metadata => {
-	// 						console.log(track.path, metadata);
-	// 						track.meta = metadata;
-	// 						worksCollection.update(work);
-	// 					});
-	//
-	// 				});
-	// 			});
-	// 		} else {
-	// 			work.tracks.forEach(track => {
-	// 				this.getTrackMetaData(track.path).then( metadata => {
-	// 					console.log(track.path, metadata);
-	// 					track.meta = metadata;
-	// 					worksCollection.update(work);
-	// 				});
-	//
-	// 			})
-	// 		}
-	// 	});
-	// }
 };

@@ -20,6 +20,7 @@ module.exports = class SettingsService {
 				libraryDisplayAuthors: false,
 				importStyle: 'folders',
 				volume: 100,
+				theme: 'dark',
 				windowState: {
 					width: 1200,
 					height: 800,

@@ -66,11 +66,11 @@ export default class AudioPlayer {
 	}
 
 	get isPlaying () {
-		return (this._audio ? this._isPlaying : false);
+		return this.isLoaded ? this._isPlaying : false;
 	}
 
 	get isLoaded () {
-		return (this._audio);
+		return Boolean(this._audio);
 	}
 
 	/**
@@ -79,7 +79,7 @@ export default class AudioPlayer {
 	 * @return {Number} duration.
 	 */
 	get duration () {
-		return (this._audio ? this._audio.duration : 0);
+		return this.isLoaded ? this._audio.duration : 0;
 	}
 
 	/**

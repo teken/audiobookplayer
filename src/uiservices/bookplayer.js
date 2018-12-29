@@ -1,16 +1,13 @@
 import AudioPlayer from "./audioplayer";
 import ChapterService from "./chapters";
-
-const {ipcRenderer} = window.require('electron');
-const mm = window.require('music-metadata');
+import LibraryService from "./library";
+import FileService from "./file";
 
 export default class BookPlayer {
 	constructor(volume) {
 		this._audioPlayer = new AudioPlayer();
 		this._audioPlayer.volume = Number(volume);
 		this._work = null;
-		this._bookNameIfSeries = null;
-		this._author = null;
 		this._currentTrack = null;
 		this._tracks = [];
 		this.minVolume = 0;
@@ -18,8 +15,8 @@ export default class BookPlayer {
 	}
 
 	get chapterService() {
-		if (this.work)
-			return new ChapterService(this.book);
+		if (this._work)
+			return new ChapterService(this._work);
 		else
 			return new ChapterService(null);
 	}
@@ -28,61 +25,29 @@ export default class BookPlayer {
 		return Number(this.maxVolume - this.minVolume);
 	}
 
-	get author () {
-		return this._author;
-	}
-
 	get work () {
 		return this._work;
 	}
 
-	get book () {
-		return this._work.type === 'SERIES' ? this._work.books.find(x => x.name === this._bookNameIfSeries) : this._work;
-	}
-
-	get timingKey() {
-		if (!this.isLoaded) return '';
-		let parts = [
-			this._author.name,
-			this._work.type === 'SERIES' ? this._work.name : '',
-			this.book.name,
-		];
-		return parts.filter(x => x.length > 0).join('##');
-
-	}
-
-	open(work_id, bookNameIfSeries, callback, endedCallback) {
-		this._bookNameIfSeries = bookNameIfSeries;
+	open(key, callback, endedCallback) {
 		this._tracks = [];
 		this._currentTrack = null;
-		this._loadData(work_id);
-		this.setToTrack(this._tracks[0].name, callback, endedCallback);
+		this._loadData(key);
+		this.setToTrack(this._tracks[0].key, callback, endedCallback);
 	}
 
-	openFromSpecificTrack(work_id, bookNameIfSeries, trackName, callback, endedCallback) {
-		this._bookNameIfSeries = bookNameIfSeries;
+	openFromSpecificTrack(key, trackName, callback, endedCallback) {
 		this._tracks = [];
 		this._currentTrack = null;
-		this._loadData(work_id);
+		this._loadData(key);
 		this.setToTrack(trackName, callback, endedCallback);
 	}
 
-	_loadData(work_id) {
-		let work = ipcRenderer.sendSync('library.getWork', work_id);
+	_loadData(key) {
+		const work = LibraryService.getWork(key);
 		if (work === null) throw new Error('Failed to find work');
 		else this._work = work;
-
-		this._tracks = this.book.tracks;
-
-		this._tracks.forEach(track => {
-			mm.parseFile(track.path).then(metadata => {
-				this._tracks.find(t => t.path === track.path).meta = metadata;
-			})
-		});
-
-		let author = ipcRenderer.sendSync('library.getAuthor', this._work.author_id);
-		if (author === null) throw new Error('Failed to find author');
-		else this._author = author;
+		this._tracks = work.tracks;
 	}
 
 	play() {
@@ -95,9 +60,9 @@ export default class BookPlayer {
 		else this.play()
 	}
 
-	setToTrack(trackName, callback, endedCallback) {
-		this._currentTrack = trackName;
-		const filePath = this._tracks.find(track => track.name === this._currentTrack).path;
+	setToTrack(trackKey, callback, endedCallback) {
+		this._currentTrack = trackKey;
+		const filePath = FileService.lookupFilePath(trackKey);
 		this._audioPlayer.open(filePath, callback, () => {
 			if (this.hasNext) this.playNext();
 			else {
@@ -126,23 +91,25 @@ export default class BookPlayer {
 	get currentTime() {
 		if (!this.isLoaded || this._tracks.length === 0) return 0;
 		else if (this._tracks.length === 1) return this.currentTrackTime;
-		else return this._tracks.slice(0, this.currentTrackIndex).map(track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0) + this.currentTrackTime;
+		else return this._tracks.slice(0, this.currentTrackIndex).map(track => track.duration).reduce((a,v) => a + v, 0) + this.currentTrackTime;
 	}
 
 	set currentTime(value) {
+		if (isNaN(value)) throw new Error(`Current time can not be set to ${value}`);
 		if (this.duration > 0 && (value > this.duration || this._tracks.length === 0)) return;
 		else if (this._tracks.length === 1) this._audioPlayer.currentTime = value;
 		else {
 			let remainingTime = value;
 			let total = 0;
-			let trackName = '';
+			let trackName;
 			for (let track of this._tracks) {
-				trackName = track.name;
-				if (remainingTime < (total + (track.meta ? track.meta.format.duration: 0 ))) {
+				trackName = track.key;
+				if (this.duration === 0) break;
+				if (remainingTime < (total + track.duration)) {
 					remainingTime -= total;
 					break;
 				}
-				total += (track.meta ? track.meta.format.duration: 0 )
+				total += track.duration;
 			}
 			this.setToTrack(trackName, () => {
 				this._audioPlayer.currentTime = remainingTime;
@@ -173,8 +140,7 @@ export default class BookPlayer {
 	}
 
 	get duration() {
-		if (!this.isLoaded) return 1;
-		return this._tracks.map( track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0);
+		return this.isLoaded ? this._tracks.map(track => track.duration).reduce((a, v) => a + v, 0) : 1;
 	}
 
 	get trackDuration() {
