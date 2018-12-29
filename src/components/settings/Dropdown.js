@@ -31,7 +31,7 @@ export default withTheme(class Dropdown extends Component {
 					backgroundColor: this.props.theme.inputBackground,
 					cursor:'pointer'
 				}} />
-				<select type="text" readOnly='false' value={this.props.value} ref={this.textInput} onChange={this.handleChange}
+				<select type="text" readOnly={false} value={this.props.value} ref={this.textInput} onChange={this.handleChange}
 				 	style={{
 						padding: '0.6em',
 						width:'90%',

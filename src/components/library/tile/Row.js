@@ -18,6 +18,7 @@ export default withTheme(class Tile extends Component {
 				maxHeight: '6.75em'
 			}}/>;
 		}
+		return '';
 	}
 
 	get hasPicture() {

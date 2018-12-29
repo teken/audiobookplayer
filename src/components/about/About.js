@@ -43,8 +43,8 @@ export default withTheme(class About extends Component {
 				<div style={{color: this.props.theme.secondaryText, lineHeight: '1.2em'}}>
 					<p>
 						Audio Book Player: v{app.getVersion()}<br/>
-						Created By Duncan Haig<br/>
-						&copy; {this.dateRange()} Duncan Haig All Rights Reserved<br/>
+						Created By Anna Haig<br/>
+						&copy; {this.dateRange()} Anna Haig All Rights Reserved<br/>
 					</p>
 					<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 					<p>

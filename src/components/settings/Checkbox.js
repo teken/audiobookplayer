@@ -44,7 +44,7 @@ export default withTheme(class Checkbox extends Component {
 					backgroundColor: this.props.theme.inputBackground,
 					cursor:'pointer'
 				}} />
-				<input type="text" readOnly='false' value={this.state.value} ref={this.textInput} onClick={this.handleClick}
+				<input type="text" readOnly={true} value={this.state.value} ref={this.textInput} onClick={this.handleClick}
 				 	style={{
 						padding: '0.6em',
 						width:'90%',

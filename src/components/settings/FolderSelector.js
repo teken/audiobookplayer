@@ -13,6 +13,10 @@ export default withTheme(class FolderSelector extends Component {
 		this.textInput = React.createRef();
 	}
 
+	static defaultProps = {
+		value: ''
+	};
+
 	handleChange(event) {
 		this.setState({value: event.target.value});
 	}
@@ -39,7 +43,7 @@ export default withTheme(class FolderSelector extends Component {
 					backgroundColor: this.props.theme.inputBackground,
 					cursor:'pointer'
 				}} />
-				<input type="text" readOnly='false' value={this.props.value} ref={this.textInput} onClick={this.handleClick} onChange={this.props.onChange}
+				<input type="text" readOnly={true} value={this.props.value} ref={this.textInput} onClick={this.handleClick} onChange={this.props.onChange}
 				 	style={{
 						padding: '0.6em',
 						width:'90%',

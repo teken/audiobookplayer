@@ -69,5 +69,6 @@ export default class ChapterService {
 			});
 			return i[0]; //TODO: Fix this
 		}
+		return [];
 	}
 }

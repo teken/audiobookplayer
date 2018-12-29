@@ -1,13 +1,5 @@
-import React, {Component} from "react";
+import React, {Component, lazy, Suspense} from "react";
 import {HashRouter, Route, Switch} from "react-router-dom";
-
-import Library from "../library/Library";
-import Player from "../player/Player";
-import Detail from "../detail/Detail";
-import WindowControls from "../WindowControls";
-import Settings from "../settings/Settings";
-import About from "../about/About";
-import Setup from "../setup/Setup";
 
 import {library} from "@fortawesome/fontawesome-svg-core";
 
@@ -37,6 +29,15 @@ import {
 
 import withTheme from "../theme/withTheme";
 import withPlayer from "../player/withPlayer";
+import Loading from "../loading/Loading";
+
+const Library = lazy(() => import("../library/Library"));
+const Player = lazy(() => import("../player/Player"));
+const Detail = lazy(() => import("../detail/Detail"));
+const WindowControls = lazy(() => import("../WindowControls"));
+const Settings = lazy(() => import("../settings/Settings"));
+const About = lazy(() => import("../about/About"));
+const Setup = lazy(() => import("../setup/Setup"));
 
 //import { faSquare } from '@fontawesome/free-regular-svg-icons';
 //import { } from '@fontawesome/free-brands-svg-icons';
@@ -85,8 +86,13 @@ export default withTheme(withPlayer(class App extends Component {
 		this.setState({ height: window.innerHeight });
 	}
 
+
+
 	render() {
 		const top = 2, bottom = 3;
+
+		const suspense = (Comp) => props => <Suspense fallback={<Loading/>}><Comp {...props}/></Suspense>;
+
 		return (
 			<HashRouter>
 				<div style={{
@@ -100,23 +106,28 @@ export default withTheme(withPlayer(class App extends Component {
 					lineHeight: '1em',
 					letterSpacing: '0.03em'
 				}}>
-					<WindowControls/>
-					<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
+					<Suspense fallback={<Loading/>}><WindowControls/></Suspense>
+					<div style={{
+						height: `calc(${this.state.height}px - ${top + bottom}em)`,
+						overflowY:'scroll',
+						overflowX:'hidden',
+						marginRight:'0.1em'}}>
 						<Switch>
-							<Route exact path="/" component={Library}/>
-							<Route path="/works/:author/:series/:book" component={Detail}/>
-							<Route path="/works/:author/:book" component={Detail}/>
-							<Route path="/settings" component={Settings}/>
-							<Route path="/about" component={About}/>
-							<Route path="/setup" component={Setup}/>
+							<Route exact path="/" component={suspense(Library)}/>
+							<Route path="/works/:author/:series/:book" component={suspense(Detail)}/>
+							<Route path="/works/:author/:book" component={suspense(Detail)}/>
+							<Route path="/settings" component={suspense(Settings)}/>
+							<Route path="/about" component={suspense(About)}/> {/*find better fix*/}
+							<Route path="/setup" component={suspense(Setup)}/>
 							<Route render={({location}) => (
 								<div style={{lineHeight: '1.5em'}}>
-									<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
+									<h1>Well this is quite a issue you found yourself in,<br/>
+										try heading back to the library</h1>
 								</div>
 							)}/>
 						</Switch>
 					</div>
-					<Player />
+					<Suspense fallback={<Loading/>}><Player /></Suspense>
 					<style dangerouslySetInnerHTML={{__html: `
 
 						@font-face {

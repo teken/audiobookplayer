@@ -16,7 +16,7 @@ export default class ColourSelector extends Component {
 		return (
 			<span style={{display:'flex'}}>
 				<input type="color" value={this.props.value} ref={this.input} onChange={this.props.onChange} style={{display:'none'}}/>
-				<input type="text" readOnly='false' value={this.props.value} onClick={this.handleClick} onChange={this.props.onChange}
+				<input type="text" readOnly={false} value={this.props.value} onClick={this.handleClick} onChange={this.props.onChange}
 					   style={{
 						   padding: '0.6em',
 						   width:'100%',

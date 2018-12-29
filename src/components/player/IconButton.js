@@ -26,9 +26,14 @@ export default class IconButton extends Component {
 
 	render() {
 		return (
-			<a style={{...this.props.style, ...(this.state.hover ? this.props.hoverStyle : {})}} onClick={this.props.onClick} title={this.props.title} onMouseOver={this._onMouseOver} onMouseOut={this._onMouseOut}>
+			<span style={{...this.props.style, ...(this.state.hover ? this.props.hoverStyle : {})}}
+			   onClick={this.props.onClick}
+			   title={this.props.title}
+			   onMouseOver={this._onMouseOver}
+			   onMouseOut={this._onMouseOut}
+			>
 				<Icon icon={this.props.icon} style={this.props.svgStyle}/>
-			</a>
+			</span>
 		);
 	}
 }

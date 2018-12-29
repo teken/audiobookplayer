@@ -155,6 +155,7 @@ export default class BookPlayer {
 				return this.currentTrackIndex > 0;
 			}
 		}
+		return false;
 	}
 
 	get hasNext() {
@@ -165,10 +166,11 @@ export default class BookPlayer {
 				return this.currentTrackIndex < (this._tracks.length - 1);
 			}
 		}
+		return false;
 	}
 
 	get next() {
-		if (!this.hasNext) return;
+		if (!this.hasNext) return '';
 		if (this.chapters) {
 			return this.flattenedChapters[this.currentChapterIndex + 1]
 		} else {
@@ -177,7 +179,7 @@ export default class BookPlayer {
 	}
 
 	get previous() {
-		if (!this.hasPrevious) return;
+		if (!this.hasPrevious) return '';
 		if (this.chapters) {
 			return this.flattenedChapters[this.currentChapterIndex - 1]
 		} else {

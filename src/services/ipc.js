@@ -40,12 +40,17 @@ module.exports = class IPCService {
 			},
 			{
 				name: "library.getAllCounts",
-				action: (event, args) => {
+				action: async (event, args) => {
+					const results = (await this.remoteLibrary.list()).map(x => x[0].key);
+					const slashCounts = results.map(x => (x.match(/\//g) || []).length);
+					const authors = new Set(results.map(x => x.slice(0,x.indexOf('/'))));
+					const series = new Set(results.filter(x => (x.match(/\//g) || []).length === 2)
+						.map(x => x.slice(x.indexOf('/'),x.lastIndexOf('/'))));
 					event.returnValue = {
-						authors: 0,
-						series: 0,
-						books: 0,
-						singleBooks: 0
+						authors: authors.size,
+						series: series.size,
+						books: slashCounts.length, //filter(x => x===2)
+						singleBooks: slashCounts.filter(x => x===1).length
 					}
 				}
 			},
