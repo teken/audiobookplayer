@@ -1,6 +1,10 @@
 const {ipcRenderer} = window.require('electron');
 
 export default class SettingsService {
+	static dbKeys() {
+		return ipcRenderer.sendSync('settings.dbkeys');
+	}
+
 	static getSetting(key) {
 		const result = ipcRenderer.sendSync('settings.get', key);
 		if (!isNaN(result)) return Number(result);

@@ -1,5 +1,6 @@
 {
   "name": "audiobookplayer",
+  "displayName": "Audio Book Player",
   "version": "0.2.0",
   "description": "A new audiobook player",
   "author": "Anna Haig",
@@ -10,10 +11,12 @@
     "@fortawesome/free-regular-svg-icons": "^5.1.0-11",
     "@fortawesome/free-solid-svg-icons": "^5.1.0-11",
     "@fortawesome/react-fontawesome": "0.1.0-11",
+    "cuefileparser": "^1.0.0",
     "deep-equal": "^1.0.1",
     "electron-updater": "^3.0.3",
     "fuse.js": "^3.2.1",
     "hyperdb": "^3.5.0",
+    "hyperdiscovery": "^8.0.0",
     "lokijs": "^1.5.3",
     "msgpack-lite": "^0.1.26",
     "music-metadata": "^2.4.2",
@@ -52,7 +55,7 @@
   "build": {
     "appId": "app.AudioBookPlayer",
     "productName": "Audio Book Player",
-    "copyright": "Copyright © 2018 Duncan Haig",
+    "copyright": "Copyright © 2018 - 2019 Anna Haig, All Rights Reserved",
     "files": [
       "build/**/*",
       "src/services/*"

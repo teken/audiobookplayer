@@ -6,6 +6,8 @@ import LibraryService from "../../uiservices/library";
 const {shell} = window.require('electron');
 const {app} = window.require('electron').remote;
 
+const pkg = require('../../../package.json');
+
 export default withTheme(class About extends Component {
 	constructor(props) {
 		super(props);
@@ -42,9 +44,10 @@ export default withTheme(class About extends Component {
 				<h1>About</h1>
 				<div style={{color: this.props.theme.secondaryText, lineHeight: '1.2em'}}>
 					<p>
-						Audio Book Player: v{app.getVersion()}<br/>
-						Created By Anna Haig<br/>
-						&copy; {this.dateRange()} Anna Haig All Rights Reserved<br/>
+						{pkg.displayName}: v{app.getVersion()}<br/>
+						Created By {pkg.author}<br/>
+						{pkg.build.copyright}<br/>
+						{/*&copy; {this.dateRange()+" "+pkg.author} All Rights Reserved<br/>*/}
 					</p>
 					<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 					<p>

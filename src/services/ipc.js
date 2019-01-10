@@ -110,6 +110,15 @@ module.exports = class IPCService {
 	get settingsCalls() {
 		return [
 			{
+				name: "settings.dbkeys",
+				action: (event) => {
+					event.returnValue = {
+						library: this.remoteLibrary.db.key.toString('hex'),
+						states: this.states.db.key.toString('hex'),
+					};
+				}
+			},
+			{
 				name: "settings.get",
 				action: (event, key) => {
 					if (!key) throw Error(`Key '${key}' is invalid`);

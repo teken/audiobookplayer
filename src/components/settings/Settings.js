@@ -43,6 +43,7 @@ export default withRouter(withTheme(class Settings extends Component {
 		// 	a.push(v.dataName);
 		// 	return a;
 		// },[]);
+		const dbkeys = SettingsService.dbKeys();
 		const fetch = (name) => SettingsService.getSetting(name);
 		this.settingsObjects.forEach(item => {
 			switch (item.type) {
@@ -58,9 +59,11 @@ export default withRouter(withTheme(class Settings extends Component {
 					break;
 			}
 		});
+		console.log(dbkeys)
 		this.setState({
 			settings: Object.assign({}, oldSettings),
-			oldSettings: oldSettings
+			oldSettings: oldSettings,
+			dbKeys: dbkeys
 		});
 	}
 
@@ -124,11 +127,13 @@ export default withRouter(withTheme(class Settings extends Component {
 				<ConfirmModal show={this.state.showClear}
 							  heading="Are you sure?"
 							  body="This will clear the library completely. Are you sure you want to do this?"
-							  okOnClick={this.clearLibrary} cancelOnClick={() => this.setState({showClear: false})} />
+							  okOnClick={this.clearLibrary}
+							  cancelOnClick={() => this.setState({showClear: false})} />
 				<ConfirmModal show={this.state.showReimport}
 							  heading="Are you sure?"
 							  body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?"
-							  okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
+							  okOnClick={this.reimportLibrary}
+							  cancelOnClick={() => this.setState({showReimport: false})} />
 				<h1>Settings</h1>
 				<form onSubmit={this.handleSubmit} style={{color:this.props.theme.secondaryText}}>
 					<Setting label="Actions">

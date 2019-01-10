@@ -1,5 +1,4 @@
 const {globalShortcut} = require('electron');
-//const globalShortcut = require('global-shortcut');
 
 
 module.exports = class GlobalShortcutsService {
@@ -11,8 +10,8 @@ module.exports = class GlobalShortcutsService {
 
 	init() {
 		this.shortcuts.forEach(item => {
-			/*let registered = */globalShortcut.register(item.name, item.action);
-			//console.log(`${item.name} registration ${registered ? 'bound!' : 'failed'}`);
+			const result = globalShortcut.register(item.name, item.action);
+			if (!result) console.error(`Failed to register shortcut: ${item.name}`)
 		});
 	}
 

@@ -57,7 +57,8 @@ module.exports = class LibraryService {
 								const book = this.mapBookObject(`${author}/${work.name}/${child.name}`, child);
 								if (book) {
 									try {
-										//await this.loadTrackMetadata(book);
+										console.log(`track metadata`)
+										await this.loadTrackMetadata(book);
 									}catch(e) {
 										console.error(e)
 									}
@@ -68,12 +69,13 @@ module.exports = class LibraryService {
 								}
 							}
 
-						} else { //file
+						} else { //book
 							console.log(`${author}/${work.name}`)
 							const book = this.mapBookObject(`${author}/${work.name}/`, work);
 							if (book) {
 								try {
-									//await this.loadTrackMetadata(book);
+									console.log(`track metadata`)
+									await this.loadTrackMetadata(book);
 								}catch(e) {
 									console.error(e)
 								}
@@ -112,18 +114,15 @@ module.exports = class LibraryService {
 	}
 
 	static async loadTrackMetadata(record) {
-		let promises = record.remote.tracks.map(file => new Promise(async (res, rej) => {
+		for (const file of record.remote.tracks) {
+			console.log(file.key);
 			try {
 				const metadata = await mm.parseFile(record.local[file.key], {duration: true, skipCovers: true});
 				file.duration = metadata.format.duration;
 			} catch (e) {
 				console.error(e);
-				rej(e);
 			}
-			res(file);
-		}));
-
-		record.remote.tracks = await Promise.all(promises);
+		}
 	}
 
 	static mapBookObject(filePrefix, book) {
@@ -147,5 +146,5 @@ module.exports = class LibraryService {
 			record.local[key] = file.path;
 		}
 		return record;
-	};
+	}
 };

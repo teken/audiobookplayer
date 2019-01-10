@@ -21,6 +21,10 @@ module.exports = class SettingsService {
 				importStyle: 'folders',
 				volume: 100,
 				theme: 'dark',
+				libraryDBSync: false,
+				libraryDBKey: null,
+				stateDBSync: false,
+				stateDBKey: null,
 				windowState: {
 					width: 1200,
 					height: 800,

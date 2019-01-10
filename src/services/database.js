@@ -2,34 +2,76 @@ const path = require('path');
 const hyperdb = require('hyperdb');
 const SettingsService = require('./settings');
 const mp = require('msgpack-lite');
+const swarm = require('hyperdiscovery');
 
 module.exports = class DatabaseService {
 
+	// libraryDBSync: false,
+	// libraryDBKey: null,
+	// stateDBSync: false,
+	// stateDBKey: null,
+
+	static get dbOptions() {
+		return {valueEncoding: 'binary'};
+	}
+
+	static get settings() {
+		return new SettingsService();
+	}
+
+	static makeFilePath(name) {
+		return path.join(this.settings.get('dataPath'), name);
+	}
+
 	static get library() {
-		return this.getDB('library.db');
+		const filePath = this.makeFilePath('library.db');
+		const sync = JSON.parse(this.settings.get('libraryDBSync'));
+		console.log(this.settings.get('libraryDBKey'), typeof this.settings.get('libraryDBKey'))
+		const s = this.settings.get('libraryDBKey');
+		const key = s && Buffer.from(s, 'hex');
+		return new Database(
+			filePath,
+			sync ? key : null,
+			this.dbOptions,
+			sync);
 	}
 
 	static get local() {
-		return this.getDB('local.db');
+		const filePath = this.makeFilePath('local.db');
+		return new Database(
+			filePath,
+			null,
+			this.dbOptions,
+			false);
 	}
 
 	static get states() {
-		return this.getDB('states.db');
-	}
-
-	static getDB(name) {
-		return this.loadDatabase(path.join(new SettingsService().get('dataPath'), name));
-	}
-
-	static loadDatabase(path) {
-		//return hyperdb(path, null, {valueEncoding: 'binary'});
-		return new Database(path, null, {valueEncoding: 'binary'})
+		const filePath = this.makeFilePath('states.db');
+		const sync = JSON.parse(this.settings.get('stateDBSync'));
+		console.log(this.settings.get('stateDBKey'), typeof this.settings.get('stateDBKey'))
+		const s = this.settings.get('stateDBKey');
+		const key = s && Buffer.from(s, 'hex');
+		return new Database(
+			filePath,
+			sync ? key : null,
+			this.dbOptions,
+			sync);
 	}
 };
 
 class Database {
-	constructor(path, key, options) {
-		this.db = hyperdb(path, null, {valueEncoding: 'binary'});
+	constructor(path, key, options, enableSwarm) {
+		this.db = hyperdb(path, key, options);
+		this.db.ready(() => {
+			if (enableSwarm) {
+				console.info(`${path} sync enabled`)
+				const sw = swarm(this.db);
+				sw.on('connection', (peer, type) => {
+					console.info(`${path} connected to: ${type.type} ${type.host} ${type.port}`)
+					console.info(`${path} connected to ${sw1.connections.length} peers`)
+				});
+			} else console.info(`${path} sync not enabled`)
+		});
 	}
 
 	get(key) {
