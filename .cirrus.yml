@@ -19,7 +19,6 @@ windows_task:
   publish_script: yarn run release
 
 mac_task:
-  only_if: $CIRRUS_TAG
   osx_instance:
     image: mojave-xcode-10.1
   yarn_script:
@@ -34,8 +33,12 @@ mac_task:
     populate_script: yarn install
   build_script: yarn run build
   publish_script: yarn run release
+  build_and_publish_linux_script: yarn run dist:linux
+  build_and_publish_win_script: yarn run dist:win
+  build_and_publish_mac_script: yarn run dist:mac
 
 linux_task:
+  only_if: $CIRRUS_TAG
   container:
     image: node:latest
   environment:
