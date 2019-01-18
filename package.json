@@ -39,6 +39,9 @@
     "dist:mac": "yarn build && electron-builder --macos --publish always",
     "dist:win": "yarn build && electron-builder --win --publish always",
     "release": "electron-builder --publish always",
+    "release:linux": "electron-builder --linux --publish always",
+    "release:mac": "electron-builder --macos --publish always",
+    "release:win": "electron-builder --win --publish always",
     "eb-start": "electron-builder start",
     "eb-create-certs": "electron-builder create-self-signed-cert",
     "postinstall": "electron-builder install-app-deps"
