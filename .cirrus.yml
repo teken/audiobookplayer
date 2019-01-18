@@ -1,5 +1,4 @@
 windows_task:
-  only_if: $CIRRUS_TAG
   windows_container:
     image: cirrusci/windowsservercore:2016
   env:
@@ -20,7 +19,6 @@ windows_task:
   publish_script: yarn run release
 
 mac_task:
-  only_if: $CIRRUS_TAG
   osx_instance:
     image: mojave-xcode-10.1
   yarn_script:
@@ -37,7 +35,6 @@ mac_task:
   publish_script: yarn run release
 
 linux_task:
-  only_if: $CIRRUS_TAG
   container:
     image: node:latest
   environment:
