@@ -4,7 +4,7 @@ windows_task:
   env:
     CIRRUS_SHELL: powershell
   yarn_script:
-    - Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+    - Set-ExecutionPolicy RemoteSigned -scope CurrentUser -force; iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
     - scoop install nodejs yarn -y
   environment:
     AWS_ACCESS_KEY_ID: ENCRYPTED[9045ce6b930edefbd4c14d388a3e963cf6bcc938815aebcb0b331800bd0c3f76587533ce9207e7989138a7ed9afd7159]
