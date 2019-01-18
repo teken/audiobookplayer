@@ -1,4 +1,5 @@
 windows_task:
+  only_if: $CIRRUS_TAG
   windows_container:
     image: cirrusci/windowsservercore:2016
   env:
@@ -35,7 +36,6 @@ mac_task:
   publish_script: yarn run release
 
 linux_task:
-  only_if: $CIRRUS_TAG
   container:
     image: node:latest
   environment:
@@ -45,5 +45,5 @@ linux_task:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
-  build_script: yarn run build
-  publish_script: yarn run release
+  buildandpublishlinux_script: yarn run dist:linux
+  buildandpublishwin_script: yarn run dist:win
