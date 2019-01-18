@@ -22,7 +22,7 @@ windows_task:
 mac_task:
   only_if: $CIRRUS_TAG
   osx_instance:
-    image: high-sierra-xcode-9.4.1
+    image: mojave-xcode-10.1
   yarn_script:
     - brew install yarn
   environment:
