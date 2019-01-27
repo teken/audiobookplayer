@@ -129,9 +129,9 @@ module.exports = class IPCService {
 				name: "settings.set",
 				action: (event, args) => {
 					this.settings.set(String(args.name), String(args.value));
-					this.settings.save()
-						.then(() => event.sender.send('settings.set.reply', {success: true}))
-						.catch(err => event.sender.send('settings.set.reply', {success: false, error: err}));
+					// this.settings.save()
+					// 	.then(() => event.sender.send('settings.set.reply', {success: true}))
+					// 	.catch(err => event.sender.send('settings.set.reply', {success: false, error: err}));
 				}
 			},
 			{
@@ -140,9 +140,9 @@ module.exports = class IPCService {
 					args.forEach(setting => {
 						this.settings.set(String(setting.name), String(setting.value));
 					});
-					this.settings.save()
-						.then(() => event.sender.send('settings.sets.reply', {success: true}))
-						.catch(err => event.sender.send('settings.sets.reply', {success: false, error: err}));
+					// this.settings.save()
+					// 	.then(() => event.sender.send('settings.sets.reply', {success: true}))
+					// 	.catch(err => event.sender.send('settings.sets.reply', {success: false, error: err}));
 				}
 			}
 		]

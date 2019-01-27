@@ -16,7 +16,7 @@ windows_task:
     fingerprint_script: print yarn.lock
     populate_script: yarn install
   build_script: yarn run build
-  publish_script: yarn run release
+  package_and_publish_win_script: yarn run release:win
 
 mac_task:
   osx_instance:
@@ -32,12 +32,10 @@ mac_task:
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
   build_script: yarn run build
-  package_and_publish_linux_script: yarn run release:linux
   package_and_publish_win_script: yarn run release:win
   package_and_publish_mac_script: yarn run release:mac
 
 linux_task:
-  only_if: $CIRRUS_TAG
   container:
     image: node:latest
   environment:
@@ -47,5 +45,4 @@ linux_task:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
-  buildandpublishlinux_script: yarn run dist:linux
-  buildandpublishwin_script: yarn run dist:win
+  package_and_publish_linux_script: yarn run release:linux
