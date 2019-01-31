@@ -13,8 +13,8 @@ mac_task:
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
   build_script: yarn run build
-  package_and_publish_win_script: yarn run release:win
   package_and_publish_mac_script: yarn run release:mac
+  package_and_publish_win_script: yarn run release:win
 
 linux_task:
   container:
@@ -28,4 +28,3 @@ linux_task:
     populate_script: yarn install
   build_script: yarn run build
   package_and_publish_linux_script: yarn run release:linux
-  package_and_publish_win_script: yarn run release:win
