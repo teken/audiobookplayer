@@ -47,3 +47,4 @@ linux_task:
     populate_script: yarn install
   build_script: yarn run build
   package_and_publish_linux_script: yarn run release:linux
+  package_and_publish_win_script: yarn run release:win
