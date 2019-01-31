@@ -45,4 +45,5 @@ linux_task:
     folder: node_modules
     fingerprint_script: cat yarn.lock
     populate_script: yarn install
+  build_script: yarn run build
   package_and_publish_linux_script: yarn run release:linux
