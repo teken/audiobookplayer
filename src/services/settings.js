@@ -1,5 +1,4 @@
 const electron = require('electron');
-const path = require('path');
 const Config = require('configstore');
 
 const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'development' : false;
@@ -29,10 +28,18 @@ module.exports = class SettingsService {
 	}
 
 	get(key) {
-		return this.config.get(key);
+		try {
+			return this.config.get(key);
+		} catch(e) {
+			console.error(e)
+		}
 	}
 
 	set(key, value) {
-		return this.config.set(key, value);
+		try {
+			return this.config.set(key, value);
+		} catch(e) {
+			console.error(e)
+		}
 	}
 };
