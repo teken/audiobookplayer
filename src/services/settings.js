@@ -6,6 +6,7 @@ const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'deve
 
 module.exports = class SettingsService {
 	constructor() {
+		const userDataPath = electron.app.getPath('userData');
 		const fileName = development ? 'settings.development.json' : 'settings.json';
 
 		const defaults = {

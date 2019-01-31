@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const mm = require('music-metadata');
+const spawn = require('threads').spawn;
 
 module.exports = class LibraryService {
 
@@ -20,7 +21,7 @@ module.exports = class LibraryService {
 	 * @param {boolean} onlyLookForChanges
 	 */
 	static fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
-		return new Promise((res, rej) => {
+		return spawn((input, done) => {
 			const pathFile = settings.get('libraryPath');
 
 			let fileSystem = this.fileRecursiveStatLookup(pathFile),
@@ -60,7 +61,9 @@ module.exports = class LibraryService {
 
 			localLibrary.saveDatabase((err) => {
 				console.log(new Date().toISOString()+": "+(err ? "error : " + err : "database saved."));
-				!err ? res() : rej(err);
+				//postMessage(err ? `failed:${err}` : 'completed:');
+				//self.close();
+				done(err)
 			});
 		});
 	}

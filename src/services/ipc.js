@@ -87,9 +87,18 @@ module.exports = class IPCService {
 			{
 				name: "library.reimport",
 				action: (event, args) => {
-					LibraryService.fileSystemToLibrary(false, this.localLibrary, this.settings).then(result => {
-						event.sender.send('library.reimport.reply', result)
-					});
+					const thread = LibraryService.fileSystemToLibrary(false, this.localLibrary, this.settings);
+					thread
+						.on('progress', (progress) => {
+							console.log(`Progress: ${progress}%`);
+						})
+						.on('error', (error) => {
+							console.error('Worker errored:', error);
+						})
+						.on('done', () => {
+							console.log('Worker has been terminated.');
+							event.sender.send('library.reimport.reply', null)
+						});
 				}
 			},
 			{
