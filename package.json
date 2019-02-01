@@ -35,9 +35,10 @@
     "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
     "pack": "yarn build && electron-builder --dir",
     "dist": "yarn build && electron-builder",
-    "dist:linux": "yarn build && electron-builder --linux --publish always",
-    "dist:mac": "yarn build && electron-builder --macos --publish always",
-    "dist:win": "yarn build && electron-builder --win --publish always",
+    "dist:linux": "yarn build && electron-builder --linux",
+    "dist:linux:snap": "yarn build && electron-builder --linux snap",
+    "dist:mac": "yarn build && electron-builder --macos",
+    "dist:win": "yarn build && electron-builder --win",
     "release": "electron-builder --publish always",
     "release:linux": "electron-builder --linux --publish always",
     "release:mac": "electron-builder --macos --publish always",
@@ -47,7 +48,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
-    "electron": "^1.8.4",
+    "electron": "^4.0.3",
     "electron-builder": "^20.38.5"
   },
   "build": {
