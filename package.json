@@ -41,6 +41,7 @@
     "pack": "yarn build && electron-builder --dir",
     "dist": "yarn build && electron-builder",
     "dist:linux": "yarn build && electron-builder --linux",
+    "dist:linux:snap": "yarn build && electron-builder --linux snap",
     "dist:mac": "yarn build && electron-builder --macos",
     "dist:win": "yarn build && electron-builder --win",
     "release": "electron-builder --publish always",
@@ -49,8 +50,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
-    "electron": "^1.8.4",
-    "electron-builder": "^20.8.1"
+    "electron": "^4.0.3",
+    "electron-builder": "^20.38.5"
   },
   "build": {
     "appId": "app.AudioBookPlayer",
