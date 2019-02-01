@@ -189,6 +189,7 @@ export default class BookPlayer {
 				return this.currentTrackIndex > 0;
 			}
 		}
+		return false;
 	}
 
 	get hasNext() {
@@ -199,6 +200,7 @@ export default class BookPlayer {
 				return this.currentTrackIndex < (this._tracks.length - 1);
 			}
 		}
+		return false;
 	}
 
 	get next() {

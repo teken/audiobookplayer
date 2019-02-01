@@ -1,12 +1,9 @@
-import React, {Component} from "react";
+import React from "react";
 
 import withTheme from "../../theme/withTheme";
+import Item from "./Item";
 
-export default withTheme(class Tile extends Component {
-
-	get hasArtWork() {
-		return this.props.work.art.length > 0;
-	}
+export default withTheme(class Row extends Item {
 
 	get tilePicture() {
 		if (this.hasArtWork) {
@@ -18,20 +15,7 @@ export default withTheme(class Tile extends Component {
 				maxHeight: '6.75em'
 			}}/>;
 		}
-	}
-
-	get hasPicture() {
-		return this.props.work && this.props.work.art && this.props.work.art.length > 0;
-	}
-
-	get cleanedName() {
-		const number = this.props.work.name.split(' ', 1)[0];
-		return this.props.series && !isNaN(number) ? this.props.work.name.slice(number.length+1) : this.props.work.name;
-	}
-
-	get seriesName() {
-		const number = this.props.work.name.split(' ', 1)[0];
-		return isNaN(number) ? this.props.series.name : `${this.props.series.name} #${number}`;
+		return '';
 	}
 
 	render() {

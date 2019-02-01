@@ -1,17 +1,12 @@
-import React, {Component} from "react";
+import React from "react";
 
 import withTheme from "../../theme/withTheme";
+import Item from "./Item";
 
-//const fs = window.require('fs');
-
-export default withTheme(class Tile extends Component {
-
-	get hasArtWork() {
-		return this.props.work.art && this.props.work.art.length > 0;
-	}
+export default withTheme(class Tile extends Item {
 
 	get tilePicture() {
-		if (this.hasArtWork) { // && fs.existsSync(this.props.work.art[0].path)
+		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
 			return <img src={p} alt={this.props.work.name} style={{
 				minWidth: '11em',
@@ -20,20 +15,7 @@ export default withTheme(class Tile extends Component {
 				maxHeight: '12.5em'
 			}}/>;
 		}
-	}
-
-	get hasPicture() {
-		return this.props.work && this.props.work.art && this.props.work.art.length > 0;
-	}
-
-	get cleanedName() {
-		const number = this.props.work.name.split(' ', 1)[0];
-		return this.props.series && !isNaN(number) ? this.props.work.name.slice(number.length+1) : this.props.work.name;
-	}
-
-	get seriesName() {
-		const number = this.props.work.name.split(' ', 1)[0];
-		return isNaN(number) ? this.props.series.name : `${this.props.series.name} #${number}`;
+		return '';
 	}
 
 	render() {
