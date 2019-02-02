@@ -142,7 +142,6 @@ module.exports = class IPCService {
 				action: async (event, key, value) => {
 					if (!key) throw Error(`Key '${key}' is invalid`);
 					this.settings.set(String(key), String(value));
-					await this.settings.save();
 				}
 			},
 			{
@@ -152,7 +151,6 @@ module.exports = class IPCService {
 					for (const setting of keys) {
 						this.settings.set(String(setting.name), String(setting.value));
 					}
-					await this.settings.save();
 				}
 			}
 		]
