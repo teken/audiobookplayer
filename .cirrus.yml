@@ -1,4 +1,6 @@
 mac_task:
+  only_if: $CIRRUS_BRANCH == 'master' && CIRRUS_TAG = 'v*'
+  timeout_in: 10m
   osx_instance:
     image: mojave-xcode-10.1
   brew_installs_script:
@@ -17,6 +19,8 @@ mac_task:
   package_and_publish_win_script: yarn run release:win
 
 linux_task:
+  only_if: $CIRRUS_BRANCH == 'master' && CIRRUS_TAG = 'v*'
+  timeout_in: 10m
   container:
     image: node:latest
   environment:
