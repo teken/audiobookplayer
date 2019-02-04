@@ -87,10 +87,11 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 
 		this.fuse = new Fuse(flattenedWorks, this.fuseOptions);
 		const settings = SettingsService.getSettings('libraryStyle', 'libraryDisplayAuthors');
+		console.log(flattenedWorks, settings)
 		this.setState({
 			flattenedWorks: flattenedWorks,
 			states: states || [],
-			libraryDisplayAuthors: settings.libraryDisplayAuthors,
+			libraryDisplayAuthors: settings.libraryDisplayAuthors === 'true',
 			libraryStyle: settings.libraryStyle,
 		});
 	}

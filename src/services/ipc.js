@@ -32,6 +32,7 @@ module.exports = class IPCService {
 				name: "library.getAll",
 				action: async (event) => {
 					const results = await this.remoteLibrary.list();
+					console.log(results)
 					event.returnValue = this.remoteLibrary.cleanUpResults(results);
 				}
 			},

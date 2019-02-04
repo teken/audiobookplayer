@@ -2,12 +2,13 @@ import React from "react";
 
 import withTheme from "../../theme/withTheme";
 import Item from "./Item";
+import FileService from "../../../uiservices/file";
 
 export default withTheme(class Row extends Item {
 
 	get tilePicture() {
 		if (this.hasArtWork) {
-			const p = this.props.work.art[0].path;
+			const p = FileService.lookupFilePath(this.props.work.art[0]);
 			return <img src={p} alt={this.props.work.name} style={{
 				minWidth: '5em',
 				minHeight: '5em',
