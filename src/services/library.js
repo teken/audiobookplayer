@@ -21,6 +21,7 @@ module.exports = class LibraryService {
 	 */
 	static fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
 		return new Promise((res, rej) => {
+
 			const pathFile = settings.get('libraryPath');
 
 			let fileSystem = this.fileRecursiveStatLookup(pathFile),
