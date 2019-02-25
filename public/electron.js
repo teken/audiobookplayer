@@ -25,16 +25,8 @@ const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'deve
 autoUpdater.checkForUpdatesAndNotify();
 
 if (!development) {
-	const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-		if (mainWindow) {
-			if (mainWindow.isMinimized()) mainWindow.restore();
-			mainWindow.focus()
-		}
-	});
-
-	if (isSecondInstance) {
-		app.quit()
-	}
+	app.requestSingleInstanceLock();
+	app.on('second-instance', () => app.quit())
 }
 
 function createWindow() {
@@ -63,7 +55,7 @@ function createWindow() {
 		show: false,
 		darkTheme: true,
 		backgroundColor:'#1d1e26',
-		overlayScrollbars: true
+		overlayScrollbars: true,
 	};
 	if (process.env.ELECTRON_START_URL) {
 		preferences["webPreferences"] = {webSecurity: false};
