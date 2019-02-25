@@ -133,15 +133,10 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 						{ this.props.player.isLoaded && this.displayName()}
 					</span>
 					<span style={{color:this.props.theme.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
-						{this.props.player.isLoaded ? `${this.formatTime(this.state.progress)} / ${this.formatTime(this.state.duration)}` : `No Book Selected`}
+						{this.props.player.isLoaded ? `${BookPlayer.formatTime(this.state.progress)} / ${BookPlayer.formatTime(this.state.duration)}` : `No Book Selected`}
 					</span>
 				</div>
 			</div>
 		);
-	}
-
-	formatTime(time) {
-		if (!time) time = 0;
-		return new Date(1000 * time).toISOString().substr(11, 8);
 	}
 })))

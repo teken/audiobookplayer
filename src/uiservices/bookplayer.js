@@ -269,4 +269,15 @@ export default class BookPlayer {
 	get chapters() {
 		return this.chapterService.chapters;
 	}
+
+	static formatTime(time) {
+		const f = n => (n).toLocaleString('en-GB', {minimumIntegerDigits: 2, useGrouping:false});
+		if (!time) time = 0;
+		const base = new Date(1000 * time);
+		const sec = base.getSeconds();
+		const min = base.getMinutes();
+		const hor = base.getHours() - 1;
+		const day = (base.getDate() - 1) * 24;
+		return `${f(hor+day)}:${f(min)}:${f(sec)}`;
+	}
 }

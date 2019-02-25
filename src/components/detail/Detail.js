@@ -183,7 +183,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 										{this.isSeries && <h3 style={{color:this.props.theme.secondaryText}}>({this.seriesName})</h3>}
 										<h2 style={{fontWeight:400, color:this.props.theme.primaryText}}>By {this.state.author.name}</h2>
 										<div>
-											Total Length: {this.formatTime(totalLength)}
+											Total Length: {BookPlayer.formatTime(totalLength)}
 										</div>
 										<div>
 											Total Size: {this.formatBytes(totalSize)}
@@ -198,7 +198,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 														})
 													}
 												>
-													Saved Time: {this.formatTime(this.state.saveTime)}
+													Saved Time: {BookPlayer.formatTime(this.state.saveTime)}
 												</div>
 											)
 										}
@@ -220,9 +220,9 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 									noDataText="No tracks found"
 									columns={[
 										{Header: 'Name', accessor: 'name'},
-										{Header: 'Length', maxWidth: 100, accessor: 'meta.format.duration', Cell: props => this.formatTime(props.value)},
-										// {Header: 'Start Time', maxWidth: 100, accessor: 'startTime', Cell: props => this.formatTime(props.value)},
-										// {Header: 'End Time', maxWidth: 100, accessor: 'endTime', Cell: props => this.formatTime(props.value)},
+										{Header: 'Length', maxWidth: 100, accessor: 'meta.format.duration', Cell: props => BookPlayer.formatTime(props.value)},
+										// {Header: 'Start Time', maxWidth: 100, accessor: 'startTime', Cell: props => this.props.player.formatTime(props.value)},
+										// {Header: 'End Time', maxWidth: 100, accessor: 'endTime', Cell: props => this.props.player.formatTime(props.value)},
 										// {Header: 'Size', maxWidth: 100, accessor: 'size', Cell: props => this.formatBytes(props.value)},
 									]}
 									minRows={0}
@@ -250,9 +250,9 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 													display: 'flex',
 													justifyContent: 'space-between'
 												}}>
-													<div>Length: {this.formatTime(track.meta ? track.meta.format.duration : 0)}</div>
-													<div>Start Time: {this.formatTime(track.startTime)}</div>
-													<div>End Time: {this.formatTime(track.endTime)}</div>
+													<div>Length: {BookPlayer.formatTime(track.meta ? track.meta.format.duration : 0)}</div>
+													<div>Start Time: {BookPlayer.formatTime(track.startTime)}</div>
+													<div>End Time: {BookPlayer.formatTime(track.endTime)}</div>
 													<div>Size: {this.formatBytes(track.size)}</div>
 													<div>Chapters: {rows ? rows.data.length : 1}</div>
 												</div>
@@ -264,7 +264,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 														noDataText="No chapters found"
 														columns={[
 															{Header: 'Chapter Name', accessor: 'name'},
-															{Header: 'Time Code', maxWidth: 200, accessor: 'time', Cell: props => this.formatTime(props.value)},
+															{Header: 'Time Code', maxWidth: 200, accessor: 'time', Cell: props => BookPlayer.formatTime(props.value)},
 														]}
 														minRows={0}
 														defaultPageSize={rows.data.length}
@@ -310,11 +310,6 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 			sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
 			i = Math.floor(Math.log(bytes) / Math.log(k));
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-	}
-
-	formatTime(time) {
-		if (!time) time = 0;
-		return new Date(1000 * time).toISOString().substr(11, 8);
 	}
 })))
 
