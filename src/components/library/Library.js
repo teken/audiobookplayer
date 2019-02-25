@@ -234,7 +234,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		let filePath = path.join(ipcRenderer.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
 		const state = this.state.states.find(x => x.key === stateKey);
 		return this.book(renderFunction, author, series, work, stateKey, [
-			{ name:`Play from ${state.time ? BookPlayer.formatTime(state.time) : 'saved time'}`, onClick:() => this.playFromStateTime(author, series, work, stateKey) },
+			{ name:`Play from ${state.time ? this.props.player.formatTime(state.time) : 'saved time'}`, onClick:() => this.playFromStateTime(author, series, work, stateKey) },
 			{ name:'Play from beginning', onClick:() => this.play(author, series, work) },
 			{ name:'Search for author', onClick:() => this.search(author.name)},
 			series && { name:'Search for series', onClick:() => this.search(series.name)},

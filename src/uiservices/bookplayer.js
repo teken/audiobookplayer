@@ -270,7 +270,7 @@ export default class BookPlayer {
 		return this.chapterService.chapters;
 	}
 
-	static formatTime(time) {
+	formatTime(time) {
 		const f = n => (n).toLocaleString('en-GB', {minimumIntegerDigits: 2, useGrouping:false});
 		if (!time) time = 0;
 		const base = new Date(1000 * time);

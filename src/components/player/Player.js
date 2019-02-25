@@ -133,7 +133,7 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 						{ this.props.player.isLoaded && this.displayName()}
 					</span>
 					<span style={{color:this.props.theme.secondaryText, float:'right', padding: "0 1em", fontSize: '0.9em'}}>
-						{this.props.player.isLoaded ? `${BookPlayer.formatTime(this.state.progress)} / ${BookPlayer.formatTime(this.state.duration)}` : `No Book Selected`}
+						{this.props.player.isLoaded ? `${this.props.player.formatTime(this.state.progress)} / ${this.props.player.formatTime(this.state.duration)}` : `No Book Selected`}
 					</span>
 				</div>
 			</div>
