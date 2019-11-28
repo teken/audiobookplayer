@@ -2,7 +2,7 @@
   "name": "audiobookplayer",
   "version": "0.1.14",
   "description": "A new audiobook player",
-  "author": "Duncan Haig",
+  "author": "Anna Haig",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.0-14",
@@ -54,7 +54,7 @@
   "build": {
     "appId": "app.AudioBookPlayer",
     "productName": "Audio Book Player",
-    "copyright": "Copyright © 2018 - 2019 Duncan Haig",
+    "copyright": "Copyright © 2018 - 2019 Anna Haig",
     "files": [
       "build/**/*",
       "src/services/*"

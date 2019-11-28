@@ -5,6 +5,8 @@ import withTheme from "../theme/withTheme";
 const {shell, ipcRenderer} = window.require('electron');
 const {app} = window.require('electron').remote;
 
+const pkg = require('../../../package.json');
+
 export default withTheme(class About extends Component {
 	constructor(props) {
 		super(props);
@@ -42,8 +44,8 @@ export default withTheme(class About extends Component {
 				<div style={{color: this.props.theme.secondaryText, lineHeight: '1.2em'}}>
 					<p>
 						Audio Book Player: v{app.getVersion()}<br/>
-						Created By Duncan Haig<br/>
-						&copy; {this.dateRange()} Duncan Haig All Rights Reserved<br/>
+						Created By {pkg.author}<br/>
+						&copy; {this.dateRange()} {pkg.author} All Rights Reserved<br/>
 					</p>
 					<h2 style={{color:this.props.theme.primaryText}}>Support this software on:</h2>
 					<p>
