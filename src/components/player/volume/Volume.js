@@ -26,7 +26,7 @@ export default withTheme(withPlayer(class Volume extends Component {
 		this.onMouseMoveFunctionRef = null;
 	}
 
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		if (nextProps.duration && nextProps.duration !== 0 && !this.holding) {
 			const lengthPerUnit = this.state.barWidth / nextProps.duration;
 			const length = nextProps.progress * lengthPerUnit;

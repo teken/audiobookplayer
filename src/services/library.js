@@ -41,22 +41,27 @@ module.exports = class LibraryService {
 				if (onlyLookForChanges) author = authors.findOne({'name':file.name});
 				if (author === null) author = authors.insert({name:file.name});
 
-				if (file.isDirectory()) file.children.forEach( work => {
-					if (work.isFile()) return;
-					let record = null;
-					if (onlyLookForChanges) record = works.findOne({'name':file.name});
-					if (record === null) record = {name: work.name, author_id: author.$loki};
+				try {
 
-					if (work.children[0].isDirectory()) { //series
-						record.type = 'SERIES';
-						record.books = work.children.map( child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
-					} else { //file
-						record = Object.assign(record, this.mapBookObject(work, author.$loki));
-					}
+					if (file.isDirectory()) file.children.forEach(work => {
+						if (work.isFile()) return;
+						let record = null;
+						if (onlyLookForChanges) record = works.findOne({'name': file.name});
+						if (record === null) record = {name: work.name, author_id: author.$loki};
 
-					if (record.$loki) works.update(record);
-					else works.insert(record);
-				});
+						if (work.children[0].isDirectory()) { //series
+							record.type = 'SERIES';
+							record.books = work.children.map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
+						} else { //file
+							record = Object.assign(record, this.mapBookObject(work, author.$loki));
+						}
+
+						if (record.$loki) works.update(record);
+						else works.insert(record);
+					});
+				}catch (e) {
+					console.log(new Date().toISOString()+`: error : ${e}`);
+				}
 			});
 
 			localLibrary.saveDatabase((err) => {

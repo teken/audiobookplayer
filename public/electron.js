@@ -57,8 +57,12 @@ function createWindow() {
 		backgroundColor:'#1d1e26',
 		overlayScrollbars: true,
 	};
+	preferences["webPreferences"] = {
+		nodeIntegration: true
+	};
+
 	if (process.env.ELECTRON_START_URL) {
-		preferences["webPreferences"] = {webSecurity: false};
+		preferences["webPreferences"].webSecurity = false;
 	}
 
 	mainWindow = new BrowserWindow(preferences);

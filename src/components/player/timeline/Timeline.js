@@ -28,7 +28,7 @@ export default withTheme(withPlayer(class Timeline extends Component {
 		this.onMouseMoveFunctionRef = null;
 	}
 
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		if (nextProps.duration && nextProps.duration !== 0 && !this.holding) {
 			const lengthPerSecond = nextProps.duration === 0 ? 0 : this.state.barWidth / nextProps.duration;
 			const length = nextProps.progress * lengthPerSecond;
