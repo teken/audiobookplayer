@@ -22,6 +22,8 @@ const settings = new SettingsService();
 
 const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'development' : false;
 
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.checkForUpdatesAndNotify();
 
 if (!development) {
