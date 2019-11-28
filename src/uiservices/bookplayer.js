@@ -204,7 +204,7 @@ export default class BookPlayer {
 	}
 
 	get next() {
-		if (!this.hasNext) return;
+		if (!this.hasNext) return null;
 		if (this.chapters) {
 			return this.flattenedChapters[this.currentChapterIndex + 1]
 		} else {
@@ -213,7 +213,7 @@ export default class BookPlayer {
 	}
 
 	get previous() {
-		if (!this.hasPrevious) return;
+		if (!this.hasPrevious) return null;
 		if (this.chapters) {
 			return this.flattenedChapters[this.currentChapterIndex - 1]
 		} else {
