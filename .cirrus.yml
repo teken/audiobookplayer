@@ -2,7 +2,7 @@ mac_task:
   only_if: $CIRRUS_BRANCH == 'master'
   timeout_in: 10m
   osx_instance:
-    image: mojave-xcode-10.1
+    image: mojave-xcode
   brew_installs_script:
     - brew install yarn
     - brew install rpm
