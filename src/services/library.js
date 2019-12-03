@@ -24,6 +24,8 @@ module.exports = class LibraryService {
 
 			const pathFile = settings.get('libraryPath');
 
+			if (!fs.existsSync(pathFile)) rej();
+
 			let fileSystem = this.fileRecursiveStatLookup(pathFile),
 				authors = localLibrary.getCollection('authors'),
 				works = localLibrary.getCollection('works');

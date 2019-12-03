@@ -19,7 +19,7 @@ export default withTheme(class FolderSelector extends Component {
 
 	handleClick(event) {
 		event.preventDefault();
-		const value = dialog.showOpenDialog({
+		const value = dialog.showOpenDialogSync({
 			properties: ['openDirectory'],
 			defaultPath: this.textInput.current.value,
 		});
@@ -39,7 +39,7 @@ export default withTheme(class FolderSelector extends Component {
 					backgroundColor: this.props.theme.inputBackground,
 					cursor:'pointer'
 				}} />
-				<input type="text" readOnly='false' value={this.props.value} ref={this.textInput} onClick={this.handleClick} onChange={this.props.onChange}
+				<input type="text" readOnly={false} value={this.props.value} ref={this.textInput} onClick={this.handleClick} onChange={this.props.onChange}
 				 	style={{
 						padding: '0.6em',
 						width:'90%',

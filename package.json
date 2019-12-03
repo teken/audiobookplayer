@@ -1,6 +1,6 @@
 {
   "name": "audiobookplayer",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "A new audiobook player",
   "author": "Anna Haig",
   "private": true,
@@ -26,7 +26,7 @@
   "main": "public/electron.js",
   "homepage": "./",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "set BROWSER=none&&react-scripts start",
     "build": "react-scripts build",
     "lint": "react-scripts lint",
     "test": "react-scripts test --env=jsdom",
