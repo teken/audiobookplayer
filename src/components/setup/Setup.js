@@ -193,7 +193,7 @@ export default withRouter(withTheme(class About extends Component {
 						{this.instruction(2, 'Select how you\'d like us to understand your library')}
 						<SelectionGrid selectedValue={this.state.importStyle} columnTemplate='1fr 1fr' padding='0 20vw' options={[
 							{cell: this._folderStructureCell(), value:'folders'},
-							{cell: this._metaDataCell(), value:'metadata'},
+							// {cell: this._metaDataCell(), value:'metadata'},
 						]} onChange={(value) => this.setState({importStyle: value})} style={{
 							fontSize:'.7em'
 						}} />

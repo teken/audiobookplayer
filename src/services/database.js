@@ -13,6 +13,7 @@ module.exports = class DatabaseService {
 	}
 
 	static getDB(name) {
+		console.log("Loading DB from "+path.join(new SettingsService().get('dataPath'), name))
 		return this.loadDatabase(path.join(new SettingsService().get('dataPath'), name));
 	}
 

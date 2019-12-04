@@ -102,9 +102,13 @@ export default withRouter(withTheme(class Settings extends Component {
 		this.setState({
 			showReimport: true
 		});
+		let self = this;
 		ipcRenderer.once('library.reimport.reply', (event, arg) => {
 			console.log('Database Re-Imported', arg);
-		});
+			self.setState({
+				showReimport: false
+			});
+		})
 		ipcRenderer.send('library.reimport');
 	}
 
@@ -156,7 +160,7 @@ export default withRouter(withTheme(class Settings extends Component {
 					<Setting label="Library Import Style">
 						<Dropdown value={this.state.settings.libraryImportStyle} options={[
 							{name:'Folder Structure', value:'folder'},
-							{name:'File Metadata', value:'metadata'}
+							// {name:'File Metadata', value:'metadata'}
 						]} onChange={(event) => this.handleChange(event, "libraryImportStyle")} />
 					</Setting>
 					<Setting>

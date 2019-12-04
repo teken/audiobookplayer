@@ -1,4 +1,5 @@
 import React from "react";
+import LazyLoad from 'react-lazy-load';
 
 import withTheme from "../../theme/withTheme";
 import Item from "./Item";
@@ -8,12 +9,17 @@ export default withTheme(class Tile extends Item {
 	get tilePicture() {
 		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
-			return <img src={p} alt={this.props.work.name} style={{
+			return <LazyLoad
+				height={176}
+				width={176}
+				offset={500}
+				debounce={false}
+			><img src={p} alt={this.props.work.name} style={{
 				minWidth: '11em',
 				minHeight: '11em',
 				maxWidth: '100%',
 				maxHeight: '12.5em'
-			}}/>;
+			}}/></LazyLoad>;
 		}
 		return '';
 	}

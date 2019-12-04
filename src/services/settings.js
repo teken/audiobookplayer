@@ -8,6 +8,8 @@ module.exports = class SettingsService {
 		const userDataPath = electron.app.getPath('userData');
 		const fileName = development ? 'settings.development.json' : 'settings.json';
 
+		console.log(`loading setting from ${fileName}`)
+
 		const defaults = {
 			firstRun: true,
 			dataPath: userDataPath,

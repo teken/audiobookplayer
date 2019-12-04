@@ -80,7 +80,11 @@ module.exports = class IPCService {
 				name: "library.importdelta",
 				action: (event, args) => {
 					LibraryService.fileSystemToLibrary(true, this.localLibrary, this.settings).then(result => {
+						console.log("fin")
 						event.sender.send('library.importdelta.reply', result)
+					}).catch(x => {
+						console.error(x)
+						event.sender.send('library.importdelta.reply', x)
 					});
 				}
 			},
@@ -88,7 +92,11 @@ module.exports = class IPCService {
 				name: "library.reimport",
 				action: (event, args) => {
 					LibraryService.fileSystemToLibrary(false, this.localLibrary, this.settings).then(result => {
+						console.log("fin")
 						event.sender.send('library.reimport.reply', result)
+					}).catch(x => {
+						console.error(x)
+						event.sender.send('library.reimport.reply', x)
 					});
 				}
 			},
@@ -96,7 +104,11 @@ module.exports = class IPCService {
 				name: "library.clear",
 				action: (event, args) => {
 					LibraryService.clearLibrary(this.localLibrary).then(result => {
+						console.log("fin")
 						event.sender.send('library.clear.reply', result)
+					}).catch(x => {
+						console.error(x)
+						event.sender.send('library.clear.reply', x)
 					});
 				}
 			}

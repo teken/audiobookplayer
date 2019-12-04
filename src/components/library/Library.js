@@ -220,6 +220,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 
 	libraryBook(renderFunction, author, series, work, stateKey) {
 		if (this.state.states.some(x => x.key === stateKey && x.time)) return this.savedBook(renderFunction, author, series, work, stateKey);
+		if (typeof(author.name) === 'undefined' || typeof(series ? series.name : '') === 'undefined') return;
 		let filePath = path.join(ipcRenderer.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
 		return this.book(renderFunction, author, series, work, stateKey, [
 			{ name:'Play', onClick:() => this.play(author, series, work) },

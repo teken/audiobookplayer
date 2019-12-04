@@ -22,9 +22,10 @@ module.exports = class LibraryService {
 	static fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
 		return new Promise((res, rej) => {
 
-			const pathFile = settings.get('libraryPath');
+			const pathFile = settings.get('libraryPath'),
+			libraryStyle = settings.get('importStyle');
 
-			if (!fs.existsSync(pathFile)) rej();
+			if (!fs.existsSync(pathFile)) rej("No library path");
 
 			let fileSystem = this.fileRecursiveStatLookup(pathFile),
 				authors = localLibrary.getCollection('authors'),
@@ -38,33 +39,81 @@ module.exports = class LibraryService {
 				works.clear();
 			}
 
-			fileSystem.forEach(file => {
-				let author = null;
-				if (onlyLookForChanges) author = authors.findOne({'name':file.name});
-				if (author === null) author = authors.insert({name:file.name});
+			if (libraryStyle === 'folder') {
+				for (const file of fileSystem) {
+					let author = null;
+					if (onlyLookForChanges) author = authors.findOne({'name': file.name});
+					if (author === null) author = authors.insert({name: file.name});
 
-				try {
+					try {
+						if (file.isDirectory()) file.children.forEach(work => {
+							if (work.isFile()) return;
+							let record = null;
+							if (onlyLookForChanges) record = works.findOne({'name': file.name});
+							if (record === null) record = {name: work.name, author_id: author.$loki};
 
-					if (file.isDirectory()) file.children.forEach(work => {
-						if (work.isFile()) return;
-						let record = null;
-						if (onlyLookForChanges) record = works.findOne({'name': file.name});
-						if (record === null) record = {name: work.name, author_id: author.$loki};
+							if (work.children[0].isDirectory()) { //series
+								record.type = 'SERIES';
+								record.books = work.children.map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
+							} else { //file
+								record = Object.assign(record, this.mapBookObject(work, author.$loki));
+							}
 
-						if (work.children[0].isDirectory()) { //series
-							record.type = 'SERIES';
-							record.books = work.children.map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
-						} else { //file
-							record = Object.assign(record, this.mapBookObject(work, author.$loki));
-						}
-
-						if (record.$loki) works.update(record);
-						else works.insert(record);
-					});
-				}catch (e) {
-					console.log(new Date().toISOString()+`: error : ${e}`);
+							if (record.$loki) works.update(record);
+							else works.insert(record);
+						});
+					} catch (e) {
+						console.log(new Date().toISOString() + `: error : ${e}`);
+					}
 				}
-			});
+			} else if (libraryStyle === 'metadata') {
+				const audioFileExtensions = ["mp3", "m4b", "m4a"];
+
+				fileSystem = fileSystem.map(x => x.children)
+					.reduce((a, b) => a.concat(b), [])
+					.reduce((a, b) => {
+						if (b.isDirectory()) {
+							let i = a.concat(b.children);
+							delete b.children;
+							return i;
+						} else return a.concat(b);
+					} , [])
+					.reduce((a, b) => {
+						if (b.isDirectory()) {
+							let i = a.concat(b.children);
+							delete b.children;
+							return i;
+						} else return a.concat(b);
+					} , []);
+
+				let files = fileSystem
+					.filter(x => x.isFile())
+					.filter(file => {
+						const fileParts = file.name.split("."),
+							fileExtension = fileParts[fileParts.length - 1].toLowerCase();
+						return audioFileExtensions.indexOf(fileExtension) > -1;
+					}).map(x => { return {path: x.path, name: x.name}});
+				console.log("loading metadata")
+				for (const item of files) {
+					console.log(item.name)
+					// item.metadata = (await this.getTrackMetaData(item.path)).common
+				}
+				console.log("loaded metadata")
+				for (const file of files) {
+					let author = authors.findOne({'name': file.metadata.artist});
+					if (author === null) author = authors.insert({name: file.metadata.artist});
+
+					let record = works.findOne({'name': file.metadata.album});
+					if (record === null) record = {name: file.metadata.album, author_id: author.$loki, type : 'BOOK', art:[], tracks:[], info:[]};
+
+					record.tracks.push(file);
+
+					if (record.$loki) works.update(record);
+					else works.insert(record);
+				}
+			} else {
+				rej(`Unknown Library Style '${libraryStyle}'`);
+			}
 
 			localLibrary.saveDatabase((err) => {
 				console.log(new Date().toISOString()+": "+(err ? "error : " + err : "database saved."));
@@ -100,9 +149,9 @@ module.exports = class LibraryService {
 		return record;
 	};
 
-	// static getTrackMetaData(filePath) {
-	// 	return mm.parseFile(filePath);
-	// }
+	static getTrackMetaData(filePath) {
+		return mm.parseFile(filePath);
+	}
 	//
 	// static mapTrackLengths(authorsCollection, worksCollection) {
 	// 	let works = worksCollection.chain().data();
