@@ -5,9 +5,7 @@ import Model from "./Modal";
 
 import Loading from "../loading/Loading";
 
-import withTheme from "../theme/withTheme";
-
-export default withTheme(class TimeCodePromptModal extends Model {
+export default class TimeCodePromptModal extends Model {
 
 	constructor(props) {
 		super(props);
@@ -87,11 +85,11 @@ export default withTheme(class TimeCodePromptModal extends Model {
 			width: '2em',
 			border:'none',
 			backgroundColor: 'transparent',
-			color: this.props.theme.activeText,
+			color: 'var(--active-text-colour)',
 			fontSize: '1em',
 			textAlign: 'center'
 		};
-		return <div style={{backgroundColor: this.props.theme.inputBackground}}>
+		return <div style={{backgroundColor: 'var(--input-background-colour)'}}>
 			<input ref={this.hours} className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.hours} onChange={this.changeHours} onKeyPress={this.changeHours}/>:
 			<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.minutes} onChange={this.changeMinutes} onKeyPress={this.changeMinutes}/>:
 			<input className="spinnerless" type="number" style={inputStyle} placeholder="00" value={this.state.seconds} onChange={this.changeSeconds} onKeyPress={this.changeSeconds}/>
@@ -108,4 +106,4 @@ export default withTheme(class TimeCodePromptModal extends Model {
 			]}/>
 		}
 	}
-})
+}

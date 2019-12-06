@@ -1,10 +1,8 @@
 import React, {Component} from "react";
 import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
 
-import withTheme from "../theme/withTheme";
 
-
-export default withTheme(class Checkbox extends Component {
+export default class Checkbox extends Component {
 	constructor(props) {
 		super(props);
 		this.handleChange = this.handleChange.bind(this);
@@ -36,12 +34,12 @@ export default withTheme(class Checkbox extends Component {
 
 	render() {
 		return (
-			<span style={{display:'flex', color: this.props.theme.activeText}}>
+			<span style={{display:'flex', color: 'var(--active-text-colour)'}}>
 				<Icon icon={this.state.value ? "check-square" : 'square' } onClick={this.handleClick} style={{
 					width:'10%',
 					fontSize: '1.5em',
 					padding: '.5em 0',
-					backgroundColor: this.props.theme.inputBackground,
+					backgroundColor: 'var(--input-background-colour)',
 					cursor:'pointer'
 				}} />
 				<input type="text" readOnly='false' value={this.state.value} ref={this.textInput} onClick={this.handleClick}
@@ -49,11 +47,11 @@ export default withTheme(class Checkbox extends Component {
 						padding: '0.6em',
 						width:'90%',
 						borderColor: 'transparent',
-						color: this.props.theme.activeText,
-						backgroundColor: this.props.theme.inputBackground,
+						color: 'var(--active-text-colour)',
+						backgroundColor: 'var(--input-background-colour)',
 						cursor:'pointer'
 					}}/>
 			</span>
 		);
 	}
-})
+}

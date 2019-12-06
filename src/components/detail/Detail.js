@@ -6,15 +6,13 @@ import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
 import Loading from "../loading/Loading";
 
 import "react-table/react-table.css";
-
-import withTheme from "../theme/withTheme";
 import withPlayer from "../player/withPlayer";
 import ChapterService from "../../uiservices/chapters";
 
 const mm = window.require('music-metadata');
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(withTheme(withPlayer(class Detail extends Component {
+export default withRouter(withPlayer(class Detail extends Component {
 	constructor(props) {
 		super(props);
 		this._tracks = [];
@@ -157,11 +155,11 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 					<Loading />
 				) : (
 					<div>
-						<div style={{color: this.props.theme.secondaryText}}>
-							<div style={{display:'flex', justifyContent: 'space-between', color: this.props.theme.secondaryText, alignItems: 'flex-end'}}>
+						<div style={{color: 'var(--secondary-text-colour)'}}>
+							<div style={{display:'flex', justifyContent: 'space-between', color: 'var(--secondary-text-colour)', alignItems: 'flex-end'}}>
 								<div style={{width:widths}}>
 									{this.isSeries && this.hasPreviousBook && (
-										<span style={{cursor:'pointer', color: this.props.theme.activeText, display: 'flex', justifyContent: 'flex-start'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.previousBook.name}`)}>
+										<span style={{cursor:'pointer', color: 'var(--active-text-colour)', display: 'flex', justifyContent: 'flex-start'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.previousBook.name}`)}>
 											<Icon style={{padding:'0 .5em'}} icon="chevron-left"/>
 											{this.previousBook.name}
 										</span>
@@ -179,9 +177,9 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 								</div>}
 								<div style={{width:widths}}>
 									<div style={this.hasArtwork ? {float:'left', textAlign:'left', paddingLeft:'.5em'} : {}}>
-										<h1 style={{color:this.props.theme.primaryText}}>{this.cleanedName}</h1>
-										{this.isSeries && <h3 style={{color:this.props.theme.secondaryText}}>({this.seriesName})</h3>}
-										<h2 style={{fontWeight:400, color:this.props.theme.primaryText}}>By {this.state.author.name}</h2>
+										<h1 style={{color:'var(--primary-text-colour)'}}>{this.cleanedName}</h1>
+										{this.isSeries && <h3 style={{color:'var(--secondary-text-colour)'}}>({this.seriesName})</h3>}
+										<h2 style={{fontWeight:400, color:'var(--primary-text-colour)'}}>By {this.state.author.name}</h2>
 										<div>
 											Total Length: {this.props.player.formatTime(totalLength)}
 										</div>
@@ -191,7 +189,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 										<br/>
 										{
 											this.state.saveTime !== null && (
-												<div style={{cursor:'pointer', color:this.props.theme.activeText}} onClick={() =>
+												<div style={{cursor:'pointer', color:'var(--active-text-colour)'}} onClick={() =>
 													this.props.player.open(this.state.work.$loki, this.props.bookName,() => {
 														this.props.player.play();
 														this.props.player.currentTime = this.state.saveTime;
@@ -206,7 +204,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 								</div>
 								<div style={{width:widths}}>
 									{this.isSeries && this.hasNextBook && (
-										<span style={{cursor:'pointer', color: this.props.theme.activeText, display: 'flex', justifyContent: 'flex-end'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.nextBook.name}`)}>
+										<span style={{cursor:'pointer', color: 'var(--active-text-colour)', display: 'flex', justifyContent: 'flex-end'}} onClick={() => this.props.history.push(`/works/${this.props.workId}/${this.nextBook.name}`)}>
 											{this.nextBook.name}
 											<Icon style={{padding:'0 .5em'}} icon="chevron-right"/>
 										</span>
@@ -231,7 +229,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 									sortable={false}
 									getTdProps={(state, rowInfo) => {
 										return {
-											style:{ cursor: 'pointer', color: this.props.theme.activeText},
+											style:{ cursor: 'pointer', color: 'var(--active-text-colour)'},
 											onDoubleClick: (e, handleOriginal) => {
 												if (this.state.work.type === "SERIES")
 													this.props.player.openFromSpecificTrack(this.state.work.$loki, this.props.bookName, rowInfo.row.name, () => { this.props.player.play()});
@@ -272,7 +270,7 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 														sortable={false}
 														getTdProps={(state, rowInfo) => {
 															return {
-																style:{ cursor: 'pointer', color: this.props.theme.activeText},
+																style:{ cursor: 'pointer', color: 'var(--active-text-colour)'},
 																onDoubleClick: (e, handleOriginal) => {
 																	if (this.state.work.type === "SERIES")
 																		this.props.player.open(this.state.work.$loki, this.props.bookName, () => {
@@ -311,5 +309,5 @@ export default withRouter(withTheme(withPlayer(class Detail extends Component {
 			i = Math.floor(Math.log(bytes) / Math.log(k));
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
-})))
+}))
 

@@ -12,15 +12,13 @@ import Row from "./tile/Row";
 import Fuse from "fuse.js";
 
 import Loading from "../loading/Loading";
-
-import withTheme from "../theme/withTheme";
 import withPlayer from "../player/withPlayer";
 
 const {ipcRenderer, shell} = window.require('electron');
 const path = window.require('path');
 
 
-export default withRouter(withTheme(withPlayer(class Library extends Component {
+export default withRouter(withPlayer(class Library extends Component {
 	constructor(props) {
 		super(props);
 		const settings = JSON.parse(ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
@@ -128,21 +126,21 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		const searchIcon = this.isSearching ? 'times' : 'search';
 		return (
 			<div>
-				<div style={{ margin: '1em', padding: '1em', color:this.props.theme.activeText, backgroundColor:this.props.theme.inputBackground }}>
+				<div style={{ margin: '1em', padding: '1em', color:'var(--active-text-colour)', backgroundColor:'var(--input-background-colour)' }}>
 					<input type="text" value={this.state.searchTerm} onChange={this.onSearchBoxChange} placeholder="Search" style={{
 					   width: '97%',
 					   border:'none',
 					   backgroundColor: 'transparent',
-					   color: this.props.theme.activeText,
+					   color: 'var(--active-text-colour)',
 					   fontSize: '1em',
 					   paddingLeft:'0.3em'
 					}} />
 					<Icon icon={searchIcon} style={{
-						borderBottom:`'1em solid ${this.props.theme.activeColour}`,
+						// borderBottom:`'1em solid ${this.props.theme.activeColour}`,
 						fontSize: '1em',
 						transform: 'translateY(.1em)',
 						paddingBottom: '0.1em',
-						color: this.props.theme.inactiveText,
+						color: 'var(--inactive-text-colour)',
 						cursor: 'pointer'
 					}} onClick={() => this.isSearching ? this.search('') : null} />
 				</div>
@@ -197,7 +195,7 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 		return <div style={{display:'flex', justifyContent:'center', alignItems: 'center'}}>
 			<div style={{lineHeight:'1.8em'}}>
 				<h1>no books to be found,<br />maybe try importing some...</h1>
-				<div style={{color:this.props.theme.secondaryText}}>
+				<div style={{color:'var(--secondary-text-colour)'}}>
 					Head to the settings page using the cog icon on the menu bar
 				</div>
 			</div>
@@ -206,11 +204,11 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 
 	book(renderFunction, author, series, work, stateKey, rightClickOptions) {
 		return <RightClickMenu style={{
-			backgroundColor: this.props.theme.inputBackground,
-			color: this.props.theme.activeText,
+			backgroundColor: 'var(--input-background-colour)',
+			color: 'var(--active-text-colour)',
 			cursor:'pointer',
-			//border: this.isPlaying(author, series, work) ? `1px solid ${this.props.theme.activeText}` : ''
-			boxShadow: this.isPlaying(author, series, work) ? `${this.props.theme.activeText} 0 0 .1em 0` : ''
+			//border: this.isPlaying(author, series, work) ? `1px solid ${'var(--active-text-colour)'}` : ''
+			boxShadow: this.isPlaying(author, series, work) ? `${'var(--active-text-colour)'} 0 0 .1em 0` : ''
 		}}
 		   key={author.name + work.name} options={rightClickOptions}
 		>
@@ -294,5 +292,5 @@ export default withRouter(withTheme(withPlayer(class Library extends Component {
 			console.error(result)
 		}
 	}
-})))
+}))
 

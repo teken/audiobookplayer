@@ -1,9 +1,8 @@
 import React from "react";
 
-import withTheme from "../../theme/withTheme";
 import Item from "./Item";
 
-export default withTheme(class Row extends Item {
+export default class Row extends Item {
 
 	get tilePicture() {
 		if (this.hasArtWork) {
@@ -24,7 +23,7 @@ export default withTheme(class Row extends Item {
 		return (
 			<div onClick={this.props.onClick} style={{
 				cursor: 'pointer',
-				border: this.props.isPlaying ? `.1em solid ${this.props.theme.activeText}` : '',
+				border: this.props.isPlaying ? `.1em solid ${'var(--active-text-colour)'}` : '',
 				display: 'flex'
 			}}>
 
@@ -34,12 +33,12 @@ export default withTheme(class Row extends Item {
 				<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width:'100%', ...s}}>
 					<div style={{margin:'0.2em 0.1em 0.4em'}}>
 						<div style={{fontWeight:600}}>{this.cleanedName}</div>
-						{this.props.series && <div style={{color:this.props.theme.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.seriesName})</div>}
+						{this.props.series && <div style={{color:'var(--secondary-text-colour)', fontSize:'.9em', padding:'0.1em 0 0'}}>({this.seriesName})</div>}
 						<div style={{padding:'0.1em 0 0'}}>{this.props.author.name}</div>
 					</div>
 				</div>
 			</div>
 		);
 	}
-})
+}
 

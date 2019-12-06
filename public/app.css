@@ -1,0 +1,200 @@
+ /*rainbowBackground: 'linear-gradient(to right, #B294FF, #57E6E6, #FEFFB8, #57E6E6, #B294FF, #57E6E6)',*/
+	/*rainbowBackgroundSize: '500% auto',*/
+	/*rainbowAnimation: 'gradient 3s linear infinite',*/
+
+/*const theme = { //light*/
+	/*background: '#fff',*/
+	/*windowBarBackground: '#E0E0E0',*/
+	/*playerBackground: '#E0E0E0',*/
+	/*scrollBarTrack: '#fff',*/
+	/*primaryText:'#42A5F5',*/
+	/*secondaryText: '#68ade8',*/
+	/*activeText: '#42A5F5',*/
+	/*inactiveText: '#99c4e8',*/
+	/*inputBackground: '#E0E0E0',*/
+	/*iconButtonHoverBackground: '#b2b2b2',*/
+	/*warning: '#e81123'*/
+/*};*/
+
+
+:root {
+	--background-colour: radial-gradient(circle at 0% 0%, #373b52, #252736 51%, #1d1e26);
+	--window-bar-background-colour: transparent;
+	--player-background-colour: transparent;
+	--scroll-bar-track-colour: rgba(256, 256, 256, 0.1);
+	--primary-text-colour: #f5f6ff;
+	--secondary-text-colour: rgba(202, 205, 239, 0.8);
+	--active-text-colour: #BFD2FF;
+	--inactive-text-colour: #7881A1;
+	--input-background-colour: rgba(57, 63, 84, 0.8);
+	--icon-button-hover-background-colour: rgba(256,256,256,0.1);
+	--warning-colour: #e81123;
+}
+
+@font-face {
+	font-family: 'Archivo';
+	font-style: normal;
+	font-weight: normal;
+	src: url('fonts/Archivo/Archivo-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Archivo';
+	font-style: italic;
+	font-weight: normal;
+	src: url('fonts/Archivo/Archivo-Italic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Archivo';
+	font-style: normal;
+	font-weight: 600;
+	src: url('fonts/Archivo/Archivo-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Archivo';
+	font-style: italic;
+	font-weight: 600;
+	src: url('fonts/Archivo/Archivo-SemiBoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Archivo';
+	font-style: normal;
+	font-weight: 700;
+	src: url('fonts/Archivo/Archivo-Bold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Archivo';
+	font-style: italic;
+	font-weight: 700;
+	src: url('fonts/Archivo/Archivo-BoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 300;
+	src: url('fonts/Open Sans/OpenSans-Light.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: 300;
+	src: url('fonts/Open Sans/OpenSans-LightItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: normal;
+	src: url('fonts/Open Sans/OpenSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: normal;
+	src: url('fonts/Open Sans/OpenSans-Italic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 600;
+	src: url('fonts/Open Sans/OpenSans-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: 600;
+	src: url('fonts/Open Sans/OpenSans-SemiBoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 700;
+	src: url('fonts/Open Sans/OpenSans-Bold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: 700;
+	src: url('fonts/Open Sans/OpenSans-BoldItalic.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 800;
+	src: url('fonts/Open Sans/OpenSans-ExtraBold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: 800;
+	src: url('fonts/Open Sans/OpenSans-ExtraBoldItalic.ttf') format('truetype');
+}
+
+body {
+	-webkit-user-select:none;
+	cursor:default;
+	margin: 0;
+	padding: 0;
+}
+
+.rt-expander::after {
+	border-top-color: var(--active-text-colour) !important;
+}
+
+::-webkit-input-placeholder {
+	color: var(--inactive-text-colour);
+}
+
+input:focus,
+select:focus {
+	outline-color: transparent;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	-webkit-border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+	background: var(--inactive-text-colour);
+	-webkit-border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:vertical:active {
+	background: var(--active-text-colour);
+	-webkit-border-radius: 100px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: var(--scroll-bar-track-colour);
+	-webkit-border-radius: 100px;
+	margin-bottom: 0.2em
+}
+
+.spinnerless::-webkit-outer-spin-button,
+.spinnerless::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+select {
+	-webkit-appearance: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	line-height:1em;
+	margin: .5em 0;
+}

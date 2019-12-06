@@ -9,13 +9,11 @@ import Tile from "../library/tile/Tile";
 import Row from "../library/tile/Row";
 
 import ReactTable from "react-table";
-
-import withTheme from "../theme/withTheme";
 import {withRouter} from "react-router-dom";
 
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(withTheme(class About extends Component {
+export default withRouter(class About extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -30,7 +28,7 @@ export default withRouter(withTheme(class About extends Component {
 	}
 
 	instruction(number, text) {
-		return (<p><span style={{color:this.props.theme.primaryText}}>{number}.</span> {text}</p>);
+		return (<p><span style={{color:'var(--primary-text-colour)'}}>{number}.</span> {text}</p>);
 	}
 
 	_onClickPrevious() {
@@ -173,9 +171,9 @@ export default withRouter(withTheme(class About extends Component {
 		const hasNext = this.state.currentStep < this.state.maxSteps;
 		return (
 			<div>
-				<div style={{color: this.props.theme.secondaryText, lineHeight: '1.2em'}}>
+				<div style={{color: 'var(--secondary-text-colour)', lineHeight: '1.2em'}}>
 					<div style={{display: this.state.currentStep === 0 ? 'block' : 'none'}}>
-						<h1 style={{color: this.props.theme.primaryText}}>Welcome to Audio Book Player</h1>
+						<h1 style={{color: 'var(--primary-text-colour)'}}>Welcome to Audio Book Player</h1>
 						<p>
 							This wizard is going to help you get setup. Click the 'Next' Button when your ready to proceed.<br/>
 							<span style={{fontSize:'.9em'}}>(Remember all selections can be changed within the a setting menu)</span>
@@ -183,13 +181,13 @@ export default withRouter(withTheme(class About extends Component {
 					</div>
 
 					<div style={{display: this.state.currentStep === 1 ? 'block' : 'none'}}>
-						<h1 style={{color: this.props.theme.primaryText}}>Library Location</h1>
+						<h1 style={{color: 'var(--primary-text-colour)'}}>Library Location</h1>
 						{this.instruction(1, 'First off start by selecting the location of your audio book library')}
 						<FolderSelector value={this.state.libraryDataFolder} onChange={(event) => this.setState({libraryDataFolder: event.target.value})} />
 					</div>
 
 					<div style={{display: this.state.currentStep === 2 ? 'block' : 'none'}}>
-						<h1 style={{color: this.props.theme.primaryText}}>Understanding Your Library</h1>
+						<h1 style={{color: 'var(--primary-text-colour)'}}>Understanding Your Library</h1>
 						{this.instruction(2, 'Select how you\'d like us to understand your library')}
 						<SelectionGrid selectedValue={this.state.importStyle} columnTemplate='1fr 1fr' padding='0 20vw' options={[
 							{cell: this._folderStructureCell(), value:'folders'},
@@ -200,7 +198,7 @@ export default withRouter(withTheme(class About extends Component {
 					</div>
 
 					<div style={{display: this.state.currentStep === 3 ? 'block' : 'none'}}>
-						<h1 style={{color: this.props.theme.primaryText}}>Displaying Your Library</h1>
+						<h1 style={{color: 'var(--primary-text-colour)'}}>Displaying Your Library</h1>
 						{this.instruction(3, 'Finally select how you\'d like your library to display')}
 						<SelectionGrid selectedValue={this.state.libraryStyle} columnTemplate='1fr 1fr' padding='0 5vw' options={[
 							{cell: this._tilesCell(), value:'grid'},
@@ -218,8 +216,8 @@ export default withRouter(withTheme(class About extends Component {
 							fontSize:' 1.5em',
 							border: 'none',
 							cursor: hasPrevious ? 'pointer' : 'default',
-							backgroundColor: this.props.theme.inputBackground,
-							color: hasPrevious ? this.props.theme.activeText : this.props.theme.inactiveText,
+							backgroundColor: 'var(--input-background-colour)',
+							color: hasPrevious ? 'var(--active-text-colour)' : 'var(--inactive-text-colour)',
 						}} onClick={this._onClickPrevious} />
 						<div style={{width:'2em'}} />
 						<input type="button" value={hasNext ? 'Next' : 'Save'} style={{
@@ -227,12 +225,12 @@ export default withRouter(withTheme(class About extends Component {
 							fontSize:' 1.5em',
 							border: 'none',
 							cursor: 'pointer',
-							backgroundColor: this.props.theme.inputBackground,
-							color: this.props.theme.activeText,
+							backgroundColor: 'var(--input-background-colour)',
+							color: 'var(--active-text-colour)',
 						}} onClick={this._onClick} />
 					</div>
 				</div>
 			</div>
 		);
 	}
-}))
+})

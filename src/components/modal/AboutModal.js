@@ -1,12 +1,11 @@
 import React from "react";
 
 import ButtonRow from "../settings/ButtonRow";
-import withTheme from "../theme/withTheme";
 
 import Model from "./Modal";
 import About from "../about/About";
 
-export default withTheme(class AboutModal extends Model {
+export default class AboutModal extends Model {
 
 	listenKeyboard(event) {
 		if (event.key === 'Escape' || event.keyCode === 27) this.okClick();
@@ -30,4 +29,4 @@ export default withTheme(class AboutModal extends Model {
 			]}/>
 		}
 	}
-})
+}

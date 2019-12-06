@@ -1,8 +1,6 @@
 import React, {Component} from "react";
 
-import withTheme from "../theme/withTheme";
-
-export default withTheme(class SelectionGrid extends Component {
+export default class SelectionGrid extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -25,7 +23,7 @@ export default withTheme(class SelectionGrid extends Component {
 					<div
 						onClick={() => this._onClick(option.value)}
 						key={option.value}
-						style={{cursor: 'pointer', boxShadow: this.state.selectedValue === option.value ? `${this.props.theme.activeText} 0 0 .1em 0` : 'none'}}
+						style={{cursor: 'pointer', boxShadow: this.state.selectedValue === option.value ? `${'var(--active-text-colour)'} 0 0 .1em 0` : 'none'}}
 					>
 						{option.cell}
 					</div>
@@ -33,4 +31,4 @@ export default withTheme(class SelectionGrid extends Component {
 			</div>
 		);
 	}
-})
+}

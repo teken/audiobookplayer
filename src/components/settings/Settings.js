@@ -10,11 +10,9 @@ import Checkbox from "./Checkbox";
 
 import ConfirmModal from "../modal/ConfirmModal";
 
-import withTheme from "../theme/withTheme";
-
 const {ipcRenderer} = window.require('electron');
 
-export default withRouter(withTheme(class Settings extends Component {
+export default withRouter(class Settings extends Component {
 	constructor(props) {
 		super(props);
 
@@ -138,7 +136,7 @@ export default withRouter(withTheme(class Settings extends Component {
 							  body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?"
 							  okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
 				<h1>Settings</h1>
-				<form onSubmit={this.handleSubmit} style={{color:this.props.theme.secondaryText}}>
+				<form onSubmit={this.handleSubmit} style={{color:'var(--secondary-text-colour)'}}>
 					<Setting label="Actions">
 						<ButtonRow buttons={this.buttons}/>
 					</Setting>
@@ -169,13 +167,13 @@ export default withRouter(withTheme(class Settings extends Component {
 							fontSize:' 1.5em',
 							border: 'none',
 							cursor: this.isDirty ? 'pointer' : 'default',
-							backgroundColor: this.props.theme.inputBackground,
-							color: this.isDirty ? this.props.theme.activeText : this.props.theme.inactiveText,
+							backgroundColor: 'var(--input-background-colour)',
+							color: this.isDirty ? 'var(--active-text-colour)' : 'var(--inactive-text-colour)',
 						}}/>
 					</Setting>
 				</form>
 			</div>
 		);
 	}
-}))
+})
 

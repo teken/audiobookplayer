@@ -90,13 +90,13 @@ export default class Modal extends Component {
 			}}>
 				<div style={{
 					display: this.state.hidden ? 'none' : 'grid',
-					background: this.props.theme.background,
+					background: 'var(--background-colour)',
 					gridTemplateRows: '1fr 1fr 1fr',
 					width: '90%',
 					height: '40%'
 				}}>
 					<div style={{padding:'0 1em', ...centreStyle}}>{this.title}</div>
-					<div style={{padding:'0 1em', color: this.props.theme.secondaryText, ...centreStyle}}>{this.body}</div>
+					<div style={{padding:'0 1em', color: 'var(--secondary-text-colour)', ...centreStyle}}>{this.body}</div>
 					<div style={{padding:'0 1em', ...centreStyle}}>
 						{this.buttons}
 					</div>

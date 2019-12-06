@@ -1,10 +1,8 @@
 import React from "react";
 import LazyLoad from 'react-lazy-load';
-
-import withTheme from "../../theme/withTheme";
 import Item from "./Item";
 
-export default withTheme(class Tile extends Item {
+export default class Tile extends Item {
 
 	get tilePicture() {
 		if (this.hasArtWork) {
@@ -24,19 +22,19 @@ export default withTheme(class Tile extends Item {
 		let s = {};
 		if (!this.hasArtWork) s = {...s, height: '100%', minHeight: '12.5em'}; //, margin:'4em 0'
 		return (
-			<div onClick={this.props.onClick} style={{cursor:'pointer', border: this.props.isPlaying ? `.1em solid ${this.props.theme.activeText}` : ''}}>
+			<div onClick={this.props.onClick} style={{cursor:'pointer', border: this.props.isPlaying ? `.1em solid ${'var(--active-text-colour)'}` : ''}}>
 				<div>
 					{this.tilePicture}
 				</div>
 				<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', ...s}}>
 					<div style={{margin:'0.2em 0.1em 0.4em'}}>
 						<div style={{fontWeight:600, fontSize: '1.1em'}}>{this.cleanedName}</div>
-						{this.props.series && <div style={{color:this.props.theme.secondaryText, fontSize:'.9em', padding:'0.1em 0 0'}}>({this.seriesName})</div>}
+						{this.props.series && <div style={{color:'var(--secondary-text-colour)', fontSize:'.9em', padding:'0.1em 0 0'}}>({this.seriesName})</div>}
 						<div style={{padding:'0.1em 0 0'}}>{this.props.author.name}</div>
 					</div>
 				</div>
 			</div>
 		);
 	}
-})
+}
 
