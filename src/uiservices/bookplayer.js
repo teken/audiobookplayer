@@ -77,7 +77,7 @@ export default class BookPlayer {
 		this._tracks.forEach(track => {
 			mm.parseFile(track.path).then(metadata => {
 				this._tracks.find(t => t.path === track.path).meta = metadata;
-			})
+			}).catch(x => console.error("Failed to parse metadata", x))
 		});
 
 		let author = ipcRenderer.sendSync('library.getAuthor', this._work.author_id);
@@ -271,13 +271,12 @@ export default class BookPlayer {
 	}
 
 	formatTime(time) {
+		if (isNaN(time)) return "--:--:--";
 		const f = n => (n).toLocaleString('en-GB', {minimumIntegerDigits: 2, useGrouping:false});
 		if (!time) time = 0;
 		const base = new Date(1000 * time);
-		const sec = base.getSeconds();
-		const min = base.getMinutes();
 		const hor = base.getHours() - 1;
 		const day = (base.getDate() - 1) * 24;
-		return `${f(hor+day)}:${f(min)}:${f(sec)}`;
+		return `${f(hor+day)}:${f(base.getMinutes())}:${f(base.getSeconds())}`;
 	}
 }

@@ -170,7 +170,7 @@ export default withTheme(withPlayer(class Timeline extends Component {
 					barHeight={barHeight}
 					handlerWidth={handlerWidth}
 					translate={this.state.translate}
-					duration={this.duration}
+					duration={isNaN(this.duration) ? 0 : this.duration}
 					onMouseDown={this._onMouseDownProgressBar}
 					onMouseOver={this._onMouseOverProgressBar}
 					onMouseOut={this._onMouseOutProgressBar}

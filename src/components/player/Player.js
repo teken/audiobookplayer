@@ -112,7 +112,7 @@ export default withRouter(withTheme(withPlayer(class Player extends Component {
 				height: '3em'
 			}}>
 				<TimeCodePromptModal show={this.state.showTimePicker} okOnClick={this.timePickerOk} cancelOnClick={() => this.setState({showTimePicker: false})}/>
-				<Timeline progress={this.state.progress} duration={this.state.duration} chapters={this.state.chapters}/>
+				<Timeline progress={isNaN(this.state.progress) ? 0 : this.state.progress} duration={isNaN(this.state.duration) ? 0 : this.state.duration} chapters={this.state.chapters}/>
 				<div className="controls" style={{height:'1em'}}>
 					<IconButton title="Previous" icon="backward" onClick={() => this.props.player.playPrevious()} style={{...commonButtonStyling, color: this.props.player.hasPrevious ? this.props.theme.activeText : this.props.theme.inactiveText}}/>
 					<IconButton title="Pause/Play" icon={this.state.playButtonIcon} onClick={() => this.playPause()} style={{...commonButtonStyling, color: this.props.player.isLoaded ? this.props.theme.activeText : this.props.theme.inactiveText}}/>

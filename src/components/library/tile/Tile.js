@@ -9,11 +9,7 @@ export default withTheme(class Tile extends Item {
 	get tilePicture() {
 		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
-			return <LazyLoad
-				height={176}
-				width={176}
-				offset={500}
-				debounce={false}
+			return <LazyLoad width={176} offset={500} debounce={false}
 			><img src={p} alt={this.props.work.name} style={{
 				minWidth: '11em',
 				minHeight: '11em',
