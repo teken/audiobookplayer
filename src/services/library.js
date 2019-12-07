@@ -39,7 +39,7 @@ module.exports = class LibraryService {
 				works.clear();
 			}
 
-			if (libraryStyle === 'folder') {
+			if (libraryStyle === 'folders' || libraryStyle === 'folder') {
 				for (const file of fileSystem) {
 					let author = null;
 					if (onlyLookForChanges) author = authors.findOne({'name': file.name});
