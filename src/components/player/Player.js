@@ -102,8 +102,6 @@ export default withRouter(withPlayer(class Player extends Component {
 		};
 		return (
 			<div className="player" style={{
-				position: 'fixed',
-				bottom: 0,
 				width: '100%',
 				backgroundColor: 'var(--player-background-colour)',
 				textAlign: 'left',

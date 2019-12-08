@@ -25,7 +25,7 @@ export default withRouter(class WindowControls extends Component {
 		};
 
 		return (
-			<div style={{cursor:'point', WebkitAppRegion:'drag', position:'fixed', top:0, width: '100%', display:'flex', justifyContent:'space-between', background: 'var(--window-bar-background-colour)', height: '1em', alignItems:'baseline', padding:'.5em 0'}}>
+			<div style={{cursor:'point', WebkitAppRegion:'drag', width: '100%', display:'flex', justifyContent:'space-between', background: 'var(--window-bar-background-colour)', height: '1em', alignItems:'baseline', padding:'.5em 0'}}>
 				<div>
 					<IconButton title="Library" icon="book-open" onClick={() => this.props.history.push(`/`)} hoverStyle={{backgroundColor:'var(--icon-button-hover-background-colour)'}} style={{...commonButtonStyling}} svgStyle={{transform: 'translateY(1.5px)'}}/>
 					<IconButton title="Settings" icon="cog" onClick={() => this.props.history.push(`/settings`)} hoverStyle={{backgroundColor:'var(--icon-button-hover-background-colour)'}} style={{...commonButtonStyling}}/>

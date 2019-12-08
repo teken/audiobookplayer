@@ -51,7 +51,9 @@ export default withPlayer(class App extends Component {
 		super(props);
 		this.registerIPCListeners();
 		this.state = {
-			height: window.innerHeight,
+			height: window.innerHeight-1,
+			windowControlHeight: 2,
+			playerHeight: 3
 		};
 	}
 
@@ -84,15 +86,15 @@ export default withPlayer(class App extends Component {
 	}
 
 	render() {
-		const top = 2, bottom = 3;
 		return (
 			<HashRouter>
 				<div style={{
-					paddingTop: `${top}em`,
-					paddingBottom: `${bottom}em`
+					display: 'grid',
+					gridTemplateRows: `${this.state.windowControlHeight}em auto ${this.state.playerHeight}em`,
+					overflow: 'hidden'
 				}}>
 					<WindowControls/>
-					<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
+					<div style={{height: `calc(${this.state.height}px - ${this.state.windowControlHeight + this.state.playerHeight}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>
 						<Switch>
 							<Route exact path="/" component={Library}/>
 							<Route path="/works/:workId/:bookName" render={({match}) => (
@@ -104,7 +106,7 @@ export default withPlayer(class App extends Component {
 							<Route path="/settings" component={Settings}/>
 							<Route path="/about" component={About}/>
 							<Route path="/setup" component={Setup}/>
-							<Route render={({location}) => (
+							<Route render={_ => (
 								<div style={{lineHeight: '1.5em'}}>
 									<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
 								</div>

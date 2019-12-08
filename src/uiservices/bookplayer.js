@@ -75,7 +75,7 @@ export default class BookPlayer {
 		this._tracks = this.book.tracks;
 
 		this._tracks.forEach(track => {
-			mm.parseFile(track.path).then(metadata => {
+			mm.parseFile(track.path, {duration:true}).then(metadata => {
 				this._tracks.find(t => t.path === track.path).meta = metadata;
 			}).catch(x => console.error("Failed to parse metadata", x))
 		});
