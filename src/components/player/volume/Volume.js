@@ -104,31 +104,29 @@ export default withPlayer(class Volume extends Component {
 		const barHeight = 4;
 
 		return (
-			<span>
-				<ProgressBar
-					width={containerWidth}
+			<ProgressBar
+				width={containerWidth}
+				height={handlerHeight}
+				barHeight={barHeight}
+				handlerWidth={handlerWidth}
+				translate={this.state.translate}
+				duration={this.duration}
+				onMouseDown={this._onMouseDownProgressBar}
+				onMouseOver={this._onMouseOverProgressBar}
+				onMouseOut={this._onMouseOutProgressBar}
+				colour={'var(--active-text-colour)'}
+				inactiveColour={'var(--inactive-text-colour)'}
+			>
+				<ProgressBarHandler
+					width={handlerWidth}
 					height={handlerHeight}
-					barHeight={barHeight}
-					handlerWidth={handlerWidth}
-					translate={this.state.translate}
-					duration={this.duration}
-					onMouseDown={this._onMouseDownProgressBar}
-					onMouseOver={this._onMouseOverProgressBar}
-					onMouseOut={this._onMouseOutProgressBar}
+					visibility={this.state.showHandler || this.holding}
+					translate={`translate(${this.state.translate - (handlerWidth / 2)})`}
+					onMouseDown={this._onMouseDownProgressBarHandler}
 					colour={'var(--active-text-colour)'}
 					inactiveColour={'var(--inactive-text-colour)'}
-				>
-					<ProgressBarHandler
-						width={handlerWidth}
-						height={handlerHeight}
-						visibility={this.state.showHandler || this.holding}
-						translate={`translate(${this.state.translate - (handlerWidth / 2)})`}
-						onMouseDown={this._onMouseDownProgressBarHandler}
-						colour={'var(--active-text-colour)'}
-						inactiveColour={'var(--inactive-text-colour)'}
-					/>
-				</ProgressBar>
-			</span>
+				/>
+			</ProgressBar>
 		);
 	}
 })

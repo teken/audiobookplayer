@@ -36,9 +36,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import withPlayer from "../player/withPlayer";
 
-//import { faSquare } from '@fontawesome/free-regular-svg-icons';
-//import { } from '@fontawesome/free-brands-svg-icons';
-
 const {ipcRenderer} = window.require('electron');
 
 library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolumeDown, faVolumeOff, faMapMarkerAlt,
@@ -97,7 +94,8 @@ export default withPlayer(class App extends Component {
 							<Route render={_ =>
 								<div style={{lineHeight: '1.5em'}}>
 									<h1>Well this is quite a issue you found yourself in,<br/> try heading back to the library</h1>
-								</div>}/>
+								</div>
+							}/>
 						</Switch>
 					</div>
 					<Player />
