@@ -15,6 +15,6 @@ ReactDOM.render(
 	<PlayerContext.Provider value={player}>
 		<App/>
 	</PlayerContext.Provider>,
-	document.getElementById('root')
+	document.getElementById('app-root')
 );
 registerServiceWorker();

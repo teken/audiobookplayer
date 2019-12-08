@@ -31,6 +31,16 @@
 	--warning-colour: #e81123;
 }
 
+ body {
+	 text-align: center;
+	 background: var(--background-colour);
+	 color: var(--primary-text-colour);
+	 -webkit-font-smoothing: antialiased;
+	 font-family: Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	 line-height: 1em;
+	 letter-spacing: 0.03em;
+ }
+
 @font-face {
 	font-family: 'Archivo';
 	font-style: normal;

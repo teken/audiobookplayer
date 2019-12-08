@@ -29,7 +29,7 @@ export default class Dropdown extends Component {
 					backgroundColor: 'var(--input-background-colour)',
 					cursor:'pointer'
 				}} />
-				<select type="text" readOnly='false' value={this.props.value} ref={this.textInput} onChange={this.handleChange}
+				<select type="text" readOnly={false} value={this.props.value} ref={this.textInput} onChange={this.handleChange}
 				 	style={{
 						padding: '0.6em',
 						width:'90%',

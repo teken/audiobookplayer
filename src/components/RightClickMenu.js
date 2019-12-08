@@ -1,8 +1,9 @@
 import React, {Component} from "react";
+import ReactDOM from 'react-dom';
 
 import idGenerator from "react-id-generator";
 
-
+const portalRoot = document.getElementById('context-root');
 
 export default class RightClickMenu extends Component {
 	constructor(props) {
@@ -24,12 +25,12 @@ export default class RightClickMenu extends Component {
 				show: false
 			});
 		} else {
-			const bounds = event.currentTarget.getBoundingClientRect();
 			const maxWidth = window.innerWidth - (this.state.width * 16) - 20;
+			const maxHeight = window.innerHeight - (this.state.width * 16);
 			this.setState({
 				show: true,
-				x: event.clientX > maxWidth ? maxWidth - bounds.left : event.clientX - bounds.left,
-				y: event.clientY - bounds.top
+				x: event.clientX > maxWidth ? maxWidth : event.clientX,
+				y: event.clientY > maxHeight ? maxHeight : event.clientY
 			});
 		}
 	}
@@ -49,49 +50,100 @@ export default class RightClickMenu extends Component {
 		if (callback) callback();
 	}
 
-	render() {
+	renderContextPortal() {
 		const options = this.props.options.filter(x => x);
-		return (
+		return ReactDOM.createPortal( <>
+			<div onClick={this._cancelContextMenu} style={{
+				display: this.state.show ? 'block' : 'none',
+				position:'fixed',
+				top: 0,
+				left: 0,
+				right: 0,
+				bottom: 0,
+				zIndex:'2000',
+				cursor: 'default'
+			}} />
 			<div style={{
-				position: 'relative',
-					...this.props.style
-			}} onContextMenu={this.state.show ? this._cancelContextMenu :this._onContextMenu}>
-				<div onClick={this._cancelContextMenu} style={{
-					display: this.state.show ? 'block' : 'none',
-					position:'fixed',
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					zIndex:'2000',
-					cursor: 'default'
-				}} />
-				<div style={{
-					display: this.state.show ? 'block' : 'none',
-					position: 'absolute',
-					top: this.state.y,
-					left: this.state.x,
-					zIndex:'2001',
-					background: 'rgba(0,0,0,0.8)',
-					padding: '0.3em',
-					width: `${this.state.width}em`,
-					textAlign: 'left',
-				}}>
-					<div>
+				display: this.state.show ? 'block' : 'none',
+				position: 'absolute',
+				top: this.state.y,
+				left: this.state.x,
+				zIndex:'2001',
+				background: 'rgba(0,0,0,0.8)',
+				padding: '0.3em',
+				width: `${this.state.width}em`,
+				textAlign: 'left',
+				color: 'var(--active-text-colour)'
+			}}>
+				<div>
 					{options.map((item, index) => {
 						const notLast = options.length > index + 1;
 						return <div key={idGenerator('right_click')} style={{
 							padding: index === 0 ? '0 0 0.15em' : notLast ? '0.15em 0' : '0.15em 0 0',
-							borderBottom: notLast ? `.1em solid ${'var(--secondary-text-colour)'}` : '',
+							borderBottom: notLast ? `.1em solid var(--secondary-text-colour)` : '',
 							cursor: 'pointer'
 						}} onClick={() => this._click(item.onClick)}>
 							{item.name}
 						</div>
 					})}
-					</div>
 				</div>
-				{this.props.children}
 			</div>
+		</>, portalRoot)
+	}
+
+	render() {
+		return (
+			<>
+				<div style={this.props.style} onContextMenu={this.state.show ? this._cancelContextMenu :this._onContextMenu}>
+					{this.props.children}</div>
+				{this.renderContextPortal()}
+			</>
 		);
 	}
+
+	// render() {
+	// 	const options = this.props.options.filter(x => x);
+	// 	return (
+	// 		<div style={{
+	// 			position: 'relative',
+	// 			...this.props.style
+	// 		}} onContextMenu={this.state.show ? this._cancelContextMenu :this._onContextMenu}>
+	// 			<div onClick={this._cancelContextMenu} style={{
+	// 				display: this.state.show ? 'block' : 'none',
+	// 				position:'fixed',
+	// 				top: 0,
+	// 				left: 0,
+	// 				right: 0,
+	// 				bottom: 0,
+	// 				zIndex:'2000',
+	// 				cursor: 'default'
+	// 			}} />
+	// 			<div style={{
+	// 				display: this.state.show ? 'block' : 'none',
+	// 				position: 'absolute',
+	// 				top: this.state.y,
+	// 				left: this.state.x,
+	// 				zIndex:'2001',
+	// 				background: 'rgba(0,0,0,0.8)',
+	// 				padding: '0.3em',
+	// 				width: `${this.state.width}em`,
+	// 				textAlign: 'left',
+	// 			}}>
+	// 				<div>
+	// 					{options.map((item, index) => {
+	// 						const notLast = options.length > index + 1;
+	// 						return <div key={idGenerator('right_click')} style={{
+	// 							padding: index === 0 ? '0 0 0.15em' : notLast ? '0.15em 0' : '0.15em 0 0',
+	// 							borderBottom: notLast ? `.1em solid ${'var(--secondary-text-colour)'}` : '',
+	// 							cursor: 'pointer'
+	// 						}} onClick={() => this._click(item.onClick)}>
+	// 							{item.name}
+	// 						</div>
+	// 					})}
+	// 				</div>
+	// 			</div>
+	// 			{this.props.children}
+	// 		</div>
+	// 	);
+	// }
 }

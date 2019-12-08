@@ -24,6 +24,7 @@ export default class FolderSelector extends Component {
 		if (value) {
 			this.textInput.current.value = value[0];
 			this.props.onChange({target: this.textInput.current});
+			this.setState({value: value[0]});
 		}
 	}
 
@@ -37,7 +38,7 @@ export default class FolderSelector extends Component {
 					backgroundColor: 'var(--input-background-colour)',
 					cursor:'pointer'
 				}} />
-				<input type="text" readOnly={false} value={this.props.value} ref={this.textInput} onClick={this.handleClick} onChange={this.props.onChange}
+				<input type="text" readOnly={true} defaultValue={this.props.value} ref={this.textInput} onClick={this.handleClick}
 				 	style={{
 						padding: '0.6em',
 						width:'90%',

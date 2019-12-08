@@ -1,7 +1,9 @@
 import React, {Component} from "react";
-
+import ReactDOM from 'react-dom';
 import ButtonRow from "../settings/ButtonRow";
 import Loading from "../loading/Loading";
+
+const portalRoot = document.getElementById('modal-root');
 
 export default class Modal extends Component {
 
@@ -77,7 +79,7 @@ export default class Modal extends Component {
 			justifyContent: 'center',
 			alignItems: 'center',
 		};
-		return (
+		return ReactDOM.createPortal(
 			<div style={{
 				position:'fixed',
 				top: 0,
@@ -102,6 +104,6 @@ export default class Modal extends Component {
 					</div>
 				</div>
 			</div>
-		);
+		, portalRoot);
 	}
 }

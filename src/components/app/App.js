@@ -88,15 +88,8 @@ export default withPlayer(class App extends Component {
 		return (
 			<HashRouter>
 				<div style={{
-					textAlign: 'center',
 					paddingTop: `${top}em`,
-					paddingBottom: `${bottom}em`,
-					background: 'var(--background-colour)',
-					color: 'var(--primary-text-colour)',
-					WebkitFontSmoothing: 'antialiased',
-					fontFamily: 'Archivo, Open Sans, "Helvetica Neue", Helvetica, Arial, sans-serif',
-					lineHeight: '1em',
-					letterSpacing: '0.03em'
+					paddingBottom: `${bottom}em`
 				}}>
 					<WindowControls/>
 					<div style={{height: `calc(${this.state.height}px - ${top + bottom}em)`, overflowY:'scroll', overflowX:'hidden', marginRight:'0.1em'}}>

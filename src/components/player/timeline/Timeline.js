@@ -180,7 +180,7 @@ export default withPlayer(class Timeline extends Component {
 					<ProgressBarHandler
 						width={handlerWidth}
 						height={handlerHeight}
-						visibility={this.props.player.isLoaded && (this.state.showHandler || this.holding)}
+						visibility={this.props.player.isLoaded && !isNaN(this.props.player.duration) && (this.state.showHandler || this.holding)}
 						translate={`translate(${this.state.translate - (handlerWidth / 2)})`}
 						onMouseDown={this._onMouseDownProgressBarHandler}
 						colour={'var(--active-text-colour)'}
