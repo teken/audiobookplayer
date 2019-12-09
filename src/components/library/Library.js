@@ -28,7 +28,7 @@ export default withRouter(withPlayer(class Library extends Component {
 			states: [],
 			flattenedWorks:[],
 			searchTerm: "",
-			//intervalId: null,
+			searchTimeoutId: null,
 			libraryDisplayAuthors: settings.libraryDisplayAuthors,
 			libraryStyle: settings.libraryStyle,
 			loading: true
@@ -56,7 +56,13 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	onSearchBoxChange(event) {
-		this.search(event.target.value.trimLeft());
+		if (this.state.searchTimeoutId != null) clearTimeout(this.state.searchTimeoutId)
+		const searchString = event.target.value.trimLeft();
+		const searchTimeoutId = setTimeout(_ => this.search(searchString), 500);
+		this.setState({
+			searchTimeoutId,
+			searchTerm: searchString,
+		});
 	}
 
 	componentDidMount() {
@@ -65,12 +71,11 @@ export default withRouter(withPlayer(class Library extends Component {
 			this.props.history.push("/setup");
 			return;
 		}
-		//setTimeout(() => {
-			this.loadData();
-			this.setState({
-				loading:false
-			});
-		//}, 0);
+		
+		this.loadData();
+		this.setState({
+			loading:false
+		});
 		window.addEventListener('keydown', this.listenKeyboard.bind(this), true);
 	}
 
@@ -278,7 +283,7 @@ export default withRouter(withPlayer(class Library extends Component {
 
 	search(text) {
 		this.setState({
-			searchTerm: text,
+			searchTimeoutId: null,
 			results: this.fuse.search(text)
 		})
 	}
