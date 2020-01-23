@@ -26,7 +26,7 @@ export default class View extends Component {
 							<h1 style={{letterSpacing: '0.03em'}}>{this.props.savedTimesTitle}</h1>
 							<div style={{
 								display: 'grid',
-								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,
+								gridTemplateColumns: `repeat(auto-fit,minmax(${this.props.cellWidthDivider}px, 1fr))`,
 								gridGap: '1em',
 								margin: '1em'
 							}}>
@@ -48,7 +48,7 @@ export default class View extends Component {
 							}}>{this.props.libraryTitle}</h1>
 							<div style={{
 								display: 'grid',
-								gridTemplateColumns: `repeat(${this.gridWidthCellCount}, 1fr)`,
+								gridTemplateColumns: `repeat(auto-fit,minmax(${this.props.cellWidthDivider}px, 1fr))`,
 								gridGap: '1em',
 								margin: '1em'
 							}}>

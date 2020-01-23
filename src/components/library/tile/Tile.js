@@ -11,7 +11,7 @@ export default class Tile extends Item {
 					minWidth: '11em',
 					minHeight: '11em',
 					maxWidth: '100%',
-					maxHeight: '12.5em'
+					// maxHeight: '12.5em'
 				}}/></LazyLoad>;
 		}
 		return '';

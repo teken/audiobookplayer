@@ -71,7 +71,7 @@ export default withRouter(withPlayer(class Library extends Component {
 			this.props.history.push("/setup");
 			return;
 		}
-		
+
 		this.loadData();
 		this.setState({
 			loading:false
