@@ -1,4 +1,7 @@
 language: node_js
+branches:
+  only:
+    - master
 matrix:
   allow_failures:
     - os: windows
