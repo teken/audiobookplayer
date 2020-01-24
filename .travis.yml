@@ -21,6 +21,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "windows" ]; then powershell -command 'Set-MpPreference -DisableRealtimeMonitoring $true'; fi
 install:
   # - cd ./packages/audiobookplayer
+  - npm install -g yarn
   - yarn install
 env:
   - DEBUG=electron-builder BUILD_COMMIT_SHA1="$TRAVIS_COMMIT" NODE_ENV=production NPM_CONFIG_PRODUCTION=false
