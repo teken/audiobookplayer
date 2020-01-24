@@ -3,8 +3,6 @@ branches:
   only:
     - master
 matrix:
-  allow_failures:
-    - os: windows
   fast_finish: true
   include:
     - name: "build on windows"
