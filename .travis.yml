@@ -3,8 +3,6 @@ branches:
   only:
     - master
 matrix:
-  allow_failures:
-    - os: windows
   fast_finish: true
   include:
     - name: "build on windows"
@@ -29,6 +27,6 @@ script:
   - echo $TRAVIS_COMMIT
   - echo $BUILD_COMMIT_SHA1
   - yarn run build
-  - if [ "$TRAVIS_OS_NAME" == "windows" ]; then powershell -command 'yarn release:win'; fi
+  - if [ "$TRAVIS_OS_NAME" == "windows" ]; then yarn release:win; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then yarn release:mac; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then yarn release:linux; fi
