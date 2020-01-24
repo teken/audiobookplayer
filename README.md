@@ -1,5 +1,6 @@
 # AudioBookPlayer
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Build Status](https://travis-ci.org/teken/audiobookplayer.svg?branch=master)](https://travis-ci.org/teken/audiobookplayer)
 
 ## Download
 To download the software please head to [audiobookplayer.app](https://audiobookplayer.app/)
