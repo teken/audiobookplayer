@@ -9,8 +9,8 @@ module.exports = class LibraryService {
 			localLibrary.removeCollection('authors');
 			localLibrary.removeCollection('works');
 
-			localLibrary.addCollection('authors', {autoupdate: true});
-			localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
+			localLibrary.addCollection('authors', { autoupdate: true });
+			localLibrary.addCollection('works', { indices: ['author_id'], autoupdate: true });
 
 			localLibrary.saveDatabase((err) => !err ? res() : rej(err));
 		});
@@ -23,7 +23,7 @@ module.exports = class LibraryService {
 		return new Promise((res, rej) => {
 
 			const pathFile = settings.get('libraryPath'),
-			libraryStyle = settings.get('importStyle');
+				libraryStyle = settings.get('importStyle');
 
 			if (!fs.existsSync(pathFile)) rej("No library path");
 
@@ -31,8 +31,8 @@ module.exports = class LibraryService {
 				authors = localLibrary.getCollection('authors'),
 				works = localLibrary.getCollection('works');
 
-			if (!authors) authors = localLibrary.addCollection('authors', {autoupdate: true});
-			if (!works) works = localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
+			if (!authors) authors = localLibrary.addCollection('authors', { autoupdate: true });
+			if (!works) works = localLibrary.addCollection('works', { indices: ['author_id'], autoupdate: true });
 
 			if (!onlyLookForChanges) {
 				authors.clear();
@@ -42,15 +42,15 @@ module.exports = class LibraryService {
 			if (libraryStyle === 'folders' || libraryStyle === 'folder') {
 				for (const file of fileSystem) {
 					let author = null;
-					if (onlyLookForChanges) author = authors.findOne({'name': file.name});
-					if (author === null) author = authors.insert({name: file.name});
+					if (onlyLookForChanges) author = authors.findOne({ 'name': file.name });
+					if (author === null) author = authors.insert({ name: file.name });
 
 					try {
 						if (file.isDirectory()) file.children.forEach(work => {
 							if (work.isFile()) return;
 							let record = null;
-							if (onlyLookForChanges) record = works.findOne({'name': file.name});
-							if (record === null) record = {name: work.name, author_id: author.$loki};
+							if (onlyLookForChanges) record = works.findOne({ 'name': file.name });
+							if (record === null) record = { name: work.name, author_id: author.$loki };
 
 							if (work.children[0].isDirectory()) { //series
 								record.type = 'SERIES';
@@ -77,14 +77,14 @@ module.exports = class LibraryService {
 							delete b.children;
 							return i;
 						} else return a.concat(b);
-					} , [])
+					}, [])
 					.reduce((a, b) => {
 						if (b.isDirectory()) {
 							let i = a.concat(b.children);
 							delete b.children;
 							return i;
 						} else return a.concat(b);
-					} , []);
+					}, []);
 
 				let files = fileSystem
 					.filter(x => x.isFile())
@@ -92,7 +92,7 @@ module.exports = class LibraryService {
 						const fileParts = file.name.split("."),
 							fileExtension = fileParts[fileParts.length - 1].toLowerCase();
 						return audioFileExtensions.indexOf(fileExtension) > -1;
-					}).map(x => { return {path: x.path, name: x.name}});
+					}).map(x => { return { path: x.path, name: x.name } });
 				console.log("loading metadata")
 				for (const item of files) {
 					console.log(item.name)
@@ -100,11 +100,11 @@ module.exports = class LibraryService {
 				}
 				console.log("loaded metadata")
 				for (const file of files) {
-					let author = authors.findOne({'name': file.metadata.artist});
-					if (author === null) author = authors.insert({name: file.metadata.artist});
+					let author = authors.findOne({ 'name': file.metadata.artist });
+					if (author === null) author = authors.insert({ name: file.metadata.artist });
 
-					let record = works.findOne({'name': file.metadata.album});
-					if (record === null) record = {name: file.metadata.album, author_id: author.$loki, type : 'BOOK', art:[], tracks:[], info:[]};
+					let record = works.findOne({ 'name': file.metadata.album });
+					if (record === null) record = { name: file.metadata.album, author_id: author.$loki, type: 'BOOK', art: [], tracks: [], info: [] };
 
 					record.tracks.push(file);
 
@@ -116,7 +116,7 @@ module.exports = class LibraryService {
 			}
 
 			localLibrary.saveDatabase((err) => {
-				console.log(new Date().toISOString()+": "+(err ? "error : " + err : "database saved."));
+				console.log(new Date().toISOString() + ": " + (err ? "error : " + err : "database saved."));
 				!err ? res() : rej(err);
 			});
 		});
@@ -138,7 +138,7 @@ module.exports = class LibraryService {
 		const audioFileExtensions = ["mp3", "m4b", "m4a"],
 			imageFileExtensions = ["jpg", "jpeg", "png"],
 			infoFileExtensions = ["cue", "m3u"];
-		let record = {type : 'BOOK', name:book.name, author_id:authorId, art:[], tracks:[], info:[]};
+		let record = { type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: [] };
 		book.children.forEach(file => {
 			const fileParts = file.name.split("."),
 				fileExtension = fileParts[fileParts.length - 1].toLowerCase();

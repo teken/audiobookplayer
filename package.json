@@ -27,13 +27,15 @@
   "main": "public/electron.js",
   "homepage": "./",
   "scripts": {
-    "start": "set BROWSER=none&&react-scripts start",
+    "start": "yarn build && yarn electron",
+    "start:dev": "concurrently -k -n webpack,electron \"yarn start:webpack\" \"yarn start:electron:dev\"",
+    "start:webpack": "set BROWSER=none&&react-scripts start",
+    "start:electron": "set NODE_ENV=development && electron .",
+    "start:electron:dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
     "build": "react-scripts build",
     "lint": "react-scripts lint",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "electron": "set NODE_ENV=development && electron .",
-    "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
     "pack": "yarn build && electron-builder --dir",
     "dist": "yarn build && electron-builder",
     "dist:linux": "yarn build && electron-builder --linux",
@@ -49,8 +51,9 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
-    "electron": "7.1.2",
-    "electron-builder": "21.2.0"
+    "concurrently": "^5.1.0",
+    "electron": "8.0.1",
+    "electron-builder": "22.3.2"
   },
   "build": {
     "appId": "app.AudioBookPlayer",
