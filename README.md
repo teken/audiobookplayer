@@ -5,8 +5,6 @@
 ## Download
 To download the software please head to [audiobookplayer.app](https://audiobookplayer.app/)
 
-## Development Help
-
 ## Help
 Please check out the official [discord server](https://discord.gg/kks2tQQ)
 
