@@ -106,7 +106,7 @@ export default withRouter(class Settings extends Component {
 			self.setState({
 				showReimport: false
 			});
-		})
+		});
 		ipcRenderer.send('library.reimport');
 	}
 
@@ -158,7 +158,7 @@ export default withRouter(class Settings extends Component {
 					<Setting label="Library Import Style">
 						<Dropdown value={this.state.settings.libraryImportStyle} options={[
 							{name:'Folder Structure', value:'folder'},
-							// {name:'File Metadata', value:'metadata'}
+							{name:'File Metadata', value:'metadata'}
 						]} onChange={(event) => this.handleChange(event, "libraryImportStyle")} />
 					</Setting>
 					<Setting>

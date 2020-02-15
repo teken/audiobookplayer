@@ -91,8 +91,8 @@ module.exports = class LibraryService {
         });
       console.log("loading metadata");
       for (const item of files) {
-        console.log(item.name)
-        // item.metadata = (await this.getTrackMetaData(item.path)).common
+        console.log(item.name);
+        item.metadata = (await mm.parseFile(item.path)).common;
       }
       console.log("loaded metadata");
       for (const file of files) {
@@ -157,35 +157,32 @@ module.exports = class LibraryService {
     return record;
   };
 
-	static getTrackMetaData(filePath) {
-		return mm.parseFile(filePath);
-	}
-	//
-	// static mapTrackLengths(authorsCollection, worksCollection) {
-	// 	let works = worksCollection.chain().data();
-	// 	works.forEach(work => {
-	// 		//const author = authorsCollection.get(work.author_id);
-	// 		if (work.type === 'SERIES') {
-	// 			work.books.filter(x => x !== undefined).forEach(book => {
-	// 				book.tracks.forEach(track => {
-	// 					this.getTrackMetaData(track.path).then( metadata => {
-	// 						console.log(track.path, metadata);
-	// 						track.meta = metadata;
-	// 						worksCollection.update(work);
-	// 					});
-	//
-	// 				});
-	// 			});
-	// 		} else {
-	// 			work.tracks.forEach(track => {
-	// 				this.getTrackMetaData(track.path).then( metadata => {
-	// 					console.log(track.path, metadata);
-	// 					track.meta = metadata;
-	// 					worksCollection.update(work);
-	// 				});
-	//
-	// 			})
-	// 		}
-	// 	});
-	// }
+  //
+  // static mapTrackLengths(authorsCollection, worksCollection) {
+  // 	let works = worksCollection.chain().data();
+  // 	works.forEach(work => {
+  // 		//const author = authorsCollection.get(work.author_id);
+  // 		if (work.type === 'SERIES') {
+  // 			work.books.filter(x => x !== undefined).forEach(book => {
+  // 				book.tracks.forEach(track => {
+  // 					this.getTrackMetaData(track.path).then( metadata => {
+  // 						console.log(track.path, metadata);
+  // 						track.meta = metadata;
+  // 						worksCollection.update(work);
+  // 					});
+  //
+  // 				});
+  // 			});
+  // 		} else {
+  // 			work.tracks.forEach(track => {
+  // 				this.getTrackMetaData(track.path).then( metadata => {
+  // 					console.log(track.path, metadata);
+  // 					track.meta = metadata;
+  // 					worksCollection.update(work);
+  // 				});
+  //
+  // 			})
+  // 		}
+  // 	});
+  // }
 };
