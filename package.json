@@ -27,10 +27,10 @@
   "main": "public/electron.js",
   "homepage": "./",
   "scripts": {
-    "start": "yarn build && yarn electron",
+    "start": "yarn build && yarn start:electron",
     "start:dev": "concurrently -k -n webpack,electron \"yarn start:webpack\" \"yarn start:electron:dev\"",
     "start:webpack": "set BROWSER=none&&react-scripts start",
-    "start:electron": "set NODE_ENV=development && electron .",
+    "start:electron": "electron .",
     "start:electron:dev": "set ELECTRON_START_URL=http://localhost:3000 && set NODE_ENV=development && electron .",
     "build": "react-scripts build",
     "lint": "react-scripts lint",
