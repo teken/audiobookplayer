@@ -4,180 +4,185 @@ const mm = require('music-metadata');
 
 module.exports = class LibraryService {
 
-	static clearLibrary(localLibrary) {
-		return new Promise((res, rej) => {
-			localLibrary.removeCollection('authors');
-			localLibrary.removeCollection('works');
+  static clearLibrary(localLibrary) {
+    localLibrary.removeCollection('authors');
+    localLibrary.removeCollection('works');
 
-			localLibrary.addCollection('authors', { autoupdate: true });
-			localLibrary.addCollection('works', { indices: ['author_id'], autoupdate: true });
+    localLibrary.addCollection('authors', {autoupdate: true});
+    localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
 
-			localLibrary.saveDatabase((err) => !err ? res() : rej(err));
-		});
-	}
+    return this.saveDatabase(localLibrary);
+  }
 
-	/**
-	 * @param {boolean} onlyLookForChanges
-	 */
-	static fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
-		return new Promise((res, rej) => {
+  /**
+   * @param {boolean} onlyLookForChanges
+   */
+  static async fileSystemToLibrary(onlyLookForChanges, localLibrary, settings) {
 
-			const pathFile = settings.get('libraryPath'),
-				libraryStyle = settings.get('importStyle');
+    const pathFile = settings.get('libraryPath');
+    const libraryStyle = settings.get('importStyle');
 
-			if (!fs.existsSync(pathFile)) rej("No library path");
+    if (!fs.existsSync(pathFile)) throw new Error('No library path');
 
-			let fileSystem = this.fileRecursiveStatLookup(pathFile),
-				authors = localLibrary.getCollection('authors'),
-				works = localLibrary.getCollection('works');
+    let fileSystem = this.fileRecursiveStatLookup(pathFile);
+    const authors = localLibrary.getCollection('authors') || localLibrary.addCollection('authors', {autoupdate: true});
+    const works = localLibrary.getCollection('works') || localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
 
-			if (!authors) authors = localLibrary.addCollection('authors', { autoupdate: true });
-			if (!works) works = localLibrary.addCollection('works', { indices: ['author_id'], autoupdate: true });
+    if (!onlyLookForChanges) {
+      authors.clear();
+      works.clear();
+    }
 
-			if (!onlyLookForChanges) {
-				authors.clear();
-				works.clear();
-			}
+    if (libraryStyle === 'folders' || libraryStyle === 'folder') {
+      for (const file of fileSystem) {
+        let author = null;
+        if (onlyLookForChanges) author = authors.findOne({'name': file.name});
+        if (author === null) author = authors.insert({name: file.name});
 
-			if (libraryStyle === 'folders' || libraryStyle === 'folder') {
-				for (const file of fileSystem) {
-					let author = null;
-					if (onlyLookForChanges) author = authors.findOne({ 'name': file.name });
-					if (author === null) author = authors.insert({ name: file.name });
+        try {
+          if (file.isDirectory()) file.children.forEach(work => {
+            if (work.isFile()) return;
+            let record = null;
+            if (onlyLookForChanges) record = works.findOne({'name': file.name});
+            if (record === null) record = {name: work.name, author_id: author.$loki};
 
-					try {
-						if (file.isDirectory()) file.children.forEach(work => {
-							if (work.isFile()) return;
-							let record = null;
-							if (onlyLookForChanges) record = works.findOne({ 'name': file.name });
-							if (record === null) record = { name: work.name, author_id: author.$loki };
+            if (work.children[0].isDirectory()) { //series
+              record.type = 'SERIES';
+              record.books = work.children.map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
+            } else { //file
+              record = Object.assign(record, this.mapBookObject(work, author.$loki));
+            }
 
-							if (work.children[0].isDirectory()) { //series
-								record.type = 'SERIES';
-								record.books = work.children.map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
-							} else { //file
-								record = Object.assign(record, this.mapBookObject(work, author.$loki));
-							}
+            if (record.$loki) works.update(record);
+            else works.insert(record);
+          });
+        } catch (e) {
+          console.log(new Date().toISOString() + `: error : ${e}`);
+        }
+      }
+    } else if (libraryStyle === 'metadata') {
+      const audioFileExtensions = ["mp3", "m4b", "m4a"];
 
-							if (record.$loki) works.update(record);
-							else works.insert(record);
-						});
-					} catch (e) {
-						console.log(new Date().toISOString() + `: error : ${e}`);
-					}
-				}
-			} else if (libraryStyle === 'metadata') {
-				const audioFileExtensions = ["mp3", "m4b", "m4a"];
+      fileSystem = fileSystem.map(x => x.children)
+        .reduce((a, b) => a.concat(b), [])
+        .reduce((a, b) => {
+          if (b.isDirectory()) {
+            let i = a.concat(b.children);
+            delete b.children;
+            return i;
+          } else return a.concat(b);
+        }, [])
+        .reduce((a, b) => {
+          if (b.isDirectory()) {
+            let i = a.concat(b.children);
+            delete b.children;
+            return i;
+          } else return a.concat(b);
+        }, []);
 
-				fileSystem = fileSystem.map(x => x.children)
-					.reduce((a, b) => a.concat(b), [])
-					.reduce((a, b) => {
-						if (b.isDirectory()) {
-							let i = a.concat(b.children);
-							delete b.children;
-							return i;
-						} else return a.concat(b);
-					}, [])
-					.reduce((a, b) => {
-						if (b.isDirectory()) {
-							let i = a.concat(b.children);
-							delete b.children;
-							return i;
-						} else return a.concat(b);
-					}, []);
+      let files = fileSystem
+        .filter(x => x.isFile())
+        .filter(file => {
+          const fileParts = file.name.split("."),
+            fileExtension = fileParts[fileParts.length - 1].toLowerCase();
+          return audioFileExtensions.indexOf(fileExtension) > -1;
+        }).map(x => {
+          return {path: x.path, name: x.name}
+        });
+      console.log("loading metadata");
+      for (const item of files) {
+        console.log(item.name);
+        item.metadata = (await mm.parseFile(item.path)).common;
+      }
+      console.log("loaded metadata");
+      for (const file of files) {
+        let author = authors.findOne({'name': file.metadata.artist});
+        if (author === null) author = authors.insert({name: file.metadata.artist});
 
-				let files = fileSystem
-					.filter(x => x.isFile())
-					.filter(file => {
-						const fileParts = file.name.split("."),
-							fileExtension = fileParts[fileParts.length - 1].toLowerCase();
-						return audioFileExtensions.indexOf(fileExtension) > -1;
-					}).map(x => { return { path: x.path, name: x.name } });
-				console.log("loading metadata")
-				for (const item of files) {
-					console.log(item.name)
-					// item.metadata = (await this.getTrackMetaData(item.path)).common
-				}
-				console.log("loaded metadata")
-				for (const file of files) {
-					let author = authors.findOne({ 'name': file.metadata.artist });
-					if (author === null) author = authors.insert({ name: file.metadata.artist });
+        let record = works.findOne({'name': file.metadata.album});
+        if (record === null) record = {
+          name: file.metadata.album,
+          author_id: author.$loki,
+          type: 'BOOK',
+          art: [],
+          tracks: [],
+          info: []
+        };
 
-					let record = works.findOne({ 'name': file.metadata.album });
-					if (record === null) record = { name: file.metadata.album, author_id: author.$loki, type: 'BOOK', art: [], tracks: [], info: [] };
+        record.tracks.push(file);
 
-					record.tracks.push(file);
+        if (record.$loki) works.update(record);
+        else works.insert(record);
+      }
+    } else {
+      throw new Error(`Unknown Library Style '${libraryStyle}'`);
+    }
 
-					if (record.$loki) works.update(record);
-					else works.insert(record);
-				}
-			} else {
-				rej(`Unknown Library Style '${libraryStyle}'`);
-			}
+    await this.saveDatabase(localLibrary);
+  }
 
-			localLibrary.saveDatabase((err) => {
+  static saveDatabase(localLibrary) {
+  	return new Promise((resolve, reject) => {
+			localLibrary.saveDatabase(err => {
 				console.log(new Date().toISOString() + ": " + (err ? "error : " + err : "database saved."));
-				!err ? res() : rej(err);
+				!err ? resolve() : reject(err);
 			});
 		});
 	}
 
-	static fileRecursiveStatLookup(pathURL) {
-		return fs.readdirSync(pathURL).map(file => {
-			let subPath = path.join(pathURL, file),
-				stats = fs.statSync(subPath);
-			stats.name = file;
-			stats.path = subPath;
-			if (stats.isDirectory()) stats.children = this.fileRecursiveStatLookup(subPath);
-			return stats;
-		});
-	}
+  static fileRecursiveStatLookup(pathURL) {
+    return fs.readdirSync(pathURL).map(file => {
+      let subPath = path.join(pathURL, file),
+        stats = fs.statSync(subPath);
+      stats.name = file;
+      stats.path = subPath;
+      if (stats.isDirectory()) stats.children = this.fileRecursiveStatLookup(subPath);
+      return stats;
+    });
+  }
 
-	static mapBookObject(book, authorId) {
-		if (book.isFile()) return;
-		const audioFileExtensions = ["mp3", "m4b", "m4a"],
-			imageFileExtensions = ["jpg", "jpeg", "png"],
-			infoFileExtensions = ["cue", "m3u"];
-		let record = { type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: [] };
-		book.children.forEach(file => {
-			const fileParts = file.name.split("."),
-				fileExtension = fileParts[fileParts.length - 1].toLowerCase();
-			if (audioFileExtensions.indexOf(fileExtension) > -1) record.tracks.push(file);
-			else if (imageFileExtensions.indexOf(fileExtension) > -1) record.art.push(file);
-			else if (infoFileExtensions.indexOf(fileExtension) > -1) record.info.push(file);
-		});
-		return record;
-	};
+  static mapBookObject(book, authorId) {
+    if (book.isFile()) return;
+    const audioFileExtensions = ["mp3", "m4b", "m4a"],
+      imageFileExtensions = ["jpg", "jpeg", "png"],
+      infoFileExtensions = ["cue", "m3u"];
+    let record = {type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: []};
+    book.children.forEach(file => {
+      const fileParts = file.name.split("."),
+        fileExtension = fileParts[fileParts.length - 1].toLowerCase();
+      if (audioFileExtensions.indexOf(fileExtension) > -1) record.tracks.push(file);
+      else if (imageFileExtensions.indexOf(fileExtension) > -1) record.art.push(file);
+      else if (infoFileExtensions.indexOf(fileExtension) > -1) record.info.push(file);
+    });
+    return record;
+  };
 
-	static getTrackMetaData(filePath) {
-		return mm.parseFile(filePath);
-	}
-	//
-	// static mapTrackLengths(authorsCollection, worksCollection) {
-	// 	let works = worksCollection.chain().data();
-	// 	works.forEach(work => {
-	// 		//const author = authorsCollection.get(work.author_id);
-	// 		if (work.type === 'SERIES') {
-	// 			work.books.filter(x => x !== undefined).forEach(book => {
-	// 				book.tracks.forEach(track => {
-	// 					this.getTrackMetaData(track.path).then( metadata => {
-	// 						console.log(track.path, metadata);
-	// 						track.meta = metadata;
-	// 						worksCollection.update(work);
-	// 					});
-	//
-	// 				});
-	// 			});
-	// 		} else {
-	// 			work.tracks.forEach(track => {
-	// 				this.getTrackMetaData(track.path).then( metadata => {
-	// 					console.log(track.path, metadata);
-	// 					track.meta = metadata;
-	// 					worksCollection.update(work);
-	// 				});
-	//
-	// 			})
-	// 		}
-	// 	});
-	// }
+  //
+  // static mapTrackLengths(authorsCollection, worksCollection) {
+  // 	let works = worksCollection.chain().data();
+  // 	works.forEach(work => {
+  // 		//const author = authorsCollection.get(work.author_id);
+  // 		if (work.type === 'SERIES') {
+  // 			work.books.filter(x => x !== undefined).forEach(book => {
+  // 				book.tracks.forEach(track => {
+  // 					this.getTrackMetaData(track.path).then( metadata => {
+  // 						console.log(track.path, metadata);
+  // 						track.meta = metadata;
+  // 						worksCollection.update(work);
+  // 					});
+  //
+  // 				});
+  // 			});
+  // 		} else {
+  // 			work.tracks.forEach(track => {
+  // 				this.getTrackMetaData(track.path).then( metadata => {
+  // 					console.log(track.path, metadata);
+  // 					track.meta = metadata;
+  // 					worksCollection.update(work);
+  // 				});
+  //
+  // 			})
+  // 		}
+  // 	});
+  // }
 };
