@@ -145,7 +145,7 @@ export default withRouter(withPlayer(class Detail extends Component {
 		const totalSize = data.map( track => track.size).reduce((a,v) => a + v, 0);
 		const totalLength = data.map( track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0);
 
-		const chapters = this.chapterService ? this.chapterService.chapters : [];
+		const chapters = (this.chapterService && this.chapterService.chapters) ? this.chapterService.chapters : [];
 
 		const widths = this.hasArtwork ? '25%' : '33%';
 
