@@ -1,6 +1,8 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const mm = require('music-metadata');
+const {app} = require('electron');
+const uuid = require('uuid');
 
 module.exports = class LibraryService {
 
@@ -24,9 +26,25 @@ module.exports = class LibraryService {
 
     if (!fs.existsSync(pathFile)) throw new Error('No library path');
 
+    const appData = app.getPath('userData');
+    const pathCoverCache = path.join(appData, 'covers');
+    if (await fs.pathExists(pathCoverCache)) {
+      console.log(`Clear cached cover-art files in ${pathCoverCache}`);
+      for (const cover of await fs.readdir(pathCoverCache)) {
+        const coverPath = path.join(pathCoverCache, cover);
+        await fs.remove(coverPath);
+      }
+    } else {
+      console.log(`Creating cover-art cache folder: ${pathCoverCache}`);
+      await fs.mkdirp(pathCoverCache);
+    }
+
     let fileSystem = this.fileRecursiveStatLookup(pathFile);
     const authors = localLibrary.getCollection('authors') || localLibrary.addCollection('authors', {autoupdate: true});
-    const works = localLibrary.getCollection('works') || localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
+    const works = localLibrary.getCollection('works') || localLibrary.addCollection('works', {
+      indices: ['author_id'],
+      autoupdate: true
+    });
 
     if (!onlyLookForChanges) {
       authors.clear();
@@ -90,12 +108,13 @@ module.exports = class LibraryService {
           return {path: x.path, name: x.name}
         });
       console.log("loading metadata");
-      for (const item of files) {
-        console.log(item.name);
-        item.metadata = (await mm.parseFile(item.path)).common;
+      for (const file of files) {
+        console.log(file.name);
+        file.metadata = (await mm.parseFile(file.path)).common;
       }
       console.log("loaded metadata");
       for (const file of files) {
+
         let author = authors.findOne({'name': file.metadata.artist});
         if (author === null) author = authors.insert({name: file.metadata.artist});
 
@@ -109,6 +128,16 @@ module.exports = class LibraryService {
           info: []
         };
 
+        // Cache cover art
+        if (record.tracks.length === 0 && file.metadata.picture) {
+          for (const picture of file.metadata.picture) {
+            const name = uuid.v4() + '.' + this.toExtension(picture.format);
+            const pathCover = path.join(pathCoverCache, name);
+            await fs.writeFile(pathCover, picture.data);
+            record.art.push({path: pathCover, format: picture.format, type: picture.type});
+          }
+        }
+
         record.tracks.push(file);
 
         if (record.$loki) works.update(record);
@@ -121,18 +150,34 @@ module.exports = class LibraryService {
     await this.saveDatabase(localLibrary);
   }
 
+  static toExtension(mime) {
+    switch (mime) {
+      case 'image/jpeg' :
+      case 'image/jpg' :
+        return 'jpg';
+      case 'image/gif' :
+        return 'gif';
+      case 'image/png' :
+        return 'png';
+      case 'image/x-ms-bmp' :
+        return 'bmp';
+      case 'image/svg+xml ' :
+        return 'svg';
+    }
+  }
+
   static saveDatabase(localLibrary) {
-  	return new Promise((resolve, reject) => {
-			localLibrary.saveDatabase(err => {
-				console.log(new Date().toISOString() + ": " + (err ? "error : " + err : "database saved."));
-				!err ? resolve() : reject(err);
-			});
-		});
-	}
+    return new Promise((resolve, reject) => {
+      localLibrary.saveDatabase(err => {
+        console.log(new Date().toISOString() + ": " + (err ? "error : " + err : "database saved."));
+        !err ? resolve() : reject(err);
+      });
+    });
+  }
 
   static fileRecursiveStatLookup(pathURL) {
-    return fs.readdirSync(pathURL).map(file => {
-      let subPath = path.join(pathURL, file),
+    return fs.readdir(pathURL).map(file => {
+      const subPath = path.join(pathURL, file),
         stats = fs.statSync(subPath);
       stats.name = file;
       stats.path = subPath;
@@ -146,7 +191,7 @@ module.exports = class LibraryService {
     const audioFileExtensions = ["mp3", "m4b", "m4a"],
       imageFileExtensions = ["jpg", "jpeg", "png"],
       infoFileExtensions = ["cue", "m3u"];
-    let record = {type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: []};
+    const record = {type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: []};
     book.children.forEach(file => {
       const fileParts = file.name.split("."),
         fileExtension = fileParts[fileParts.length - 1].toLowerCase();
