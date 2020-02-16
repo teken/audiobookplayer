@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import ReactDOM from 'react-dom';
 import ButtonRow from "../settings/ButtonRow";
 import Loading from "../loading/Loading";
@@ -12,7 +12,7 @@ export default class Modal extends Component {
 		this.okClick = this.okClick.bind(this);
 		this.cancelClick = this.cancelClick.bind(this);
 		this.state = {
-			hidden:true
+			hidden: true
 		}
 	}
 	componentDidUpdate(prevProps, prevState) {
@@ -25,13 +25,11 @@ export default class Modal extends Component {
 	okClick() {
 		this.setState({ loading: true });
 		this.props.okOnClick && this.props.okOnClick();
-		this.hide();
 	}
 
 	cancelClick() {
 		this.setState({ loading: true });
 		this.props.cancelOnClick && this.props.cancelOnClick();
-		this.hide();
 	}
 
 	show() {
@@ -67,9 +65,9 @@ export default class Modal extends Component {
 			return <Loading />
 		} else {
 			return <ButtonRow buttonWidth={100} buttons={[
-				{value:"OK", onClick:this.okClick},
-				{value:"Cancel", onClick:this.cancelClick},
-			]}/>
+				{ value: "OK", onClick: this.okClick },
+				{ value: "Cancel", onClick: this.cancelClick },
+			]} />
 		}
 	}
 
@@ -81,14 +79,14 @@ export default class Modal extends Component {
 		};
 		return ReactDOM.createPortal(
 			<div style={{
-				position:'fixed',
+				position: 'fixed',
 				top: 0,
 				left: 0,
 				right: 0,
 				bottom: 0,
 				backgroundColor: 'rgba(0, 0, 0, .65)',
 				...centreStyle,
-				zIndex:'9000'
+				zIndex: '9000'
 			}}>
 				<div style={{
 					display: this.state.hidden ? 'none' : 'grid',
@@ -97,13 +95,13 @@ export default class Modal extends Component {
 					width: '90%',
 					height: '40%'
 				}}>
-					<div style={{padding:'0 1em', ...centreStyle}}>{this.title}</div>
-					<div style={{padding:'0 1em', color: 'var(--secondary-text-colour)', ...centreStyle}}>{this.body}</div>
-					<div style={{padding:'0 1em', ...centreStyle}}>
+					<div style={{ padding: '0 1em', ...centreStyle }}>{this.title}</div>
+					<div style={{ padding: '0 1em', color: 'var(--secondary-text-colour)', ...centreStyle }}>{this.body}</div>
+					<div style={{ padding: '0 1em', ...centreStyle }}>
 						{this.buttons}
 					</div>
 				</div>
 			</div>
-		, portalRoot);
+			, portalRoot);
 	}
 }

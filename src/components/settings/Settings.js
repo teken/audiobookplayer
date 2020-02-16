@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import {withRouter} from "react-router-dom";
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 import equal from "deep-equal";
 
 import Setting from "./Setting";
@@ -10,23 +10,23 @@ import Checkbox from "./Checkbox";
 
 import ConfirmModal from "../modal/ConfirmModal";
 
-const {ipcRenderer} = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 export default withRouter(class Settings extends Component {
 	constructor(props) {
 		super(props);
 
 		this.settingsObjects = [
-			{name:'libraryDataFolder', dataName:'libraryPath'},
-			{name:'dataDataFolder', dataName:'dataPath'},
-			{name:'libraryStyle', dataName:'libraryStyle'},
-			{name:'libraryDisplayAuthors', dataName:'libraryDisplayAuthors', type:'boolean'},
-			{name:'libraryImportStyle', dataName:'importStyle'},
+			{ name: 'libraryDataFolder', dataName: 'libraryPath' },
+			{ name: 'dataDataFolder', dataName: 'dataPath' },
+			{ name: 'libraryStyle', dataName: 'libraryStyle' },
+			{ name: 'libraryDisplayAuthors', dataName: 'libraryDisplayAuthors', type: 'boolean' },
+			{ name: 'libraryImportStyle', dataName: 'importStyle' },
 			//{name:'displayFirstRunWizard', dataName:'firstRun', type:'boolean'},
 		];
 		this.state = {
-			oldSettings:{},
-			settings:{}
+			oldSettings: {},
+			settings: {}
 		};
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.clearLibrary = this.clearLibrary.bind(this);
@@ -69,14 +69,14 @@ export default withRouter(class Settings extends Component {
 	handleChange(event, name) {
 		let settings = this.state.settings;
 		settings[name] = event.target.value;
-		this.setState({settings:settings});
+		this.setState({ settings: settings });
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
 		this.settingsObjects.forEach(item => {
 			if (this.state.oldSettings[item.name] !== this.state.settings[item.name])
-				ipcRenderer.send('settings.set', {name: item.dataName, value: this.state.settings[item.name]});
+				ipcRenderer.send('settings.set', { name: item.dataName, value: this.state.settings[item.name] });
 		});
 		this.props.history.push('/');
 	}
@@ -118,27 +118,27 @@ export default withRouter(class Settings extends Component {
 	}
 
 	buttons = [
-		{value:"Show Setup Wizard", onClick:() => this.props.history.push('/setup')},
+		{ value: "Show Setup Wizard", onClick: () => this.props.history.push('/setup') },
 		// {value:"Clear Library", onClick:() => this.setState({showClear: true})},
-		{value:"Re-Import Library", onClick:() => this.setState({showReimport: true})},
+		{ value: "Re-Import Library", onClick: () => this.setState({ showReimport: true }) },
 		// {value:"Scan for changes in Library", onClick:this.addDeltasToLibrary},
 	];
 
 	render() {
 		return (
-			<div style={{margin:'1em'}}>
+			<div style={{ margin: '1em' }}>
 				<ConfirmModal show={this.state.showClear}
-							  heading="Are you sure?"
-							  body="This will clear the library completely. Are you sure you want to do this?"
-							  okOnClick={this.clearLibrary} cancelOnClick={() => this.setState({showClear: false})} />
+					heading="Are you sure?"
+					body="This will clear the library completely. Are you sure you want to do this?"
+					okOnClick={this.clearLibrary} cancelOnClick={() => this.setState({ showClear: false })} />
 				<ConfirmModal show={this.state.showReimport}
-							  heading="Are you sure?"
-							  body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?"
-							  okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({showReimport: false})} />
+					heading="Are you sure?"
+					body="This will clear the library completely and then import everything from fresh. Are you sure you want to do this?"
+					okOnClick={this.reimportLibrary} cancelOnClick={() => this.setState({ showReimport: false })} />
 				<h1>Settings</h1>
-				<form onSubmit={this.handleSubmit} style={{color:'var(--secondary-text-colour)'}}>
+				<form onSubmit={this.handleSubmit} style={{ color: 'var(--secondary-text-colour)' }}>
 					<Setting label="Actions">
-						<ButtonRow buttons={this.buttons}/>
+						<ButtonRow buttons={this.buttons} />
 					</Setting>
 					<Setting label="Library Folder Path">
 						<FolderSelector value={this.state.settings.libraryDataFolder} onChange={(event) => this.handleChange(event, "libraryDataFolder")} />
@@ -148,8 +148,8 @@ export default withRouter(class Settings extends Component {
 					</Setting>
 					<Setting label="Library Style">
 						<Dropdown value={this.state.settings.libraryStyle} options={[
-							{name:'Grid', value:'grid'},
-							{name:'Rows', value:'row'}
+							{ name: 'Grid', value: 'grid' },
+							{ name: 'Rows', value: 'row' }
 						]} onChange={(event) => this.handleChange(event, "libraryStyle")} />
 					</Setting>
 					<Setting label="Display Authors in Library">
@@ -157,19 +157,19 @@ export default withRouter(class Settings extends Component {
 					</Setting>
 					<Setting label="Library Import Style">
 						<Dropdown value={this.state.settings.libraryImportStyle} options={[
-							{name:'Folder Structure', value:'folder'},
-							{name:'File Metadata', value:'metadata'}
+							{ name: 'Folder Structure', value: 'folder' },
+							{ name: 'File Metadata', value: 'metadata' }
 						]} onChange={(event) => this.handleChange(event, "libraryImportStyle")} />
 					</Setting>
 					<Setting>
 						<input type="submit" value="Save" disabled={!this.isDirty} style={{
-							padding:' 1em 4em',
-							fontSize:' 1.5em',
+							padding: ' 1em 4em',
+							fontSize: ' 1.5em',
 							border: 'none',
 							cursor: this.isDirty ? 'pointer' : 'default',
 							backgroundColor: 'var(--input-background-colour)',
 							color: this.isDirty ? 'var(--active-text-colour)' : 'var(--inactive-text-colour)',
-						}}/>
+						}} />
 					</Setting>
 				</form>
 			</div>

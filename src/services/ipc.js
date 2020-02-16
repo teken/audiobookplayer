@@ -1,4 +1,4 @@
-const {ipcMain} = require('electron');
+const { ipcMain } = require('electron');
 
 const LibraryService = require('./library');
 const SettingService = require('./settings');
@@ -29,7 +29,7 @@ module.exports = class IPCService {
 	}
 
 	get libraryCalls() {
-		return  [
+		return [
 			{
 				name: "library.getAll",
 				action: (event, args) => {
@@ -46,7 +46,7 @@ module.exports = class IPCService {
 				action: (event, args) => {
 					const authors = this.localLibrary.getCollection('authors');
 					const works = this.localLibrary.getCollection('works');
-					const fetchWorks = (mapFunction) => works ? works.mapReduce(mapFunction, x => x.reduce((a,v) => a + v,0)) : 0;
+					const fetchWorks = (mapFunction) => works ? works.mapReduce(mapFunction, x => x.reduce((a, v) => a + v, 0)) : 0;
 					event.returnValue = {
 						authors: authors ? authors.count() : 0,
 						series: fetchWorks(x => x.type === 'SERIES' ? 1 : 0),
@@ -167,31 +167,31 @@ module.exports = class IPCService {
 				action: (event, args) => {
 					let timings = this.bookTimings.getCollection('timings');
 					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
+						this.bookTimings.addCollection('timings', { indices: ['key'], autoupdate: true });
 						timings = this.bookTimings.getCollection('timings');
 					}
 					let items = timings.chain().data();
 					if (items === null) {
-						event.returnValue = {success: false, error:'No items found'};
+						event.returnValue = { success: false, error: 'No items found' };
 					} else {
-						event.returnValue = {success: true, times:items};
+						event.returnValue = { success: true, times: items };
 					}
 				}
 			},
 			{
 				name: "timings.get",
 				action: (event, args) => {
-					if (!args.key || args.key.length <= 0) event.returnValue = {success: false, error:'Key length to short'};
+					if (!args.key || args.key.length <= 0) event.returnValue = { success: false, error: 'Key length to short' };
 					let timings = this.bookTimings.getCollection('timings');
 					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
+						this.bookTimings.addCollection('timings', { indices: ['key'], autoupdate: true });
 						timings = this.bookTimings.getCollection('timings');
 					}
-					let item = timings.findOne({key:args.key});
+					let item = timings.findOne({ key: args.key });
 					if (item === null) {
-						event.returnValue = {success: false, error:'No item found'};
+						event.returnValue = { success: false, error: 'No item found' };
 					} else {
-						event.returnValue = {success: true, time:item.time};
+						event.returnValue = { success: true, time: item.time };
 					}
 				}
 			},
@@ -201,13 +201,13 @@ module.exports = class IPCService {
 					if (!args.key || args.key.length <= 0) return;
 					let timings = this.bookTimings.getCollection('timings');
 					if (timings === null) {
-						this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
+						this.bookTimings.addCollection('timings', { indices: ['key'], autoupdate: true });
 						timings = this.bookTimings.getCollection('timings');
 					}
 
-					let item = timings.findOne({key:args.key});
+					let item = timings.findOne({ key: args.key });
 					if (item === null) {
-						timings.insert({key:args.key, time: args.time});
+						timings.insert({ key: args.key, time: args.time });
 					} else {
 						item.time = args.time;
 						timings.update(item);
@@ -218,13 +218,13 @@ module.exports = class IPCService {
 				name: "timings.clear",
 				action: (event, args) => {
 					try {
-						if (!args.key || args.key.length <= 0) event.returnValue =  { success: false, error: 'Key length to short'};
+						if (!args.key || args.key.length <= 0) event.returnValue = { success: false, error: 'Key length to short' };
 						let timings = this.bookTimings.getCollection('timings');
 						if (timings === null) {
-							this.bookTimings.addCollection('timings', {indices: ['key'], autoupdate: true});
+							this.bookTimings.addCollection('timings', { indices: ['key'], autoupdate: true });
 							timings = this.bookTimings.getCollection('timings');
 						}
-						let items = timings.find({key: args.key});
+						let items = timings.find({ key: args.key });
 						if (items.length > 1) {
 							items.slice(1).map(x => timings.remove(x));
 						}
@@ -232,12 +232,12 @@ module.exports = class IPCService {
 						if (item !== null) {
 							delete item.time;
 							timings.update(item);
-							event.returnValue = {success: true};
+							event.returnValue = { success: true };
 						} else {
-							event.returnValue = {success: false, error: 'Failed to find time for provided key'};
+							event.returnValue = { success: false, error: 'Failed to find time for provided key' };
 						}
 					} catch (e) {
-						event.returnValue = {success: false, error: 'Exception in clear: '+e};
+						event.returnValue = { success: false, error: 'Exception in clear: ' + e };
 					}
 				}
 			}
