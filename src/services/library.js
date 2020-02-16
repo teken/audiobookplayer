@@ -4,6 +4,8 @@ const mm = require('music-metadata');
 const { app } = require('electron');
 const uuid = require('uuid');
 
+const audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'];
+
 module.exports = class LibraryService {
 
   static clearLibrary(localLibrary) {
@@ -80,8 +82,6 @@ module.exports = class LibraryService {
       }
     } else if (libraryStyle === 'metadata') {
 
-      const audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'];
-
       fileSystem = fileSystem.map(x => x.children)
         .reduce((a, b) => a.concat(b), [])
         .reduce((a, b) => {
@@ -123,7 +123,7 @@ module.exports = class LibraryService {
         const ch = Math.floor(i / chunkSize);
         all[ch] = [].concat((all[ch] || []), one);
         return all
-      }, [])
+      }, []);
       for (const files of chunkedFiles) {
         for (const file of files) {
           let author = authors.findOne({ 'name': file.metadata.artist });
@@ -203,9 +203,8 @@ module.exports = class LibraryService {
 
   static mapBookObject(book, authorId) {
     if (book.isFile()) return;
-    const audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'],
-      imageFileExtensions = ["jpg", "jpeg", "png"],
-      infoFileExtensions = ["cue", "m3u"];
+    const imageFileExtensions = ["jpg", "jpeg", "png"];
+    const infoFileExtensions = ["cue", "m3u"];
     const record = { type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: [] };
     book.children.forEach(file => {
       const fileParts = file.name.split("."),
