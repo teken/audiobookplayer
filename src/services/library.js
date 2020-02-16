@@ -135,7 +135,7 @@ module.exports = class LibraryService {
 
       console.log(`Saving in chunks of ${(files.length / 10)}`);
       let chunkedFiles = files.reduce((all, one, i) => {
-        const ch = Math.floor(i / (files.length / 10));
+        const ch = Math.floor(i / Math.floor(files.length / 10));
         all[ch] = [].concat((all[ch] || []), one);
         return all
       }, [])
