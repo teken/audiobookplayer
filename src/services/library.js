@@ -86,20 +86,20 @@ module.exports = class LibraryService {
         .reduce((a, b) => a.concat(b), [])
         .reduce((a, b) => {
           if (b.isDirectory()) {
-            let i = a.concat(b.children);
+            const i = a.concat(b.children);
             delete b.children;
             return i;
           } else return a.concat(b);
         }, [])
         .reduce((a, b) => {
           if (b.isDirectory()) {
-            let i = a.concat(b.children);
+            const i = a.concat(b.children);
             delete b.children;
             return i;
           } else return a.concat(b);
         }, []);
 
-      let files = fileSystem
+      const files = fileSystem
         .filter(x => x.isFile())
         .filter(file => {
           const fileParts = file.name.split("."),
@@ -139,10 +139,8 @@ module.exports = class LibraryService {
             info: []
           };
 
-          record.tracks.push(file);
-
           // Cache cover art
-          if (record.tracks.length === 0 && file.metadata.picture) {
+          if (record.track.length === 0 && file.metadata.picture) {
             for (const picture of file.metadata.picture) {
               const name = uuid.v4() + '.' + this.toExtension(picture.format);
               const pathCover = path.join(pathCoverCache, name);
