@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const mm = require('music-metadata');
-const {app} = require('electron');
+const { app } = require('electron');
 const uuid = require('uuid');
 
 module.exports = class LibraryService {
@@ -40,7 +40,7 @@ module.exports = class LibraryService {
     }
 
     let fileSystem = this.fileRecursiveStatLookup(pathFile);
-    const authors = localLibrary.getCollection('authors') || localLibrary.addCollection('authors', {autoupdate: true});
+    const authors = localLibrary.getCollection('authors') || localLibrary.addCollection('authors', { autoupdate: true });
     const works = localLibrary.getCollection('works') || localLibrary.addCollection('works', {
       indices: ['author_id'],
       autoupdate: true
@@ -116,22 +116,22 @@ module.exports = class LibraryService {
       console.log("loaded metadata");
       for (const file of files) {
 
-        let author = authors.findOne({'name': file.metadata.artist});
-        if (author === null) author = authors.insert({name: file.metadata.artist});
-
+        let author = authors.findOne({ 'name': file.metadata.artist });
+        if (author === null) author = authors.insert({ name: file.metadata.artist });
+      }
       console.log(`loaded metadata in ${end - start}`);
 
-        // Cache cover art
-        if (record.tracks.length === 0 && file.metadata.picture) {
-          for (const picture of file.metadata.picture) {
-            const name = uuid.v4() + '.' + this.toExtension(picture.format);
-            const pathCover = path.join(pathCoverCache, name);
-            await fs.writeFile(pathCover, picture.data);
-            record.art.push({path: pathCover, format: picture.format, type: picture.type});
-          }
+      // Cache cover art
+      if (record.tracks.length === 0 && file.metadata.picture) {
+        for (const picture of file.metadata.picture) {
+          const name = uuid.v4() + '.' + this.toExtension(picture.format);
+          const pathCover = path.join(pathCoverCache, name);
+          await fs.writeFile(pathCover, picture.data);
+          record.art.push({ path: pathCover, format: picture.format, type: picture.type });
         }
+      }
 
-        record.tracks.push(file);
+      record.tracks.push(file);
 
       console.log(`Saving in chunks of ${(files.length / 10)}`);
       let chunkedFiles = files.reduce((all, one, i) => {
@@ -170,16 +170,16 @@ module.exports = class LibraryService {
 
   static toExtension(mime) {
     switch (mime) {
-      case 'image/jpeg' :
-      case 'image/jpg' :
+      case 'image/jpeg':
+      case 'image/jpg':
         return 'jpg';
-      case 'image/gif' :
+      case 'image/gif':
         return 'gif';
-      case 'image/png' :
+      case 'image/png':
         return 'png';
-      case 'image/x-ms-bmp' :
+      case 'image/x-ms-bmp':
         return 'bmp';
-      case 'image/svg+xml ' :
+      case 'image/svg+xml ':
         return 'svg';
     }
   }
@@ -206,10 +206,10 @@ module.exports = class LibraryService {
 
   static mapBookObject(book, authorId) {
     if (book.isFile()) return;
-    const audioFileExtensions = ["mp3", "m4b", "m4a"],
+    const audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'],
       imageFileExtensions = ["jpg", "jpeg", "png"],
       infoFileExtensions = ["cue", "m3u"];
-    const record = {type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: []};
+    const record = { type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: [] };
     book.children.forEach(file => {
       const fileParts = file.name.split("."),
         fileExtension = fileParts[fileParts.length - 1].toLowerCase();
