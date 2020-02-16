@@ -109,16 +109,12 @@ module.exports = class LibraryService {
           return { path: x.path, name: x.name }
         });
       console.log("loading metadata");
+      const start = Date.now();
       for (const file of files) {
         console.log(file.name);
         file.metadata = (await mm.parseFile(file.path)).common;
       }
-      console.log("loaded metadata");
-      for (const file of files) {
-
-        let author = authors.findOne({ 'name': file.metadata.artist });
-        if (author === null) author = authors.insert({ name: file.metadata.artist });
-      }
+      const end = Date.now();
       console.log(`loaded metadata in ${end - start}`);
 
       // Cache cover art
