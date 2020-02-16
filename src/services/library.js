@@ -108,7 +108,7 @@ module.exports = class LibraryService {
         }).map(x => {
           return { path: x.path, name: x.name }
         });
-      console.log("loading metadata");
+      console.log(`loading metadata for ${files.length} files`);
       const start = Date.now();
       for (const file of files) {
         console.log(file.name);
@@ -117,21 +117,10 @@ module.exports = class LibraryService {
       const end = Date.now();
       console.log(`loaded metadata in ${end - start}`);
 
-      // Cache cover art
-      if (record.tracks.length === 0 && file.metadata.picture) {
-        for (const picture of file.metadata.picture) {
-          const name = uuid.v4() + '.' + this.toExtension(picture.format);
-          const pathCover = path.join(pathCoverCache, name);
-          await fs.writeFile(pathCover, picture.data);
-          record.art.push({ path: pathCover, format: picture.format, type: picture.type });
-        }
-      }
-
-      record.tracks.push(file);
-
-      console.log(`Saving in chunks of ${(files.length / 10)}`);
+      const chunkSize = 500;
+      console.log(`Saving in chunks of ${chunkSize}`);
       let chunkedFiles = files.reduce((all, one, i) => {
-        const ch = Math.floor(i / Math.floor(files.length / 10));
+        const ch = Math.floor(i / chunkSize);
         all[ch] = [].concat((all[ch] || []), one);
         return all
       }, [])
@@ -149,6 +138,18 @@ module.exports = class LibraryService {
             tracks: [],
             info: []
           };
+
+          record.tracks.push(file);
+
+          // Cache cover art
+          if (record.tracks.length === 0 && file.metadata.picture) {
+            for (const picture of file.metadata.picture) {
+              const name = uuid.v4() + '.' + this.toExtension(picture.format);
+              const pathCover = path.join(pathCoverCache, name);
+              await fs.writeFile(pathCover, picture.data);
+              record.art.push({ path: pathCover, format: picture.format, type: picture.type });
+            }
+          }
 
           record.tracks.push(file);
 
@@ -190,7 +191,7 @@ module.exports = class LibraryService {
   }
 
   static fileRecursiveStatLookup(pathURL) {
-    return fs.readdir(pathURL).map(file => {
+    return fs.readdirSync(pathURL).map(file => {
       const subPath = path.join(pathURL, file),
         stats = fs.statSync(subPath);
       stats.name = file;
