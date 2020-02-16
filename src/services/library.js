@@ -61,7 +61,8 @@ module.exports = class LibraryService {
         }
       }
     } else if (libraryStyle === 'metadata') {
-      const audioFileExtensions = ["mp3", "m4b", "m4a"];
+
+      const audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'];
 
       fileSystem = fileSystem.map(x => x.children)
         .reduce((a, b) => a.concat(b), [])
