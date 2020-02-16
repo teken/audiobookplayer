@@ -10,8 +10,8 @@ module.exports = class LibraryService {
     localLibrary.removeCollection('authors');
     localLibrary.removeCollection('works');
 
-    localLibrary.addCollection('authors', {autoupdate: true});
-    localLibrary.addCollection('works', {indices: ['author_id'], autoupdate: true});
+    localLibrary.addCollection('authors', { autoupdate: true });
+    localLibrary.addCollection('works', { indices: ['author_id'], autoupdate: true });
 
     return this.saveDatabase(localLibrary);
   }
@@ -54,15 +54,15 @@ module.exports = class LibraryService {
     if (libraryStyle === 'folders' || libraryStyle === 'folder') {
       for (const file of fileSystem) {
         let author = null;
-        if (onlyLookForChanges) author = authors.findOne({'name': file.name});
-        if (author === null) author = authors.insert({name: file.name});
+        if (onlyLookForChanges) author = authors.findOne({ 'name': file.name });
+        if (author === null) author = authors.insert({ name: file.name });
 
         try {
           if (file.isDirectory()) file.children.forEach(work => {
             if (work.isFile()) return;
             let record = null;
-            if (onlyLookForChanges) record = works.findOne({'name': file.name});
-            if (record === null) record = {name: work.name, author_id: author.$loki};
+            if (onlyLookForChanges) record = works.findOne({ 'name': file.name });
+            if (record === null) record = { name: work.name, author_id: author.$loki };
 
             if (work.children[0].isDirectory()) { //series
               record.type = 'SERIES';
@@ -106,7 +106,7 @@ module.exports = class LibraryService {
             fileExtension = fileParts[fileParts.length - 1].toLowerCase();
           return audioFileExtensions.indexOf(fileExtension) > -1;
         }).map(x => {
-          return {path: x.path, name: x.name}
+          return { path: x.path, name: x.name }
         });
       console.log("loading metadata");
       for (const file of files) {
@@ -119,15 +119,7 @@ module.exports = class LibraryService {
         let author = authors.findOne({'name': file.metadata.artist});
         if (author === null) author = authors.insert({name: file.metadata.artist});
 
-        let record = works.findOne({'name': file.metadata.album});
-        if (record === null) record = {
-          name: file.metadata.album,
-          author_id: author.$loki,
-          type: 'BOOK',
-          art: [],
-          tracks: [],
-          info: []
-        };
+      console.log(`loaded metadata in ${end - start}`);
 
         // Cache cover art
         if (record.tracks.length === 0 && file.metadata.picture) {
@@ -141,8 +133,33 @@ module.exports = class LibraryService {
 
         record.tracks.push(file);
 
-        if (record.$loki) works.update(record);
-        else works.insert(record);
+      console.log(`Saving in chunks of ${(files.length / 10)}`);
+      let chunkedFiles = files.reduce((all, one, i) => {
+        const ch = Math.floor(i / (files.length / 10));
+        all[ch] = [].concat((all[ch] || []), one);
+        return all
+      }, [])
+      for (const files of chunkedFiles) {
+        for (const file of files) {
+          let author = authors.findOne({ 'name': file.metadata.artist });
+          if (author === null) author = authors.insert({ name: file.metadata.artist });
+
+          let record = works.findOne({ 'name': file.metadata.album });
+          if (record === null) record = {
+            name: file.metadata.album,
+            author_id: author.$loki,
+            type: 'BOOK',
+            art: [],
+            tracks: [],
+            info: []
+          };
+
+          record.tracks.push(file);
+
+          if (record.$loki) works.update(record);
+          else works.insert(record);
+        }
+        await this.saveDatabase(localLibrary);
       }
     } else {
       throw new Error(`Unknown Library Style '${libraryStyle}'`);
