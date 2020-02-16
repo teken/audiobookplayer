@@ -119,9 +119,9 @@ export default withRouter(class Settings extends Component {
 
 	buttons = [
 		{ value: "Show Setup Wizard", onClick: () => this.props.history.push('/setup') },
-		// {value:"Clear Library", onClick:() => this.setState({showClear: true})},
+		// { value: "Clear Library", onClick: () => this.setState({ showClear: true }) },
 		{ value: "Re-Import Library", onClick: () => this.setState({ showReimport: true }) },
-		// {value:"Scan for changes in Library", onClick:this.addDeltasToLibrary},
+		// { value: "Scan Library For Changes", onClick: this.addDeltasToLibrary },
 	];
 
 	render() {
