@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "concurrently": "^5.1.0",
-    "electron": "8.0.1",
+    "electron": "8.2.4",
     "electron-builder": "22.3.2"
   },
   "build": {
