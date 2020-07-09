@@ -107,8 +107,9 @@ export default class TimeCodePromptModal extends Model {
 	}
 
 	bondCheck(value) {
-		if (value < 0) value = 0;
-		if (value > 59) value = 59;
+		if (value < 0) return '00';
+		if (value > 59) return '59';
+		if (value < 10) return `0${value}`;
 		return value;
 	}
 
