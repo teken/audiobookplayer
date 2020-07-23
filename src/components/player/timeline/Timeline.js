@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 
 import ProgressBar from "./ProgressBar";
 import ProgressBarHandler from "./ProgressBarHandler";
@@ -107,7 +107,7 @@ export default withPlayer(class Timeline extends Component {
 	}
 
 	changeSteps(chapters, lengthPerSecond) {
-		const flatternChapters = chapters.reduce((acc, val) => acc.concat(val.data),[]).map(x => {
+		const flatternChapters = chapters.reduce((acc, val) => acc.concat(val.data), []).map(x => {
 			x.time *= lengthPerSecond;
 			return x;
 		});

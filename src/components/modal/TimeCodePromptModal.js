@@ -16,7 +16,6 @@ export default class TimeCodePromptModal extends Model {
 			seconds: 0,
 			timeString: '',
 			timeInput: ''
-			// timeString: '123456'
 		};
 		this.changeHours = this.changeHours.bind(this);
 		this.changeMinutes = this.changeMinutes.bind(this);

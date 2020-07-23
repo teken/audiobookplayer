@@ -10,7 +10,7 @@ import withPlayer from "./withPlayer";
 
 const { ipcRenderer } = window.require('electron');
 
-export default withRouter(withPlayer(class Player extends Component {
+export class Player extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -130,9 +130,12 @@ export default withRouter(withPlayer(class Player extends Component {
 					</span>
 					<span style={{ color: 'var(--secondary-text-colour)', float: 'right', padding: "0 1em", fontSize: '0.9em' }}>
 						{this.props.player.isLoaded ? `${this.props.player.formatTime(this.state.progress)} / ${this.props.player.formatTime(this.state.duration)}` : `No Book Selected`}
+						<IconButton title="Expand" icon="chevron-up" onClick={() => this.props.togglePlayerExpansion()} style={{ ...commonButtonStyling, color: this.props.player.isLoaded ? 'var(--active-text-colour)' : 'var(--inactive-text-colour)' }} />
 					</span>
 				</div>
 			</div>
 		);
 	}
-}))
+}
+
+export default withRouter(withPlayer(Player))
