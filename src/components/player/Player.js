@@ -34,7 +34,24 @@ export default withRouter(withPlayer(class Player extends Component {
 
 	update() {
 		const timingKey = this.props.player.timingKey;
-		if (this.props.player.isPlaying && timingKey.length > 0) ipcRenderer.send('timings.set', { key: timingKey, time: this.props.player.currentTime });
+		if (this.props.player.isPlaying && timingKey.length > 0) {
+			ipcRenderer.send('timings.set', { key: timingKey, time: this.props.player.currentTime });
+			// fetch('/timings', {
+			// 	method: 'PATCH', body: JSON.stringify({
+			// 		name: 'volume',
+			// 		value: this.props.player.volume
+			// 	})
+			// });
+		}
+
+		// fetch('/tools/window/progressbar', { method: 'PATCH', body: JSON.stringify(this.props.player.progress) });
+		// fetch('/settings', {
+		// 	method: 'PATCH', body: JSON.stringify({
+		// 		name: 'volume',
+		// 		value: this.props.player.volume
+		// 	})
+		// });
+
 		ipcRenderer.send('window.progressbar.set', this.props.player.progress);
 		ipcRenderer.send('settings.set', {
 			name: 'volume',
