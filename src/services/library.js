@@ -60,15 +60,15 @@ module.exports = class LibraryService {
         if (author === null) author = authors.insert({ name: file.name });
 
         try {
-          if (file.isDirectory()) file.children.forEach(work => {
+          if (file.isDirectory() && file.children.length > 0) file.children.forEach(work => {
             if (work.isFile()) return;
             let record = null;
             if (onlyLookForChanges) record = works.findOne({ 'name': file.name });
             if (record === null) record = { name: work.name, author_id: author.$loki };
 
-            if (work.children[0].isDirectory()) { //series
+            if (work.children.some(x => x.isDirectory())) { //series
               record.type = 'SERIES';
-              record.books = work.children.map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
+              record.books = work.children.filter(x => x.isDirectory() && x.children.length > 0).map(child => this.mapBookObject(child, author.$loki)).filter(x => x !== undefined);
             } else { //file
               record = Object.assign(record, this.mapBookObject(work, author.$loki));
             }
@@ -200,7 +200,7 @@ module.exports = class LibraryService {
   }
 
   static mapBookObject(book, authorId) {
-    if (book.isFile()) return;
+    if (book.isFile() || book.children.length <= 0) return;
     const imageFileExtensions = ["jpg", "jpeg", "png"];
     const infoFileExtensions = ["cue", "m3u"];
     const record = { type: 'BOOK', name: book.name, author_id: authorId, art: [], tracks: [], info: [] };
