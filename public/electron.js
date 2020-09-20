@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow } = require('electron');
 
 const url = require('url');
 const path = require('path');
@@ -20,7 +20,7 @@ let ipcService;
 let globalShortcutService;
 const settings = new SettingsService();
 
-const development = process.env.NODE_ENV ? process.env.NODE_ENV.trim() === 'development' : false;
+const development = process.env.NODE_ENV ? process.env.NODE_ENV.toLowerCase().trim() === 'development' : false;
 
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
@@ -43,7 +43,7 @@ function createWindow() {
 		transparent: true,
 		frame: false,
 		alwaysOnTop: true,
-		backgroundColor:'#1d1e26',
+		backgroundColor: '#1d1e26',
 		icon: getIconPath()
 	});
 	splash.loadURL(splashStartUrl);
@@ -56,7 +56,7 @@ function createWindow() {
 		icon: getIconPath(),
 		show: false,
 		darkTheme: true,
-		backgroundColor:'#1d1e26',
+		backgroundColor: '#1d1e26',
 		overlayScrollbars: true,
 	};
 	preferences["webPreferences"] = {
@@ -81,7 +81,7 @@ function createWindow() {
 	});
 	mainWindow.loadURL(startUrl);
 
-	mainWindow.on('app-command', (e,cmd) => {
+	mainWindow.on('app-command', (e, cmd) => {
 		if (cmd === 'browser-backward' && mainWindow.webContents.canGoBack()) mainWindow.webContents.goBack();
 		else if (cmd === 'browser-forward' && mainWindow.webContents.canGoForward()) mainWindow.webContents.goForward();
 	});
@@ -96,7 +96,7 @@ function createWindow() {
 		mainWindow.focus();
 		if (development) mainWindow.webContents.openDevTools();
 	});
-	['resize', 'move', 'close' ].forEach((e) => {
+	['resize', 'move', 'close'].forEach((e) => {
 		mainWindow.on(e, () => storeWindowState());
 	});
 }
@@ -124,6 +124,12 @@ app.on('will-quit', () => {
 	globalShortcutService.deinit();
 });
 
+autoUpdater.on('update-downloaded', (ev, info) => {
+	setTimeout(() => {
+		autoUpdater.quitAndInstall();
+	}, 5000)
+})
+
 function storeWindowState() {
 	const bounds = mainWindow.getBounds();
 	settings.set('windowState.width', bounds.width);
@@ -135,7 +141,7 @@ function storeWindowState() {
 }
 
 function getIconPath() {
-	switch(process.platform){
+	switch (process.platform) {
 		case 'darwin':
 			return `${getMainPath()}/icon.icns`;
 		case 'win32':
