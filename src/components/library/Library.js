@@ -1,7 +1,7 @@
-import React, {Component} from "react";
-import {withRouter} from "react-router-dom";
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 
-import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import RightClickMenu from "../RightClickMenu";
 
 import AuthoredView from "./AuthoredView";
@@ -14,7 +14,7 @@ import Fuse from "fuse.js";
 import Loading from "../loading/Loading";
 import withPlayer from "../player/withPlayer";
 
-const {ipcRenderer, shell} = window.require('electron');
+const { ipcRenderer, shell } = window.require('electron');
 const path = window.require('path');
 
 
@@ -26,22 +26,24 @@ export default withRouter(withPlayer(class Library extends Component {
 			authors: [],
 			works: [],
 			states: [],
-			flattenedWorks:[],
+			flattenedWorks: [],
 			searchTerm: "",
 			searchTimeoutId: null,
 			libraryDisplayAuthors: settings.libraryDisplayAuthors,
 			libraryStyle: settings.libraryStyle,
-			loading: true
+			initLoading: true,
+			searchLoading: false,
 		};
 		this.fuse = null;
 		this.fuseOptions = {
 			shouldSort: true,
+			isCaseSensitive: false,
 			threshold: 0.6,
 			tokenize: true,
 			location: 0,
 			distance: 1,
 			maxPatternLength: 32,
-			minMatchCharLength: 1,
+			minMatchCharLength: 2,
 			keys: [
 				"name",
 				"series.name",
@@ -74,7 +76,7 @@ export default withRouter(withPlayer(class Library extends Component {
 
 		this.loadData();
 		this.setState({
-			loading:false
+			initLoading: false
 		});
 		window.addEventListener('keydown', this.listenKeyboard.bind(this), true);
 	}
@@ -84,12 +86,14 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	listenKeyboard(event) {
-		if ((event.key === 'Escape' || event.keyCode === 27) && this.state.searchTerm.length > 0) this.search('');
+		if ((event.key === 'Escape' || event.keyCode === 27) && this.state.searchTerm.length > 0) this.setState({
+			searchTerm: ''
+		}, this.search(''));
 	}
 
 	loadData() {
-		const {works, authors} = ipcRenderer.sendSync('library.getAll');
-		const {times} = ipcRenderer.sendSync('timings.getAll');
+		const { works, authors } = ipcRenderer.sendSync('library.getAll');
+		const { times } = ipcRenderer.sendSync('timings.getAll');
 		const flattenedWorks = works.map(work => {
 			work.author = authors.find(x => x.$loki === work.author_id);
 			if (work.type === 'SERIES') work.books = work.books.map(book => {
@@ -98,7 +102,7 @@ export default withRouter(withPlayer(class Library extends Component {
 				return book;
 			});
 			return work;
-		}).reduce((a,v) => a.concat(v.type === 'SERIES' ? v.books : v) ,[]).filter(item => item.type === 'BOOK');
+		}).reduce((a, v) => a.concat(v.type === 'SERIES' ? v.books : v), []).filter(item => item.type === 'BOOK');
 		this.fuse = new Fuse(flattenedWorks, this.fuseOptions);
 		const settings = JSON.parse(ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
 		this.setState({
@@ -131,27 +135,28 @@ export default withRouter(withPlayer(class Library extends Component {
 		const searchIcon = this.isSearching ? 'times' : 'search';
 		return (
 			<div>
-				<div style={{ margin: '1em', padding: '1em', color:'var(--active-text-colour)', backgroundColor:'var(--input-background-colour)' }}>
+				<div style={{ display: 'flex', margin: '1em', padding: '1em', color: 'var(--active-text-colour)', backgroundColor: 'var(--input-background-colour)' }}>
 					<input type="text" value={this.state.searchTerm} onChange={this.onSearchBoxChange} placeholder="Search" style={{
-					   width: '97%',
-					   border:'none',
-					   backgroundColor: 'transparent',
-					   color: 'var(--active-text-colour)',
-					   fontSize: '1em',
-					   paddingLeft:'0.3em'
-					}} />
-					<Icon icon={searchIcon} style={{
-						// borderBottom:`'1em solid ${this.props.theme.activeColour}`,
+						width: '97%',
+						border: 'none',
+						backgroundColor: 'transparent',
+						color: 'var(--active-text-colour)',
 						fontSize: '1em',
-						transform: 'translateY(.1em)',
-						paddingBottom: '0.1em',
-						color: 'var(--inactive-text-colour)',
-						cursor: 'pointer'
-					}} onClick={() => this.isSearching ? this.search('') : null} />
+						paddingLeft: '0.3em'
+					}} />
+					{this.state.searchLoading ? <Loading /> :
+						<Icon icon={searchIcon} style={{
+							// borderBottom:`'1em solid ${this.props.theme.activeColour}`,
+							fontSize: '1em',
+							transform: 'translateY(.1em)',
+							paddingBottom: '0.1em',
+							color: 'var(--inactive-text-colour)',
+							cursor: 'pointer'
+						}} onClick={() => this.isSearching ? this.search('') : null} />}
 				</div>
 				{
-					this.state.loading ?
-						<div style={{display:'flex', justifyContent:'center', alignItems: 'center', height: `calc(${window.innerHeight}px - 12.5em)`}}><Loading/></div>
+					this.state.initLoading ?
+						<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: `calc(${window.innerHeight}px - 12.5em)` }}><Loading /></div>
 						:
 						this.library(displaySavedTimesSection, displayLibrary, savedTimeWorks, savedTimes, libraryWorks)
 				}
@@ -197,10 +202,10 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	noBooksFound() {
-		return <div style={{display:'flex', justifyContent:'center', alignItems: 'center'}}>
-			<div style={{lineHeight:'1.8em'}}>
+		return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			<div style={{ lineHeight: '1.8em' }}>
 				<h1>no books to be found,<br />maybe try importing some...</h1>
-				<div style={{color:'var(--secondary-text-colour)'}}>
+				<div style={{ color: 'var(--secondary-text-colour)' }}>
 					Head to the settings page using the cog icon on the menu bar
 				</div>
 			</div>
@@ -211,11 +216,11 @@ export default withRouter(withPlayer(class Library extends Component {
 		return <RightClickMenu style={{
 			backgroundColor: 'var(--input-background-colour)',
 			color: 'var(--active-text-colour)',
-			cursor:'pointer',
+			cursor: 'pointer',
 			//border: this.isPlaying(author, series, work) ? `1px solid ${'var(--active-text-colour)'}` : ''
 			boxShadow: this.isPlaying(author, series, work) ? `${'var(--active-text-colour)'} 0 0 .1em 0` : ''
 		}}
-		   key={author.name + work.name} options={rightClickOptions}
+			key={author.name + work.name} options={rightClickOptions}
 		>
 			{renderFunction(author, series, work, stateKey)}
 		</RightClickMenu>;
@@ -223,14 +228,14 @@ export default withRouter(withPlayer(class Library extends Component {
 
 	libraryBook(renderFunction, author, series, work, stateKey) {
 		if (this.state.states.some(x => x.key === stateKey && x.time)) return this.savedBook(renderFunction, author, series, work, stateKey);
-		if (typeof(author.name) === 'undefined' || typeof(series ? series.name : '') === 'undefined') return;
+		if (typeof (author.name) === 'undefined' || typeof (series ? series.name : '') === 'undefined') return;
 		let filePath = path.join(ipcRenderer.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
 		return this.book(renderFunction, author, series, work, stateKey, [
-			{ name:'Play', onClick:() => this.play(author, series, work) },
-			{ name:'Search for author', onClick:() => this.search(author.name)},
-			series && { name:'Search for series', onClick:() => this.search(series.name)},
-			{ name:'Open', onClick:() => this.handleClick(author, series, work)},
-			{ name:'Open file location', onClick:() => shell.openItem(filePath)}
+			{ name: 'Play', onClick: () => this.play(author, series, work) },
+			{ name: 'Search for author', onClick: () => this.search(author.name) },
+			series && { name: 'Search for series', onClick: () => this.search(series.name) },
+			{ name: 'Open', onClick: () => this.handleClick(author, series, work) },
+			{ name: 'Open file location', onClick: () => shell.openItem(filePath) }
 		]);
 	}
 
@@ -238,13 +243,13 @@ export default withRouter(withPlayer(class Library extends Component {
 		let filePath = path.join(ipcRenderer.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
 		const state = this.state.states.find(x => x.key === stateKey);
 		return this.book(renderFunction, author, series, work, stateKey, [
-			{ name:`Play from ${state.time ? this.props.player.formatTime(state.time) : 'saved time'}`, onClick:() => this.playFromStateTime(author, series, work, stateKey) },
-			{ name:'Play from beginning', onClick:() => this.play(author, series, work) },
-			{ name:'Search for author', onClick:() => this.search(author.name)},
-			series && { name:'Search for series', onClick:() => this.search(series.name)},
-			{ name:'Open', onClick:() => this.handleClick(author, series, work)},
-			{ name:'Open file location', onClick:() => shell.openItem(filePath)},
-			{ name:'Clear saved time', onClick:() => this.clearTimingData(stateKey)}
+			{ name: `Play from ${state.time ? this.props.player.formatTime(state.time) : 'saved time'}`, onClick: () => this.playFromStateTime(author, series, work, stateKey) },
+			{ name: 'Play from beginning', onClick: () => this.play(author, series, work) },
+			{ name: 'Search for author', onClick: () => this.search(author.name) },
+			series && { name: 'Search for series', onClick: () => this.search(series.name) },
+			{ name: 'Open', onClick: () => this.handleClick(author, series, work) },
+			{ name: 'Open file location', onClick: () => shell.openItem(filePath) },
+			{ name: 'Clear saved time', onClick: () => this.clearTimingData(stateKey) }
 		]);
 	}
 
@@ -263,7 +268,7 @@ export default withRouter(withPlayer(class Library extends Component {
 		const state = ipcRenderer.sendSync('timings.get', { key: stateKey });
 		const book = series ? series : work;
 		const name = series ? work.name : null;
-		this.props.player.open(book.$loki, name,() => {
+		this.props.player.open(book.$loki, name, () => {
 			this.props.player.play();
 			setTimeout(() => {
 				this.props.player.currentTime = state.time;
@@ -283,13 +288,21 @@ export default withRouter(withPlayer(class Library extends Component {
 
 	search(text) {
 		this.setState({
-			searchTimeoutId: null,
-			results: this.fuse.search(text)
-		})
+			searchLoading: true
+		}, _ => this.setState(
+			text.length > 0 ?
+				{
+					searchTimeoutId: null,
+					results: this.fuse.search(text),
+					searchLoading: false
+				} : {
+					searchTimeoutId: null,
+					searchLoading: false
+				}))
 	}
 
 	clearTimingData(key) {
-		let result = ipcRenderer.sendSync('timings.clear', {key:key});
+		let result = ipcRenderer.sendSync('timings.clear', { key: key });
 		if (result && result.success) {
 			this.loadData();
 			this.forceUpdate();
