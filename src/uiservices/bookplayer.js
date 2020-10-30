@@ -1,7 +1,7 @@
 import AudioPlayer from "./audioplayer";
 import ChapterService from "./chapters";
 
-const {ipcRenderer} = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 const mm = window.require('music-metadata');
 
 export default class BookPlayer {
@@ -28,15 +28,15 @@ export default class BookPlayer {
 		return Number(this.maxVolume - this.minVolume);
 	}
 
-	get author () {
+	get author() {
 		return this._author;
 	}
 
-	get work () {
+	get work() {
 		return this._work;
 	}
 
-	get book () {
+	get book() {
 		return this._work.type === 'SERIES' ? this._work.books.find(x => x.name === this._bookNameIfSeries) : this._work;
 	}
 
@@ -75,7 +75,7 @@ export default class BookPlayer {
 		this._tracks = this.book.tracks;
 
 		this._tracks.forEach(track => {
-			mm.parseFile(track.path, {duration:true}).then(metadata => {
+			mm.parseFile(track.path, { duration: true }).then(metadata => {
 				this._tracks.find(t => t.path === track.path).meta = metadata;
 			}).catch(x => console.error("Failed to parse metadata", x))
 		});
@@ -126,7 +126,7 @@ export default class BookPlayer {
 	get currentTime() {
 		if (!this.isLoaded || this._tracks.length === 0) return 0;
 		else if (this._tracks.length === 1) return this.currentTrackTime;
-		else return this._tracks.slice(0, this.currentTrackIndex).map(track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0) + this.currentTrackTime;
+		else return this._tracks.slice(0, this.currentTrackIndex).map(track => track.meta ? track.meta.format.duration : 0).reduce((a, v) => a + v, 0) + this.currentTrackTime;
 	}
 
 	set currentTime(value) {
@@ -138,11 +138,11 @@ export default class BookPlayer {
 			let trackName = '';
 			for (let track of this._tracks) {
 				trackName = track.name;
-				if (remainingTime < (total + (track.meta ? track.meta.format.duration: 0 ))) {
+				if (remainingTime < (total + (track.meta ? track.meta.format.duration : 0))) {
 					remainingTime -= total;
 					break;
 				}
-				total += (track.meta ? track.meta.format.duration: 0 )
+				total += (track.meta ? track.meta.format.duration : 0)
 			}
 			this.setToTrack(trackName, () => {
 				this._audioPlayer.currentTime = remainingTime;
@@ -174,7 +174,7 @@ export default class BookPlayer {
 
 	get duration() {
 		if (!this.isLoaded) return 1;
-		return this._tracks.map( track => track.meta ? track.meta.format.duration : 0).reduce((a,v) => a + v, 0);
+		return this._tracks.map(track => track.meta ? track.meta.format.duration : 0).reduce((a, v) => a + v, 0);
 	}
 
 	get trackDuration() {
@@ -263,7 +263,7 @@ export default class BookPlayer {
 	}
 
 	get flattenedChapters() {
-		return this.chapters.reduce((acc, val) => acc.concat(val.data),[]);
+		return this.chapters.reduce((acc, val) => acc.concat(val.data), []);
 	}
 
 	get chapters() {
@@ -272,11 +272,11 @@ export default class BookPlayer {
 
 	formatTime(time) {
 		if (isNaN(time)) return "--:--:--";
-		const f = n => (n).toLocaleString('en-GB', {minimumIntegerDigits: 2, useGrouping:false});
+		const f = n => (n).toLocaleString('en-GB', { minimumIntegerDigits: 2, useGrouping: false });
 		if (!time) time = 0;
 		const base = new Date(1000 * time);
 		const hor = base.getHours() - 1;
 		const day = (base.getDate() - 1) * 24;
-		return `${f(hor+day)}:${f(base.getMinutes())}:${f(base.getSeconds())}`;
+		return `${f(hor + day)}:${f(base.getMinutes())}:${f(base.getSeconds())}`;
 	}
 }

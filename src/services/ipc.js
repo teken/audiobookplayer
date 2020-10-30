@@ -77,6 +77,22 @@ module.exports = class IPCService {
 				}
 			},
 			{
+				name: "library.getWorkTracksDuration",
+				action: (event, args) => {
+					let work = this.localLibrary.getCollection('works').get(Number(args.workId));
+					let tracks = (work.type === 'SERIES' ? work.books.find(x => x.name == args.name) : work).tracks;
+					let result = tracks.map(x => {
+						return {
+							duration: LibraryService.fileDuration(x.path),
+							path: x.path,
+							name: x.name
+						}
+					})
+					console.log(result)
+					event.returnValue = result;
+				}
+			},
+			{
 				name: "library.importdelta",
 				action: (event, args) => {
 					LibraryService.fileSystemToLibrary(true, this.localLibrary, this.settings).then(result => {

@@ -60,6 +60,7 @@ function createWindow() {
 		overlayScrollbars: true,
 	};
 	preferences["webPreferences"] = {
+		enableRemoteModule: true,
 		nodeIntegration: true
 	};
 

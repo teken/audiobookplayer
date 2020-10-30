@@ -1,10 +1,11 @@
-const fs = require('fs-extra');
-const path = require('path');
-const mm = require('music-metadata');
-const { app } = require('electron');
-const uuid = require('uuid');
-
-const audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'];
+const fs = require('fs-extra'),
+  path = require('path'),
+  mm = require('music-metadata'),
+  { app } = require('electron'),
+  uuid = require('uuid'),
+  ffprobe = require('ffprobe'),
+  ffprobeStatic = require('ffprobe-static'),
+  audioFileExtensions = ['aac', 'flac', 'm2a', 'm4a', 'm4b', 'mka', 'mp3', 'oga', 'ogg', 'opus', 'spx', 'wma', 'wav'];
 
 module.exports = class LibraryService {
 
@@ -16,6 +17,18 @@ module.exports = class LibraryService {
     localLibrary.addCollection('works', { indices: ['author_id'], autoupdate: true });
 
     return this.saveDatabase(localLibrary);
+  }
+
+  static async fileDuration(filePath) {
+    if (audioFileExtensions.indexOf(path.extname(filePath).slice(1).toLowerCase()) > -1) {
+      let data = await ffprobe(filePath, { path: ffprobeStatic.path });
+      return data.streams[0].duration;
+    } else
+      throw 'Not Supported Audio Type';
+  }
+
+  static filesDuration(filePaths) {
+    return filePaths.map(this.fileDuration).reduce((a, b) => a + b, 0)
   }
 
   /**

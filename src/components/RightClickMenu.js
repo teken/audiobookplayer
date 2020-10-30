@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import ReactDOM from 'react-dom';
 
 import idGenerator from "react-id-generator";
@@ -13,9 +13,9 @@ export default class RightClickMenu extends Component {
 		this._click = this._click.bind(this);
 		this.state = {
 			show: false,
-			x:0,
-			y:0,
-			width:10
+			x: 0,
+			y: 0,
+			width: 10
 		};
 	}
 
@@ -38,8 +38,8 @@ export default class RightClickMenu extends Component {
 	_cancelContextMenu() {
 		this.setState({
 			show: false,
-			x:0,
-			y:0
+			x: 0,
+			y: 0
 		});
 	}
 
@@ -52,15 +52,15 @@ export default class RightClickMenu extends Component {
 
 	renderContextPortal() {
 		const options = this.props.options.filter(x => x);
-		return ReactDOM.createPortal( <>
+		return ReactDOM.createPortal(<>
 			<div onClick={this._cancelContextMenu} style={{
 				display: this.state.show ? 'block' : 'none',
-				position:'fixed',
+				position: 'fixed',
 				top: 0,
 				left: 0,
 				right: 0,
 				bottom: 0,
-				zIndex:'2000',
+				zIndex: '2000',
 				cursor: 'default'
 			}} />
 			<div style={{
@@ -68,7 +68,7 @@ export default class RightClickMenu extends Component {
 				position: 'absolute',
 				top: this.state.y,
 				left: this.state.x,
-				zIndex:'2001',
+				zIndex: '2001',
 				background: 'rgba(0,0,0,0.8)',
 				padding: '0.3em',
 				width: `${this.state.width}em`,
@@ -94,7 +94,7 @@ export default class RightClickMenu extends Component {
 	render() {
 		return (
 			<>
-				<div style={this.props.style} onContextMenu={this.state.show ? this._cancelContextMenu :this._onContextMenu}>
+				<div style={this.props.style} onContextMenu={this.state.show ? this._cancelContextMenu : this._onContextMenu}>
 					{this.props.children}</div>
 				{this.renderContextPortal()}
 			</>

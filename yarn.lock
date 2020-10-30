@@ -3359,6 +3359,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"JSONStream@npm:^1.3.5":
+  version: 1.3.5
+  resolution: "JSONStream@npm:1.3.5"
+  dependencies:
+    jsonparse: ^1.2.0
+    through: ">=2.2.7 <3"
+  bin:
+    JSONStream: ./bin.js
+  checksum: e9849f8a52cde19c95d7fbf0bdab7bde1f31c9fbf2062e47044817eeebb31217c99aaa041366f377243aa852c64fa144c4397ef76965d6491eb47827464d8479
+  languageName: node
+  linkType: hard
+
 "abab@npm:^2.0.0":
   version: 2.0.0
   resolution: "abab@npm:2.0.0"
@@ -4033,6 +4045,8 @@ __metadata:
     electron: ^10.1.2
     electron-builder: ^22.8.1
     electron-updater: ^4.3.5
+    ffprobe: ^1.1.2
+    ffprobe-static: ^3.0.0
     fs-extra: ^8.1.0
     fuse.js: 3.4.6
     lokijs: 1.5.8
@@ -4368,6 +4382,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bl@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "bl@npm:4.0.3"
+  dependencies:
+    buffer: ^5.5.0
+    inherits: ^2.0.4
+    readable-stream: ^3.4.0
+  checksum: 1f33c5a3da08a87260a7f11acadf088ef331ebb4b86db1160ec332be9326afdf9f73dca1fd5cc431dba7cc9d5574b508192f9fd7c37a9a11c9e4a50025917690
+  languageName: node
+  linkType: hard
+
 "bluebird-lst@npm:^1.0.9":
   version: 1.0.9
   resolution: "bluebird-lst@npm:1.0.9"
@@ -4676,6 +4701,16 @@ __metadata:
     ieee754: ^1.1.4
     isarray: ^1.0.0
   checksum: 50c5f8c753419f563d2c3f32f6a1cb88d0148b57f4748d99f23158ba13570ad23dbdc7efd93d93dfb6ad57309724e73e767bddc79fbb8a4372d2c0a0c18d0f3c
+  languageName: node
+  linkType: hard
+
+"buffer@npm:^5.5.0":
+  version: 5.6.0
+  resolution: "buffer@npm:5.6.0"
+  dependencies:
+    base64-js: ^1.0.2
+    ieee754: ^1.1.4
+  checksum: e18fdf099c25cae354d673c7deee0391978bde5a47b785cf81e118c75853f0f36838b0a5ea5ee7adf8c02eedb9664292608efdcac9945f4f4f514d14054656f7
   languageName: node
   linkType: hard
 
@@ -6254,6 +6289,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"deferential@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "deferential@npm:1.0.0"
+  dependencies:
+    native-promise-only: ^0.8.1
+  checksum: a5354877da7afbe9dc915aa435568b0288204d24c4884060a1e342a0633d5f4d91a1a7e47e92216084a6dddc03b161105c2c39e0098cf225f69e33ddafbc7151
+  languageName: node
+  linkType: hard
+
 "define-properties@npm:^1.1.2, define-properties@npm:^1.1.3":
   version: 1.1.3
   resolution: "define-properties@npm:1.1.3"
@@ -7664,6 +7708,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ffprobe-static@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "ffprobe-static@npm:3.0.0"
+  checksum: 417cf8ed4f8c5986b70722237cb79c221689c9a26572a38d5a6b3fbab7742a01c0d435f9f21f14b09fb8d452b1ac407846147ac106fe8d42d668cd0be70ebe5b
+  languageName: node
+  linkType: hard
+
+"ffprobe@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "ffprobe@npm:1.1.2"
+  dependencies:
+    JSONStream: ^1.3.5
+    bl: ^4.0.3
+    deferential: ^1.0.0
+  checksum: 63bc0002b67a1af670039842cd16a8457c239303cbf9fb83e9d9230661cd5b51fa5aa31fec322cf9c7966067733937da979dd4fb8a926bab2aae555563bec5c1
+  languageName: node
+  linkType: hard
+
 "figgy-pudding@npm:^3.5.1":
   version: 3.5.1
   resolution: "figgy-pudding@npm:3.5.1"
@@ -9054,7 +9116,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"inherits@npm:2.0.4":
+"inherits@npm:2.0.4, inherits@npm:^2.0.4":
   version: 2.0.4
   resolution: "inherits@npm:2.0.4"
   checksum: 98426da247ddfc3dcd7d7daedd90c3ca32d5b08deca08949726f12d49232aef94772a07b36cf4ff833e105ae2ef931777f6de4a6dd8245a216b9299ad4a50bea
@@ -10520,6 +10582,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"jsonparse@npm:^1.2.0":
+  version: 1.3.1
+  resolution: "jsonparse@npm:1.3.1"
+  checksum: 6669acd7b39cdc4a4cbb078d1a19d2a07cb81651d5045b907b4d067e5c453d060a274f348b53c51ed817456f1cdfc709a13a76ca47c8304547f03843c043ebcb
+  languageName: node
+  linkType: hard
+
 "jsprim@npm:^1.2.2":
   version: 1.4.1
   resolution: "jsprim@npm:1.4.1"
@@ -11551,6 +11620,13 @@ fsevents@^1.2.7:
     snapdragon: ^0.8.1
     to-regex: ^3.0.1
   checksum: 2e1440c5705f0192b9d9b46bb682a1832052974dad359ed473b9f555abb5c55a08b3d5ba45d7d37c53a83f64b7f93866292824d3086a150ff7980e71874feb3b
+  languageName: node
+  linkType: hard
+
+"native-promise-only@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "native-promise-only@npm:0.8.1"
+  checksum: c5b74e061f4afeeeeb8b04cf115ff341c824e5e16c61f7b24167a2845b7a1b2dabec5464786073101596d9d3e24d903b63ccee1e6d176ba41612aa1c385dcb24
   languageName: node
   linkType: hard
 
@@ -14357,6 +14433,17 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"readable-stream@npm:^3.4.0":
+  version: 3.6.0
+  resolution: "readable-stream@npm:3.6.0"
+  dependencies:
+    inherits: ^2.0.3
+    string_decoder: ^1.1.1
+    util-deprecate: ^1.0.1
+  checksum: f178b1daa80d9e58ebba71dbb08486430aa6f0dea3a22a1b7401f3f6983077d0bc0edea43099db06b8d006c9ad48d6383e8fb72c05d5b187670aeaf1b9b44f00
+  languageName: node
+  linkType: hard
+
 "readdirp@npm:^2.0.0":
   version: 2.1.0
   resolution: "readdirp@npm:2.1.0"
@@ -16448,7 +16535,7 @@ resolve@^1.8.1:
   languageName: node
   linkType: hard
 
-"through@npm:^2.3.6":
+"through@npm:>=2.2.7 <3, through@npm:^2.3.6":
   version: 2.3.8
   resolution: "through@npm:2.3.8"
   checksum: 918d9151680b5355990011eb8c4b02e8cb8cf6e9fb6ea3d3e5a1faa688343789e261634ae35de4ea9167ab029d1e7bac6af2fe61b843931768d405fdc3e8897c
