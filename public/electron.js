@@ -60,7 +60,8 @@ function createWindow() {
 		overlayScrollbars: true,
 	};
 	preferences["webPreferences"] = {
-		nodeIntegration: true
+		nodeIntegration: true,
+		enableRemoteModule: true,
 	};
 
 	if (process.env.ELECTRON_START_URL) {
