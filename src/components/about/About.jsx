@@ -36,16 +36,16 @@ export default class About extends Component {
 				<h1>About</h1>
 				<div style={{color: 'var(--secondary-text-colour)', lineHeight: '1.2em'}}>
 					<p>
-						Audio Book Player: v{app.getVersion()}<br/>
-						Created By {pkg.author}<br/>
-						&copy; {this.dateRange()} {pkg.author} All Rights Reserved<br/>
+						Audio Book Player: v{window.electron.pkg.version}<br/>
+						Created By {window.electron.pkg.author}<br/>
+						&copy; {this.dateRange()} {window.electron.pkg.author} All Rights Reserved<br/>
 					</p>
 					<h2 style={{color:'var(--primary-text-colour)'}}>Support this software on:</h2>
 					<p>
-						<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => shell.openExternal('https://audiobookplayer.app')}>
+						<span style={{cursor:'pointer', textDecoration:'underline', marginBottom:'1em'}} onClick={() => window.electron.shell.openExternal('https://audiobookplayer.app')}>
 							AudioBookPlayer.app
 						</span><br/>
-						<span style={{cursor:'pointer', textDecoration:'underline'}} onClick={() => shell.openExternal('https://www.patreon.com/AudioBookPlayer')}>
+						<span style={{cursor:'pointer', textDecoration:'underline'}} onClick={() => window.electron.shell.openExternal('https://www.patreon.com/AudioBookPlayer')}>
 							Patreon
 						</span>
 					</p>

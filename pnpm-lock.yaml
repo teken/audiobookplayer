@@ -123,8 +123,8 @@ importers:
         specifier: ^5.2.0
         version: 5.3.4(react@16.14.0)
       react-table:
-        specifier: ^7.5.1
-        version: 7.8.0(react@16.14.0)
+        specifier: 7.5.1
+        version: 7.5.1(react@16.14.0)
       resolve:
         specifier: 1.15.0
         version: 1.15.0
@@ -4257,10 +4257,10 @@ packages:
     peerDependencies:
       react: '>=15'
 
-  react-table@7.8.0:
-    resolution: {integrity: sha512-hNaz4ygkZO4bESeFfnfOft73iBUj8K5oKi1EcSHPAibEydfsX2MyU6Z8KCr3mv3C9Kqqh71U+DhZkFvibbnPbA==}
+  react-table@7.5.1:
+    resolution: {integrity: sha512-rprrUElCqvj79lyY2XbUoYLzwA5Mm4CGS8ElQ8OyzocvmkvCcmunvvfbpIg9Jm9HnMBjVZcVyPFPZ1BFelIBKw==}
     peerDependencies:
-      react: ^16.8.3 || ^17.0.0-0 || ^18.0.0
+      react: ^16.8.3
 
   react@16.14.0:
     resolution: {integrity: sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==}
@@ -10600,7 +10600,7 @@ snapshots:
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
 
-  react-table@7.8.0(react@16.14.0):
+  react-table@7.5.1(react@16.14.0):
     dependencies:
       react: 16.14.0
 

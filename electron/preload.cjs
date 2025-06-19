@@ -1,8 +1,9 @@
-const { contextBridge, ipcRenderer } = require('electron');
-const { remote } = require('electron');
+const { contextBridge, ipcRenderer, shell } = require('electron');
 const path = require('path');
 const mm = require('music-metadata');
 const fs = require('fs');
+const pkg = require('../package.json');
+
 contextBridge.exposeInMainWorld('electron', {
     send: (channel, data) => ipcRenderer.send(channel, data),
     sendSync: (channel, data) => ipcRenderer.sendSync(channel, data),
@@ -21,5 +22,12 @@ contextBridge.exposeInMainWorld('electron', {
     fs: {
         readFile: (path) => fs.readFile(path),
         readFileSync: (path) => fs.readFileSync(path),
-    }
+    },
+    pkg: {
+        author: pkg.author,
+        version: pkg.version,
+    },
+    shell: {
+        openExternal: (url) => shell.openExternal(url),
+    },
 });

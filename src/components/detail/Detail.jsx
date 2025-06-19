@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import ReactTable from "react-table";
+import { ReactTable } from "react-table";
 
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import Loading from "../loading/Loading";
@@ -162,7 +162,7 @@ export default withRouter(withPlayer(class Detail extends Component {
 								)}
 							</div>
 							{this.hasArtwork && <div style={{ width: widths, alignSelf: 'center' }}>
-								<img src={this.state.book.art[0].path} alt={this.cleanedName} style={{
+								<img src={"file://" + this.state.book.art[0].path} alt={this.cleanedName} style={{
 									minWidth: '11em',
 									minHeight: '11em',
 									maxWidth: '100%',
@@ -223,7 +223,7 @@ export default withRouter(withPlayer(class Detail extends Component {
 								defaultPageSize={data.length}
 								showPagination={false}
 								sortable={false}
-								getTdProps={(state, rowInfo) => {
+								getTdProps={(_state, rowInfo) => {
 									return {
 										style: { cursor: 'pointer', color: 'var(--active-text-colour)' },
 										onDoubleClick: (e, handleOriginal) => {
