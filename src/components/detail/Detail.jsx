@@ -208,6 +208,7 @@ export default withRouter(withPlayer(class Detail extends Component {
 							</div>
 						</div>
 						<div>
+							need to fix
 							{/* <ReactTable
 								className="-striped -highlight"
 								data={data}
