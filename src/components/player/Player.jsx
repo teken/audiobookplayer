@@ -8,8 +8,6 @@ import IconButton from "./IconButton";
 import TimeCodePromptModal from "../modal/TimeCodePromptModal";
 import withPlayer from "./withPlayer";
 
-const { ipcRenderer } = window.require('electron');
-
 export default withRouter(withPlayer(class Player extends Component {
 	constructor(props) {
 		super(props);
@@ -34,9 +32,9 @@ export default withRouter(withPlayer(class Player extends Component {
 
 	update() {
 		const timingKey = this.props.player.timingKey;
-		if (this.props.player.isPlaying && timingKey.length > 0) ipcRenderer.send('timings.set', { key: timingKey, time: this.props.player.currentTime });
-		ipcRenderer.send('window.progressbar.set', this.props.player.progress);
-		ipcRenderer.send('settings.set', {
+		if (this.props.player.isPlaying && timingKey.length > 0) window.electron.send('timings.set', { key: timingKey, time: this.props.player.currentTime });
+		window.electron.send('window.progressbar.set', this.props.player.progress);
+		window.electron.send('settings.set', {
 			name: 'volume',
 			value: this.props.player.volume
 		});

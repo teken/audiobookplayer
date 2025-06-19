@@ -157,21 +157,58 @@ export default class AudioPlayer {
 	 */
 	open (filePath, loadCallback, endCallback) {
 		this.close();
-
-		this._audio = new window.Audio(filePath);
-		this._audio.addEventListener('loadstart', () => {
-			if (!this._sourceNode) {
-				this._sourceNode = this._audioContext.createMediaElementSource(this._audio);
-				this._sourceNode.connect(this._sourceEffectNode);
+		
+		// Create new audio element
+		this._audio = new window.Audio();
+		
+		// Add error handling with detailed messages
+		this._audio.addEventListener('error', (e) => {
+			const error = e.target.error;
+			let errorMessage = 'Unknown error occurred';
+			
+			if (error) {
+				switch (error.code) {
+					case error.MEDIA_ERR_ABORTED:
+						errorMessage = 'Loading aborted';
+						break;
+					case error.MEDIA_ERR_NETWORK:
+						errorMessage = 'Network error';
+						break;
+					case error.MEDIA_ERR_DECODE:
+						errorMessage = 'Audio decoding failed';
+						break;
+					case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+						errorMessage = 'Audio format not supported';
+						break;
+				}
 			}
-			if (loadCallback) loadCallback()
+			
+			console.error('Audio Error:', errorMessage, error);
 		});
+
+		this._audio.addEventListener('loadstart', () => {
+			try {
+				if (!this._sourceNode) {
+					this._sourceNode = this._audioContext.createMediaElementSource(this._audio);
+					this._sourceNode.connect(this._sourceEffectNode);
+				}
+				if (loadCallback) loadCallback();
+			} catch (err) {
+				console.error('Error creating audio source:', err);
+			}
+		});
+
+		this._audio.addEventListener('canplaythrough', () => {
+		});
+
 		this._audio.addEventListener('ended', () => {
-			if (endCallback) endCallback()
+			if (endCallback) endCallback();
 		});
-		this._audio.addEventListener('error', error => {
-			console.error('error event', error)
-		});
+
+		// Set the source after setting up event listeners
+		this._audio.src = "file://" + filePath;
+		// Explicitly load the audio
+		this._audio.load();
 	}
 
 	/**

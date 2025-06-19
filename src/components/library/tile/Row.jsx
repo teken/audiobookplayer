@@ -7,7 +7,7 @@ export default class Row extends Item {
 	get tilePicture() {
 		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
-			return <img src={p} alt={this.props.work.name} style={{
+			return <img src={"file://" + p} alt={this.props.work.name} style={{
 				minWidth: '5em',
 				minHeight: '5em',
 				maxWidth: '100%',

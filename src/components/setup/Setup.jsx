@@ -11,15 +11,13 @@ import Row from "../library/tile/Row";
 import ReactTable from "react-table";
 import {withRouter} from "react-router-dom";
 
-const {ipcRenderer} = window.require('electron');
-
 export default withRouter(class About extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			libraryDataFolder: ipcRenderer.sendSync('settings.get','libraryPath'),
-			importStyle: ipcRenderer.sendSync('settings.get','importStyle'),
-			libraryStyle: (Boolean(ipcRenderer.sendSync('settings.get','libraryDisplayAuthors'))?'authored':'')+ipcRenderer.sendSync('settings.get','libraryStyle'),
+			libraryDataFolder: window.electron.sendSync('settings.get','libraryPath'),
+			importStyle: window.electron.sendSync('settings.get','importStyle'),
+			libraryStyle: (Boolean(window.electron.sendSync('settings.get','libraryDisplayAuthors'))?'authored':'')+window.electron.sendSync('settings.get','libraryStyle'),
 			currentStep:0,
 			maxSteps:3,
 		};
@@ -48,11 +46,11 @@ export default withRouter(class About extends Component {
 		}
 		const libraryDisplayAuthors = this.state.libraryStyle.includes('authored');
 		const libraryStyle = this.state.libraryStyle.replace('authored', '');
-		ipcRenderer.send('settings.set', {name:'libraryDisplayAuthors', value:libraryDisplayAuthors});
-		ipcRenderer.send('settings.set', {name:'libraryStyle', value:libraryStyle});
-		ipcRenderer.send('settings.set', {name:'libraryPath', value:this.state.libraryDataFolder});
-		ipcRenderer.send('settings.set', {name:'importStyle', value:this.state.importStyle});
-		ipcRenderer.send('settings.set', {name:'firstRun', value:false});
+		window.electron.send('settings.set', {name:'libraryDisplayAuthors', value:libraryDisplayAuthors});
+		window.electron.send('settings.set', {name:'libraryStyle', value:libraryStyle});
+		window.electron.send('settings.set', {name:'libraryPath', value:this.state.libraryDataFolder});
+		window.electron.send('settings.set', {name:'importStyle', value:this.state.importStyle});
+		window.electron.send('settings.set', {name:'firstRun', value:false});
 		this.props.history.push('/');
 
 	}

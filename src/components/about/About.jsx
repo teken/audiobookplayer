@@ -1,10 +1,5 @@
 import React, {Component} from "react";
 
-const {shell, ipcRenderer} = window.require('electron');
-const {app} = window.require('electron').remote;
-
-const pkg = require('../../../package.json');
-
 export default class About extends Component {
 	constructor(props) {
 		super(props);
@@ -14,7 +9,7 @@ export default class About extends Component {
 	}
 
 	componentDidMount() {
-		const stats = ipcRenderer.sendSync('library.getAllCounts');
+		const stats = window.electron.sendSync('library.getAllCounts');
 		this.setState({
 			stats: stats
 		});

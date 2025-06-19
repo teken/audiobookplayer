@@ -36,8 +36,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import withPlayer from "../player/withPlayer";
 
-const {ipcRenderer} = window.require('electron');
-
 library.add(faPlay, faPause, faStop, faBackward, faForward, faVolumeUp, faVolumeDown, faVolumeOff, faMapMarkerAlt,
 			faMinus, faSquare, faTimes, faBookOpen, faCog, faSearch, faFolderOpen, faChevronLeft, faChevronRight,
 			faQuestion, faCaretDown, faCheckSquare
@@ -55,10 +53,10 @@ export default withPlayer(class App extends Component {
 	}
 
 	registerIPCListeners() {
-		ipcRenderer.on('player.pauseplay', _ => this.props.player.playPause());
-		ipcRenderer.on('player.previoustrack', _ => this.props.player.playPrevious());
-		ipcRenderer.on('player.nexttrack', _ => this.props.player.playNext());
-		ipcRenderer.on('player.stop', _ => this.props.player.stop());
+		window.electron.on('player.pauseplay', _ => this.props.player.playPause());
+		window.electron.on('player.previoustrack', _ => this.props.player.playPrevious());
+		window.electron.on('player.nexttrack', _ => this.props.player.playNext());
+		window.electron.on('player.stop', _ => this.props.player.stop());
 	}
 
 	componentDidMount() {

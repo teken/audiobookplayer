@@ -14,14 +14,10 @@ import Fuse from "fuse.js";
 import Loading from "../loading/Loading";
 import withPlayer from "../player/withPlayer";
 
-const { ipcRenderer, shell } = window.require('electron');
-const path = window.require('path');
-
-
 export default withRouter(withPlayer(class Library extends Component {
 	constructor(props) {
 		super(props);
-		const settings = JSON.parse(ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
+		const settings = JSON.parse(window.electron.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
 		this.state = {
 			authors: [],
 			works: [],
@@ -68,7 +64,7 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	componentDidMount() {
-		const firstRun = JSON.parse(ipcRenderer.sendSync('settings.get', 'firstRun'));
+		const firstRun = JSON.parse(window.electron.sendSync('settings.get', 'firstRun'));
 		if (firstRun) {
 			this.props.history.push("/setup");
 			return;
@@ -92,8 +88,8 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	loadData() {
-		const { works, authors } = ipcRenderer.sendSync('library.getAll');
-		const { times } = ipcRenderer.sendSync('timings.getAll');
+		const { works, authors } = window.electron.sendSync('library.getAll');
+		const { times } = window.electron.sendSync('timings.getAll');
 		const flattenedWorks = works.map(work => {
 			work.author = authors.find(x => x.$loki === work.author_id);
 			if (work.type === 'SERIES') work.books = work.books.map(book => {
@@ -104,7 +100,7 @@ export default withRouter(withPlayer(class Library extends Component {
 			return work;
 		}).reduce((a, v) => a.concat(v.type === 'SERIES' ? v.books : v), []).filter(item => item.type === 'BOOK');
 		this.fuse = new Fuse(flattenedWorks, this.fuseOptions);
-		const settings = JSON.parse(ipcRenderer.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
+		const settings = JSON.parse(window.electron.sendSync('settings.gets', ['libraryStyle', 'libraryDisplayAuthors']));
 		this.setState({
 			works: works,
 			authors: authors,
@@ -229,7 +225,7 @@ export default withRouter(withPlayer(class Library extends Component {
 	libraryBook(renderFunction, author, series, work, stateKey) {
 		if (this.state.states.some(x => x.key === stateKey && x.time)) return this.savedBook(renderFunction, author, series, work, stateKey);
 		if (typeof (author.name) === 'undefined' || typeof (series ? series.name : '') === 'undefined') return;
-		let filePath = path.join(ipcRenderer.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
+		let filePath = window.electron.path.join(window.electron.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
 		return this.book(renderFunction, author, series, work, stateKey, [
 			{ name: 'Play', onClick: () => this.play(author, series, work) },
 			{ name: 'Search for author', onClick: () => this.search(author.name) },
@@ -240,7 +236,7 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	savedBook(renderFunction, author, series, work, stateKey) {
-		let filePath = path.join(ipcRenderer.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
+		let filePath = window.electron.path.join(window.electron.sendSync('settings.get', 'libraryPath'), author.name, series ? series.name : '', work.name);
 		const state = this.state.states.find(x => x.key === stateKey);
 		return this.book(renderFunction, author, series, work, stateKey, [
 			{ name: `Play from ${state?.time ? this.props.player.formatTime(state.time) : 'saved time'}`, onClick: () => this.playFromStateTime(author, series, work, stateKey) },
@@ -265,7 +261,7 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	playFromStateTime(author, series, work, stateKey) {
-		const state = ipcRenderer.sendSync('timings.get', { key: stateKey });
+		const state = window.electron.sendSync('timings.get', { key: stateKey });
 		const book = series ? series : work;
 		const name = series ? work.name : null;
 		this.props.player.open(book.$loki, name, () => {
@@ -302,7 +298,7 @@ export default withRouter(withPlayer(class Library extends Component {
 	}
 
 	clearTimingData(key) {
-		let result = ipcRenderer.sendSync('timings.clear', { key: key });
+		let result = window.electron.sendSync('timings.clear', { key: key });
 		if (result && result.success) {
 			this.loadData();
 			this.forceUpdate();

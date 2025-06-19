@@ -7,7 +7,7 @@ export default class Tile extends Item {
 	get tilePicture() {
 		if (this.hasArtWork) {
 			return <LazyLoad offset={500} debounce={false}>
-			 	<img src={this.props.work.art[0].path} alt={this.props.work.name} style={{
+			 	<img src={"file://" + this.props.work.art[0].path} alt={this.props.work.name} style={{
 					minWidth: '11em',
 					minHeight: '11em',
 					maxWidth: '100%',

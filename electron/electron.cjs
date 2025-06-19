@@ -22,6 +22,8 @@ const settings = new SettingsService();
 
 const development = process.env.NODE_ENV ? process.env.NODE_ENV.toLowerCase().trim() === 'development' : false;
 
+console.log("is development", development)
+
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.checkForUpdatesAndNotify();
@@ -62,6 +64,7 @@ function createWindow() {
 	preferences["webPreferences"] = {
 		nodeIntegration: true,
 		enableRemoteModule: true,
+		preload: path.join(__dirname, '../electron/preload.cjs')
 	};
 
 	if (process.env.ELECTRON_START_URL) {

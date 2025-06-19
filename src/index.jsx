@@ -7,9 +7,7 @@ import BookPlayer from "./uiservices/bookplayer";
 
 import {PlayerContext} from "./components/player/withPlayer";
 
-const {ipcRenderer} = window.require('electron');
-
-const player = new BookPlayer(ipcRenderer.sendSync('settings.get', 'volume'));
+const player = new BookPlayer(window.electron.sendSync('settings.get', 'volume'));
 
 ReactDOM.render(
 	<PlayerContext.Provider value={player}>

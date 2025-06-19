@@ -1,4 +1,5 @@
 const { ipcMain } = require('electron');
+const { dialog } = require('electron');
 
 const LibraryService = require('./library');
 const SettingService = require('./settings');
@@ -6,7 +7,6 @@ const SettingService = require('./settings');
 const j = o => JSON.stringify(o);
 
 module.exports = class IPCService {
-
 	constructor(window, localLibrary, bookTimes, settings) {
 		this.window = window;
 		this.localLibrary = localLibrary;
@@ -21,10 +21,22 @@ module.exports = class IPCService {
 
 	get calls() {
 		return [
+			...this.dialogCalls,
 			...this.libraryCalls,
 			...this.settingsCalls,
 			...this.timingsCalls,
 			...this.windowCalls,
+		];
+	}
+
+	get dialogCalls() {
+		return [
+			{
+				name: "dialog.showOpenDialogSync",
+				action: (event, args) => {
+					event.returnValue = dialog.showOpenDialogSync(args);
+				}
+			}
 		];
 	}
 

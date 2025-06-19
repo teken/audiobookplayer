@@ -10,8 +10,6 @@ import Checkbox from "./Checkbox";
 
 import ConfirmModal from "../modal/ConfirmModal";
 
-const { ipcRenderer } = window.require('electron');
-
 export default withRouter(class Settings extends Component {
 	constructor(props) {
 		super(props);
@@ -41,7 +39,7 @@ export default withRouter(class Settings extends Component {
 		// 	a.push(v.dataName);
 		// 	return a;
 		// },[]);
-		const fetch = (name) => ipcRenderer.sendSync('settings.get', name);
+		const fetch = (name) => window.electron.sendSync('settings.get', name);
 		this.settingsObjects.forEach(item => {
 			switch (item.type) {
 				default:
@@ -76,7 +74,7 @@ export default withRouter(class Settings extends Component {
 		event.preventDefault();
 		this.settingsObjects.forEach(item => {
 			if (this.state.oldSettings[item.name] !== this.state.settings[item.name])
-				ipcRenderer.send('settings.set', { name: item.dataName, value: this.state.settings[item.name] });
+				window.electron.send('settings.set', { name: item.dataName, value: this.state.settings[item.name] });
 		});
 		this.props.history.push('/');
 	}
@@ -89,10 +87,10 @@ export default withRouter(class Settings extends Component {
 		this.setState({
 			showClear: true
 		});
-		ipcRenderer.once('library.clear.reply', (event, arg) => {
+		window.electron.once('library.clear.reply', (event, arg) => {
 			console.log('Database cleared', arg);
 		});
-		ipcRenderer.send('library.clear');
+		window.electron.send('library.clear');
 
 	}
 
@@ -101,20 +99,20 @@ export default withRouter(class Settings extends Component {
 			showReimport: true
 		});
 		let self = this;
-		ipcRenderer.once('library.reimport.reply', (event, arg) => {
+		window.electron.once('library.reimport.reply', (event, arg) => {
 			console.log('Database Re-Imported', arg);
 			self.setState({
 				showReimport: false
 			});
 		});
-		ipcRenderer.send('library.reimport');
+		window.electron.send('library.reimport');
 	}
 
 	addDeltasToLibrary() {
-		ipcRenderer.once('library.importdelta.reply', (event, arg) => {
+		window.electron.once('library.importdelta.reply', (event, arg) => {
 			console.log('Database Deltas Imported', arg);
 		});
-		ipcRenderer.send('library.importdelta');
+		window.electron.send('library.importdelta');
 	}
 
 	buttons = [

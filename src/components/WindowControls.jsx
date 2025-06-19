@@ -5,8 +5,6 @@ import IconButton from "./player/IconButton";
 
 //import AboutModule from './modal/AboutModal';
 
-const remote = window.require('electron').remote;
-
 export default withRouter(class WindowControls extends Component {
 	constructor(props) {
 		super(props);

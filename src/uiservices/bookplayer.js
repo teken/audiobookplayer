@@ -1,9 +1,6 @@
 import AudioPlayer from "./audioplayer";
 import ChapterService from "./chapters";
 
-const {ipcRenderer} = window.require('electron');
-const mm = window.require('music-metadata');
-
 export default class BookPlayer {
 	constructor(volume) {
 		this._audioPlayer = new AudioPlayer();
@@ -68,19 +65,19 @@ export default class BookPlayer {
 	}
 
 	_loadData(work_id) {
-		let work = ipcRenderer.sendSync('library.getWork', work_id);
+		let work = window.electron.sendSync('library.getWork', work_id);
 		if (work === null) throw new Error('Failed to find work');
 		else this._work = work;
 
 		this._tracks = this.book.tracks;
 
 		this._tracks.forEach(track => {
-			mm.parseFile(track.path, {duration:true}).then(metadata => {
+			window.electron.mm.parseFile(track.path, {duration:true}).then(metadata => {
 				this._tracks.find(t => t.path === track.path).meta = metadata;
 			}).catch(x => console.error("Failed to parse metadata", x))
 		});
 
-		let author = ipcRenderer.sendSync('library.getAuthor', this._work.author_id);
+		let author = window.electron.sendSync('library.getAuthor', this._work.author_id);
 		if (author === null) throw new Error('Failed to find author');
 		else this._author = author;
 	}

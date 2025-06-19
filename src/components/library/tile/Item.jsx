@@ -9,7 +9,7 @@ export default class Item extends Component {
 	get tilePicture() {
 		if (this.hasArtWork) {
 			const p = this.props.work.art[0].path;
-			return <img src={p} alt={this.props.work.name} />;
+			return <img src={"file://" + p} alt={this.props.work.name} />;
 		}
 		return '';
 	}

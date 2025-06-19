@@ -1,8 +1,6 @@
 import React, {Component} from "react";
 import {FontAwesomeIcon as Icon} from "@fortawesome/react-fontawesome";
 
-const {dialog} = window.require('electron').remote;
-
 export default class FolderSelector extends Component {
 	constructor(props) {
 		super(props);
@@ -17,7 +15,7 @@ export default class FolderSelector extends Component {
 
 	handleClick(event) {
 		event.preventDefault();
-		const value = dialog.showOpenDialogSync({
+		const value = window.electron.showOpenDialogSync({
 			properties: ['openDirectory'],
 			defaultPath: this.textInput.current.value,
 		});

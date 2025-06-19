@@ -1,5 +1,3 @@
-const fs = window.require('fs');
-
 export default class ChapterService {
 	constructor(book) {
 		this._book = book;
@@ -7,7 +5,7 @@ export default class ChapterService {
 
 	loadCUEFileData(path) {
 		if (path === null) return [];
-		const buffer = fs.readFileSync(path);
+		const buffer = window.electron.fs.readFileSync(path);
 		const lines = buffer.toString('utf8').split('\n').map(line => line.trim()).filter(line => line.length > 0);
 		const name = lines.slice(0,1)[0].slice(6, -5);
 		const content = lines.slice(1);
@@ -33,7 +31,7 @@ export default class ChapterService {
 
 	loadM3UFileData(path) {
 		if (path === null) return [];
-		const buffer = fs.readFileSync(path);
+		const buffer = window.electron.fs.readFileSync(path);
 		const lines = buffer.toString('utf8').split('\n').map(line => line.trim()).filter(line => line.length > 0);
 		const content = lines.slice(1);
 		let data = [];
