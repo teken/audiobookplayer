@@ -6,35 +6,20 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.9.0",
-    "@fortawesome/fontawesome-svg-core": "^1.2.30",
-    "@fortawesome/free-regular-svg-icons": "^5.14.0",
-    "@fortawesome/free-solid-svg-icons": "^5.14.0",
-    "@fortawesome/react-fontawesome": "^0.1.11",
-    "babel-eslint": "10.1.0",
-    "babel-jest": "^24.9.0",
-    "babel-plugin-named-asset-import": "^0.3.6",
-    "babel-preset-react-app": "^9.1.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "camelcase": "^5.3.1",
     "configstore": "^5.0.1",
     "deep-equal": "^1.0.1",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
-    "electron-updater": "^4.3.5",
-    "eslint": "^6.6.0",
-    "eslint-config-react-app": "^5.2.1",
-    "eslint-plugin-flowtype": "4.6.0",
-    "eslint-plugin-import": "2.20.1",
-    "eslint-plugin-jsx-a11y": "6.2.3",
-    "eslint-plugin-react": "7.19.0",
-    "eslint-plugin-react-hooks": "^1.6.1",
+    "electron-updater": "^6.6.2",
     "fs-extra": "^8.1.0",
     "fuse.js": "3.4.6",
     "identity-obj-proxy": "3.0.0",
-    "jest": "24.9.0",
-    "jest-environment-jsdom-fourteen": "1.0.1",
-    "jest-resolve": "24.9.0",
-    "jest-watch-typeahead": "0.4.2",
-    "lokijs": "1.5.8",
+    "lokijs": "1.5.12",
     "music-metadata": "11.3.0",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
@@ -47,7 +32,7 @@
     "resolve": "1.15.0",
     "semver": "6.3.0",
     "ts-pnp": "1.1.6",
-    "uuid": "^3.4.0"
+    "uuid": "^11.1.0"
   },
   "main": "electron/electron.cjs",
   "homepage": "./",
@@ -56,7 +41,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start:electron": "electron .",
-    "start:electron:dev": "ELECTRON_START_URL=http://0.0.0.0:5173 NODE_ENV=development electron .",
+    "start:electron:dev": "ELECTRON_START_URL=http://localhost:5173 NODE_ENV=development electron .",
     "pack": "pnpm build && electron-builder --dir",
     "dist": "pnpm build && electron-builder",
     "dist:linux": "pnpm build && electron-builder --linux",
@@ -69,14 +54,12 @@
     "release:win": "electron-builder --win --publish always",
     "eb-start": "electron-builder start",
     "eb-create-certs": "electron-builder create-self-signed-cert",
-    "postinstall": "electron-builder install-app-deps",
-    "dev:all": "concurrently -k -n VITE,ELECTRON -c yellow,cyan \"pnpm dev\" \"pnpm run start:electron:dev\""
+    "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.5.2",
-    "concurrently": "^5.1.0",
     "electron": "^36.5.0",
-    "electron-builder": "^22.8.1",
+    "electron-builder": "^26.0.12",
     "vite": "^6.3.5"
   },
   "build": {
@@ -157,9 +140,6 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "modulePaths": [
-      "/home/anna/dev/audiobookplayer/node_modules/.pnpm/react-scripts@3.4.4_eslint@6.8.0_react@16.14.0_typescript@3.9.10/node_modules/react-scripts/bin/node_modules",
-      "/home/anna/dev/audiobookplayer/node_modules/.pnpm/react-scripts@3.4.4_eslint@6.8.0_react@16.14.0_typescript@3.9.10/node_modules/react-scripts/node_modules",
-      "/home/anna/dev/audiobookplayer/node_modules/.pnpm/react-scripts@3.4.4_eslint@6.8.0_react@16.14.0_typescript@3.9.10/node_modules",
       "/home/anna/dev/audiobookplayer/node_modules/.pnpm/node_modules"
     ],
     "moduleNameMapper": {
