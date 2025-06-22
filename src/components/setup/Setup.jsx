@@ -57,7 +57,8 @@ export default withRouter(class About extends Component {
 
 	_folderStructureCell() {
 		const dlStyle = {textAlign:'left', padding: '0 0 0 5em', margin: '0'};
-		return <div>
+		return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1em" }}>
+			<div>
 			<h2 style={{fontWeight:400}}>Folder Structure</h2>
 			<dl style={dlStyle}>
 				<dt>
@@ -76,14 +77,34 @@ export default withRouter(class About extends Component {
 						<dt>
 							Adventure Series
 							<dl style={dlStyle}>
-								<dt>01 First Book</dt>
-								<dt>02 Second Book</dt>
-								<dt>03 Third Book</dt>
+								<dt>01 First Book
+									<dl style={dlStyle}>
+										<dt>Track 1</dt>
+									</dl>
+								</dt>
+								<dt>02 Second Book
+									<dl style={dlStyle}>
+										<dt>Track 1</dt>
+									</dl>
+								</dt>
+								<dt>03 Third Book
+									<dl style={dlStyle}>
+										<dt>Track 1</dt>
+										<dt>Track 2</dt>
+									</dl>
+								</dt>
 							</dl>
 						</dt>
 					</dl>
 				</dt>
 			</dl>
+			</div>
+			<div style={{fontSize:'1.1em'}}>
+				Due to proformance concerns the library formats is a folder structure based approach. <br/>
+				We will look for this pattern to understand the structure of your library:<br/><br/>
+				Author Name -&gt; Series Name -&gt; Book Name -&gt; Track 1, Track 2, Track 3, etc. <br/>
+				Author Name -&gt; Book Name -&gt; Track 1, Track 2, Track 3, etc.
+			</div>
 		</div>;
 	}
 
@@ -115,10 +136,10 @@ export default withRouter(class About extends Component {
 			name: 'Charlie Smith', $loki:1
 		}];
 		const works = [
-			{type:'BOOK', name:'Adventure Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1)},
-			{type:'BOOK', name:'01 First Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
-			{type:'BOOK', name:'02 Second Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
-			{type:'BOOK', name:'03 Third Book', author_id:1, art:[{path:'/assets/cover.png'}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
+			{type:'BOOK', name:'Adventure Book', author_id:1, art:[{path:"assets/cover.png"}], tracks:[], info:[], author:authors.find(x => x.$loki === 1)},
+			{type:'BOOK', name:'01 First Book', author_id:1, art:[{path:"assets/cover.png"}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
+			{type:'BOOK', name:'02 Second Book', author_id:1, art:[{path:"assets/cover.png"}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
+			{type:'BOOK', name:'03 Third Book', author_id:1, art:[{path:"assets/cover.png"}], tracks:[], info:[], author:authors.find(x => x.$loki === 1), series: {type:'SERIES', name:'Adventure Series', author_id:1}},
 		];
 		return {
 			libraryTitle: '',
@@ -186,8 +207,8 @@ export default withRouter(class About extends Component {
 
 					<div style={{display: this.state.currentStep === 2 ? 'block' : 'none'}}>
 						<h1 style={{color: 'var(--primary-text-colour)'}}>Understanding Your Library</h1>
-						{this.instruction(2, 'Select how you\'d like us to understand your library')}
-						<SelectionGrid selectedValue={this.state.importStyle} columnTemplate='1fr 1fr' padding='0 20vw' options={[
+						{/* {this.instruction(2, 'Select how you\'d like us to understand your library')} */}
+						<SelectionGrid selectedValue={this.state.importStyle} columnTemplate='1fr' padding='0 20vw' options={[
 							{cell: this._folderStructureCell(), value:'folders'},
 							// {cell: this._metaDataCell(), value:'metadata'},
 						]} onChange={(value) => this.setState({importStyle: value})} style={{
